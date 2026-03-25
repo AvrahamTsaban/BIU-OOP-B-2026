@@ -10,9 +10,8 @@
  * @author Avraham Tsaban
  */
 public class Line {
-    private static final double INFINITY = Double.POSITIVE_INFINITY;
-    private Point start;
-    private Point end;
+    private final Point start;
+    private final Point end;
     private double slope;
 
     /**
@@ -47,7 +46,7 @@ public class Line {
         double dy = this.end.getY() - this.start.getY();
         
         if (Helper.doubleEq(dx, 0)) {
-            this.slope = INFINITY;
+            this.slope = Double.POSITIVE_INFINITY;
         } else {
             this.slope = (dy / dx);
         }
@@ -122,8 +121,11 @@ public class Line {
             return false;
         }
         
-        if (Helper.doubleEq(this.getSlope(), INFINITY) || Helper.doubleEq(other.getSlope(), INFINITY)) {
+        if (Double.isInfinite(this.getSlope()) && Double.isInfinite(other.getSlope())) {
             return isYWithinBounds(other);
+        }
+        if (Double.isInfinite(this.getSlope()) || Double.isInfinite(other.getSlope())) {
+            return verticalIntersection(other) != null;
         }
 
         // assume "this" is y = a1 * x + b1 and "other" is y = a2 * x + b2
@@ -239,7 +241,10 @@ public class Line {
             return null;
         }
 
-        if (Helper.doubleEq(this.getSlope(), INFINITY) || Helper.doubleEq(other.getSlope(), INFINITY)) {
+        if (Double.isInfinite(this.getSlope()) && Double.isInfinite(other.getSlope())) {
+            return null;
+        }
+        if (Double.isInfinite(this.getSlope()) || Double.isInfinite(other.getSlope())) {
             return verticalIntersection(other);
         }
 
@@ -259,15 +264,12 @@ public class Line {
     }
 
     /* this method asserts isXWithinBounds(other) is true, and
-     * this.getSlope() *or* other.getSlope() equals INFINITY */
+     * this.getSlope() *xor* other.getSlope() is infinite. */
     private Point verticalIntersection(Line other) {
-        if (Helper.doubleEq(this.getSlope(), other.getSlope())) {
-            return null;
-        }
-
+        
         Line nonVertical;
         Line vertical;
-        if (Helper.doubleEq(this.getSlope(), INFINITY)) {
+        if (Double.isInfinite(this.getSlope())) {
             vertical = this;
             nonVertical = other;
         } else {
