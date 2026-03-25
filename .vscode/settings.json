@@ -1,4 +1,5 @@
 {
+<<<<<<< HEAD
     "java.checkstyle.configuration": "${workspaceFolder}/checkstyle/biuoop.xml",
     "java.project.sourcePaths": [
         "ass3/src",
@@ -19,4 +20,7 @@
         "java": true,
         "javac": true
     }
+=======
+    "java.checkstyle.configuration": "${workspaceFolder}/checkstyle/biuoop.xml"
+>>>>>>> 5439265 (stage 1)
 }

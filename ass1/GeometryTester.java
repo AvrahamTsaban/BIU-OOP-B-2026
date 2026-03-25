@@ -3,16 +3,27 @@
  */
 public final class GeometryTester {
 
+<<<<<<< HEAD
     private static final double COMPARISON_THRESHOLD = 0.00001;
+=======
+    static final double COMPARISON_THRESHOLD = 0.00001;
+>>>>>>> 5439265 (stage 1)
 
     /**
      *
      * @param a
      * @param b
+<<<<<<< HEAD
      * @return true if a and b are equal up to the comparison threshold, false otherwise.
      */
     public static boolean doubleEquals(double a, double b) {
         return  Math.abs(a - b) < GeometryTester.COMPARISON_THRESHOLD;
+=======
+     * @return true if a and b are close enough to be considered equal, false otherwise.
+     */
+    public static boolean doubleEquals(double a, double b) {
+        return Math.abs(a - b) < GeometryTester.COMPARISON_THRESHOLD;
+>>>>>>> 5439265 (stage 1)
     }
 
     /**
@@ -91,10 +102,16 @@ public final class GeometryTester {
 
     /**
      * Main method, running tests on both the point and the line classes.
+     *
      * @param args ignored.
      */
     public static void main(String[] args) {
+<<<<<<< HEAD
         if (GeometryTester.testPoint() && GeometryTester.testLine()) {
+=======
+        GeometryTester tester = new GeometryTester();
+        if (tester.testPoint() && tester.testLine()) {
+>>>>>>> 5439265 (stage 1)
             System.out.println("Test Completed Successfully!");
         } else {
             System.out.println("Found failing tests.");
