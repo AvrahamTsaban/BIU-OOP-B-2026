@@ -112,9 +112,8 @@ public class Line implements Comparable<Line> {
  * @author Avraham Tsaban
  */
 public class Line {
-    private static final double INFINITY = Double.POSITIVE_INFINITY;
-    private Point start;
-    private Point end;
+    private final Point start;
+    private final Point end;
     private double slope;
 
     /**
@@ -149,7 +148,7 @@ public class Line {
         double dy = this.end.getY() - this.start.getY();
         
         if (Helper.doubleEq(dx, 0)) {
-            this.slope = INFINITY;
+            this.slope = Double.POSITIVE_INFINITY;
         } else {
             this.slope = (dy / dx);
 >>>>>>> 5439265 (stage 1)
@@ -283,7 +282,7 @@ public class Line {
             return false;
         }
         
-        if (Helper.doubleEq(this.getSlope(), INFINITY) || Helper.doubleEq(other.getSlope(), INFINITY)) {
+        if (Double.isInfinite(this.getSlope()) && Double.isInfinite(other.getSlope())) {
             return isYWithinBounds(other);
 >>>>>>> 5439265 (stage 1)
         }
@@ -582,12 +581,9 @@ public class Line {
         if (Double.isInfinite(this.getSlope())) {
 =======
     /* this method asserts isXWithinBounds(other) is true, and
-     * this.getSlope() *or* other.getSlope() equals INFINITY */
+     * this.getSlope() *xor* other.getSlope() is infinite. */
     private Point verticalIntersection(Line other) {
-        if (Helper.doubleEq(this.getSlope(), other.getSlope())) {
-            return null;
-        }
-
+        
         Line nonVertical;
         Line vertical;
         if (Helper.doubleEq(this.getSlope(), INFINITY)) {
