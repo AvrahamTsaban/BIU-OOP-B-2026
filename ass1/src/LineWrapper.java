@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import java.util.Arrays;
 
 /**
@@ -49,6 +50,47 @@ public class LineWrapper {
             }
             for (int j = i + 1; j < allLines.length; ++j) {
                 if (allLines[j] == this || allLines[j] == allLines[i]) {
+=======
+
+import java.util.Arrays;
+
+/** A wrapper for a line in the abstract art drawing.
+ * @author Avraham Tsaban
+ */
+public class LineWrapper {
+    private final Line line;
+    private Line[] triangleLines;
+    private final int index;
+    private colouredLine colouredLine;
+
+    /**
+     * Constructor for LineWrapper class.
+     *
+     * @param line the line to wrap
+     * @param index the index of the line in the drawing
+     */
+    public LineWrapper(Line line, int index) {
+        this.line = new Line(line.start(), line.end());
+        this.index = index;
+        this.triangleLines = new Line[];
+        colouredLine = new colouredLine();
+    }
+
+    /**
+     * Calculate the intersection points of this line with all the other lines in the drawing,
+     * and add the corresponding triangles to this line.
+     *
+     * @param allLines all line wrappers in the drawing
+     */
+    public void intersections(LineWrapper[] allLines) {
+        for (int i = 0; i < allLines.length; ++i) {
+            Line other1 = allLines[i].getLine();
+            if (i == this.index || !this.line.isIntersecting(other1)) {
+                continue;
+            }
+            for (int j = 0; j < allLines.length; ++j) {
+                if (i == j || j == this.index) {
+>>>>>>> fee5559 (happy passover)
                     continue;
                 }
                 Line other2 = allLines[j].getLine();
@@ -59,6 +101,7 @@ public class LineWrapper {
 
                 Point intersection1 = this.line.intersectionWith(other1);
                 Point intersection2 = this.line.intersectionWith(other2);
+<<<<<<< HEAD
                 if (intersection1 == null || intersection2 == null) {
                     continue;
                 }
@@ -98,10 +141,15 @@ public class LineWrapper {
                     greenLines[i] = null;
                     break;
                 }
+=======
+                trianglePoints = Arrays.copyOf(trianglePoints, trianglePoints.length + 1);
+                trianglePoints[trianglePoints.length - 1] = new Point[]{intersection1, intersection2};
+>>>>>>> fee5559 (happy passover)
             }
         }
     }
 
+<<<<<<< HEAD
     /**
      * Gets an array of Line[] type and returns a copy of it without nulls.
      *
@@ -192,6 +240,31 @@ public class LineWrapper {
     /**
      * Returns a copy of the wrapped line.
      *
+=======
+    //TODO: anything. recycle trianglepoints as line array
+
+    public void mapToColor() {
+        int index = 1;
+        Point[] next = findNextLn(line.start().getX());
+        colouredLine.addLine(start, end, index);
+        while (true) {
+            ++index;
+        }
+    }
+
+    private Point[] findNextLn(double x) {
+        Point[] temp = trianglePoints[0];
+        for (Point[] current : trianglePoints) {
+            if (current[0].getX() > x && current[0].getX() < temp[0].getX()) {
+                temp = current;
+            }
+        }
+        return temp;
+    }
+
+    /**
+     * Return a copy of the line wrapped by this class.
+>>>>>>> fee5559 (happy passover)
      * @return a copy of the line
      */
     public Line getLine() {
@@ -199,7 +272,11 @@ public class LineWrapper {
     }
 
     /**
+<<<<<<< HEAD
      * Returns the wrapped line start point.
+=======
+     * Return the start point of the wrapped line.
+>>>>>>> fee5559 (happy passover)
      *
      * @return the start point
      */
@@ -208,7 +285,11 @@ public class LineWrapper {
     }
 
     /**
+<<<<<<< HEAD
      * Returns the wrapped line end point.
+=======
+     * Return the end point of the wrapped line.
+>>>>>>> fee5559 (happy passover)
      *
      * @return the end point
      */
@@ -217,7 +298,11 @@ public class LineWrapper {
     }
 
     /**
+<<<<<<< HEAD
      * Returns the wrapped line middle point.
+=======
+     * Return the middle point of the wrapped line.
+>>>>>>> fee5559 (happy passover)
      *
      * @return the middle point
      */

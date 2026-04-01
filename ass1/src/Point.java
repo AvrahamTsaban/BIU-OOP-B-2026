@@ -29,8 +29,8 @@ public class Point implements Comparable<Point> {
  * @author Avraham Tsaban
  */
 public class Point {
-    private double x;
-    private double y;
+    private final double x;
+    private final double y;
 
     /**
      * Constructor for Point class.
