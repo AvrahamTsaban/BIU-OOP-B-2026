@@ -1,3 +1,9 @@
 {
-    "java.checkstyle.configuration": "${workspaceFolder}/checkstyle/biuoop.xml"
+    "java.checkstyle.configuration": "${workspaceFolder}/checkstyle/biuoop.xml",
+    "java.project.outputPath": "ass1/bin",
+    "java.project.referencedLibraries": {
+        "include": [
+            "ass1/**/*.jar"
+        ]
+    }
 }

@@ -1,6 +1,7 @@
 /**
  * Line class represents a line segment in 2D space defined by two points:
  * start and end.
+ * Constructor ensures that the start point x value <= end point x value, for simplicity.
  * It provides methods to:
  * - calculate the length of the line,
  * - find the middle point,
@@ -16,11 +17,17 @@ public class Line {
 
     /**
      * Constructor which takes two Point objects as parameters.
+     * Ensures that the start point x value <= end point x value.
      *
      * @param start - the starting point of the line
      * @param end - the ending point of the line
      */
     public Line(Point start, Point end) {
+        if (start.getX() > end.getX()) {
+            Point tmp = start;
+            start = end;
+            end = tmp;
+        }
         this.start = new Point(start.getX(), start.getY());
         this.end = new Point(end.getX(), end.getY());
         calcSlope();
@@ -29,6 +36,7 @@ public class Line {
     /**
      * Constructor which takes four double values as parameters, representing
      * x and y coordinates of the start and end points of the line.
+     * Ensures that the start point x value <= end point x value.
      *
      * @param x1 - x-coordinate of the start point
      * @param y1 - y-coordinate of the start point
@@ -36,15 +44,24 @@ public class Line {
      * @param y2 - y-coordinate of the end point
      */
     public Line(double x1, double y1, double x2, double y2) {
+        if (x1 > x2) {
+            double tmp = x1;
+            x1 = x2;
+            x2 = tmp;
+        }
         this.start = new Point(x1, y1);
         this.end = new Point(x2, y2);
         calcSlope();
     }
 
+    /**
+     * Calculate the slope of the line and store it in the slope field.
+     * If the line is vertical, the slope is set to Double.POSITIVE_INFINITY.
+     */
     private void calcSlope() {
         double dx = this.end.getX() - this.start.getX();
         double dy = this.end.getY() - this.start.getY();
-        
+
         if (Helper.doubleEq(dx, 0)) {
             this.slope = Double.POSITIVE_INFINITY;
         } else {
@@ -69,8 +86,7 @@ public class Line {
     public Point middle() {
         double midx = (this.start.getX() + this.end.getX()) / 2;
         double midy = (this.start.getY() + this.end.getY()) / 2;
-        Point mid = new Point(midx, midy);
-        return mid;
+        return new Point(midx, midy);
     }
 
     /**
@@ -79,8 +95,7 @@ public class Line {
      * @return the start point of the line
      */
     public Point start() {
-        Point startCpy = new Point(this.start.getX(), this.start.getY());
-        return startCpy;
+        return new Point(this.start.getX(), this.start.getY());
     }
 
     /**
@@ -89,8 +104,7 @@ public class Line {
      * @return the end point of the line
      */
     public Point end() {
-        Point endCpy = new Point(this.end.getX(), this.end.getY());
-        return endCpy;
+        return new Point(this.end.getX(), this.end.getY());
     }
 
     /**
@@ -107,20 +121,22 @@ public class Line {
      * Intersection algorithm:
      * 1. If the x-ranges of the two segments do not overlap,
      *    intersection is impossible.
-     * 2. Compare slopes using their difference. If slopes are equal,
+     * 2. If both lines are vertical, check if their y-ranges overlap.
+     * 3. If only one line is vertical, calculate the intersection point using designated method.
+     * 4. Compare slopes using their difference. If slopes are equal,
      *    check if the y-intercept is also equal.
-     * 4. Otherwise, solve to find intersection x and verify it lies
+     * 5. Otherwise, solve to find intersection x and verify it lies
      *    within both segments' x-ranges.
      *
      * @param other - the other line to check for intersection
      * @return true if the lines intersect, false otherwise
      */
     public boolean isIntersecting(Line other) {
-        
+
         if (!isXWithinBounds(other)) {
             return false;
         }
-        
+
         if (Double.isInfinite(this.getSlope()) && Double.isInfinite(other.getSlope())) {
             return isYWithinBounds(other);
         }
@@ -130,23 +146,29 @@ public class Line {
 
         // assume "this" is y = a1 * x + b1 and "other" is y = a2 * x + b2
         double slopeDiff = this.getSlope() - other.getSlope(); // a1 - a2
-        double YInterceptDiff = getYIntercept(other) - getYIntercept(this); // b2 - b1
+        double yInterceptDiff = getYIntercept(other) - getYIntercept(this); // b2 - b1
         if (Helper.doubleEq(slopeDiff, 0)) {
-            return Helper.doubleEq(YInterceptDiff, 0);
+            return Helper.doubleEq(yInterceptDiff, 0);
         }
 
         // (a1 - a2)x + (b1 - b2) = 0 => x = (b2 - b1) / (a1 - a2)
-        double x = YInterceptDiff / slopeDiff; 
+        double x = yInterceptDiff / slopeDiff;
         return (this.isXWithinBounds(x) && other.isXWithinBounds(x));
     }
 
+    /**
+     * Calculate the y-intercept of the line, which is the y value when x is 0.
+     *
+     * @param line - the line to calculate the y-intercept for
+     * @return the y-intercept of the line
+     */
     private double getYIntercept(Line line) {
         return line.start.getY() - (line.start.getX() * line.getSlope());
     }
 
     /**
      * Checks if the x-ranges of the two lines overlap.
-     * 
+     *
      * @param other - the other line
      * @return true if the x-ranges of the two lines overlap, false otherwise.
      */
@@ -172,6 +194,15 @@ public class Line {
         return isWithinBounds(a1, a2, b1, b2);
     }
 
+    /**
+     * Checks if the range defined by a1 and a2 overlaps with the range defined by b1 and b2.
+     *
+     * @param a1
+     * @param a2
+     * @param b1
+     * @param b2
+     * @return true if the ranges overlap, false otherwise
+     */
     private boolean isWithinBounds(double a1, double a2, double b1, double b2) {
         double maxA = Math.max(a1, a2);
         double minB = Math.min(b1, b2);
@@ -207,6 +238,14 @@ public class Line {
         return isWithinBounds(a1, a2, y);
     }
 
+    /**
+     * Checks if the value pt is within the range defined by a1 and a2.
+     *
+     * @param a1
+     * @param a2
+     * @param pt
+     * @return true if pt is within the range defined by a1 and a2, false otherwise
+     */
     private boolean isWithinBounds(double a1, double a2, double pt) {
         double max = Math.max(a1, a2);
         double min = Math.min(a1, a2);
@@ -229,9 +268,9 @@ public class Line {
      * and null otherwise.
      * Algorithm is the same as isIntersecting, but if the lines do intersect,
      * we calculate intersection point using "this" line's linear equation.
-     * If lines are parallel, we arbitrarily return null, 
-     * even if they are collinear, to keep the method predictable,
-     * since in that case there are many intersection points.
+     * If lines are parallel, we arbitrarily return null, even if they are collinear,
+     * to keep the method predictable, since in that case there are many intersection points
+     * (except if they have single intersection point).
      *
      * @param other - the other line to check for intersection
      * @return the intersection point if the lines intersect, null otherwise
@@ -251,7 +290,11 @@ public class Line {
         double slopeDiff = this.getSlope() - other.getSlope();
         double interceptDiff = getYIntercept(other) - getYIntercept(this);
         if (Helper.doubleEq(slopeDiff, 0)) {
-            return null;
+            if (Helper.doubleEq(interceptDiff, 0)) {
+                 return collinearLinesIntersection(other);
+            } else {
+                return null;
+            }
         }
         double x = interceptDiff / slopeDiff;
         if (this.isXWithinBounds(x) && other.isXWithinBounds(x)) {
@@ -263,10 +306,46 @@ public class Line {
         }
     }
 
-    /* this method asserts isXWithinBounds(other) is true, and
-     * this.getSlope() *xor* other.getSlope() is infinite. */
+    /**
+     * Returns the intersection point if the lines are collinear and have a single intersection point,
+     * and null otherwise.
+     * This method assumes the lines are collinear, so it only checks if they have a single intersection point,
+     * which is the case if one of the lines has an endpoint that lies on the other line.
+     *
+     * @param other - the other line to check for intersection
+     * @return intersection point if the lines are collinear and have a single intersection point, null otherwise
+     * */
+    private Point collinearLinesIntersection(Line other) {
+        if (this.isXWithinBounds(other.middle().getX()) || other.isXWithinBounds(this.middle().getX())) {
+            if (this.end.equals(this.start)) {
+                return this.start;
+            } else if (other.end.equals(other.start)) {
+                return other.start;
+            } else {
+                return null;
+            }
+        }
+
+        if (this.start.equals(other.start) || this.start.equals(other.end)) {
+            return this.start;
+        } else if (this.end.equals(other.start) || this.end.equals(other.end)) {
+            return this.end;
+        } else {
+            return null;
+        }
+    }
+
+    /**
+     * Returns the intersection point if one of the lines is vertical and they intersect,
+     * and null otherwise.
+     * this method asserts isXWithinBounds(other) is true, and
+     * this.getSlope() *xor* other.getSlope() is infinite.
+     *
+     * @param other - the other line to check for intersection
+     * @return the intersection point if the lines intersect, null otherwise
+     * */
     private Point verticalIntersection(Line other) {
-        
+
         Line nonVertical;
         Line vertical;
         if (Double.isInfinite(this.getSlope())) {

@@ -5,11 +5,13 @@
  */
 public class Helper {
 
-    private static final double THRESHOLD = 0.00001;
+    private static final double THRESHOLD = 1e-6;
 
     /**
-     * @param a
-     * @param b
+     * Check whether two double values are approximately equal.
+     *
+     * @param a the first value
+     * @param b the second value
      * @return true if a and b are close enough to be considered equal, false otherwise.
      */
     public static boolean doubleEq(double a, double b) {
