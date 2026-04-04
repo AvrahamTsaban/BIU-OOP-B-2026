@@ -3,10 +3,9 @@
  */
 public class HelloWorld {
    /**
-    * This is a traditional demo class to demonstrate how to
-    *  write, build and run a Java program.
+    * Prints a short greeting five times.
     *
-    * @param args command line arguments.
+    * @param args command-line arguments (not used)
     */
     public static void main(String[] args) {
         for (int i = 0; i < 5; i++) {

@@ -1,9 +1,5 @@
 /**
- * Point class represents a point in 2D space with x and y coordinates.
- * It provides methods to:
- * - calculate the distance to another point,
- * - check for equality with another point,
- * - and get the x and y values of the point.
+ * Represents a point in 2D space.
  *
  * @author Avraham Tsaban
  */
@@ -12,10 +8,10 @@ public class Point {
     private final double y;
 
     /**
-     * Constructor for Point class.
+     * Creates a point from x and y values.
      *
-     * @param x - the x value of the point
-     * @param y - the y value of the point
+     * @param x x coordinate
+     * @param y y coordinate
      */
     public Point(double x, double y) {
         this.x = x;
@@ -23,11 +19,10 @@ public class Point {
     }
 
     /**
-     * Calculate the distance between this point and another point.
+     * Calculates the distance to another point.
      *
-     * @param other - the other point to calculate the distance to
-     *
-     * @return the distance between the two points
+     * @param other point to measure distance to
+     * @return distance between this point and other
      */
     public double distance(Point other) {
         double dx = this.x - other.x;
@@ -36,29 +31,31 @@ public class Point {
     }
 
     /**
-     * Check if this point is equal to another point.
+     * Checks if this point equals another point.
      *
-     * @param other - the other point to compare to
-     *
-     * @return true if the points are equal, false otherwise
+     * @param other point to compare with
+     * @return true if both coordinates are equal (up to {@link Helper#doubleEq(double, double)})
      */
     public boolean equals(Point other) {
+        if (other == null) {
+            return false;
+        }
         return (Helper.doubleEq(this.x, other.getX()) && Helper.doubleEq(this.y, other.getY()));
     }
 
     /**
-     * Return the x value of this point.
+     * Returns x.
      *
-     * @return the x value
+     * @return x coordinate
      */
     public double getX() {
         return this.x;
     }
 
     /**
-     * Return the y value of this point.
+     * Returns y.
      *
-     * @return the y value
+     * @return y coordinate
      */
     public double getY() {
         return this.y;
