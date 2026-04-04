@@ -19,7 +19,7 @@ public class AbstractArtDrawing {
         private LineWrapper[] lines;
 
         /**
-         * Constructor for AbstractArtDrawing class.
+         * Creates the random generator, window, and draw surface.
          */
         public AbstractArtDrawing() {
             this.rand = new Random();
@@ -28,7 +28,7 @@ public class AbstractArtDrawing {
         }
 
         /**
-         * Create a fixed-size array of random lines.
+         * Creates 10 random lines inside the window bounds.
          */
         public void createLines() {
             this.lines = new LineWrapper[10];
@@ -37,19 +37,23 @@ public class AbstractArtDrawing {
                 int y1 = rand.nextInt(600) + 1; // get integer in range 1-600
                 int x2 = rand.nextInt(800) + 1;
                 int y2 = rand.nextInt(600) + 1;
+                while (x1 == x2 && y1 == y2) { // esure the line is not a point
+                    x2 = rand.nextInt(800) + 1;
+                    y2 = rand.nextInt(600) + 1;
+                }
                 this.lines[i] = new LineWrapper(new Line(x1, y1, x2, y2), i);
             }
         }
 
         /**
-         * Display the drawing on the GUI window.
+         * Shows the current drawing on the window.
          */
         public void showLines() {
             this.gui.show(d);
         }
 
     /**
-     * Main method for running the abstract art drawing example.
+     * Runs the random-line drawing demo.
      *
      * @param args ignored
      */

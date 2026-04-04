@@ -1,24 +1,25 @@
 /**
- * This class does some simple tessting of the Point and Line classes.
+ * Basic tests for Point and Line.
  */
 public class GeometryTester {
 
     static final double COMPARISON_THRESHOLD = 0.00001;
 
     /**
+     * Checks if two doubles are almost equal.
      *
-     * @param a
-     * @param b
-     * @return true if a and b are close enough to be considered equal, false otherwise.
+     * @param a first value
+     * @param b second value
+     * @return true if the difference is smaller than the threshold
      */
     public static boolean doubleEquals(double a, double b) {
         return Math.abs(a - b) < GeometryTester.COMPARISON_THRESHOLD;
     }
 
     /**
-     * The method is in charge of testing the Point class.
+     * Runs Point tests.
      *
-     * @return true if not mistakes were found, false otherwise.
+     * @return true if all point tests pass; otherwise false
      */
     public boolean testPoint() {
         boolean mistake = false;
@@ -62,9 +63,9 @@ public class GeometryTester {
     }
 
     /**
-     * The method is in charge of testing the Line class.
+     * Runs Line tests.
      *
-     * @return true if not mistakes were found, false otherwise.
+     * @return true if all line tests pass; otherwise false
      */
     public boolean testLine() {
         boolean mistakes = false;
@@ -90,9 +91,9 @@ public class GeometryTester {
     }
 
     /**
-     * Main method, running tests on both the point and the line classes.
+     * Runs all tests and prints a summary.
      *
-     * @param args ignored.
+     * @param args ignored
      */
     public static void main(String[] args) {
         GeometryTester tester = new GeometryTester();
