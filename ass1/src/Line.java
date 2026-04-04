@@ -1,6 +1,5 @@
 /**
  * Represents a line segment between two points.
- *
  * Constructors keep the point with the smaller x value as start.
  *
  * @author Avraham Tsaban
@@ -12,7 +11,6 @@ public class Line implements Comparable<Line> {
 
     /**
      * Creates a line from two points.
-     *
      * If start.x is greater than end.x, the points are swapped.
      *
      * @param start start point candidate
@@ -31,7 +29,6 @@ public class Line implements Comparable<Line> {
 
     /**
      * Creates a line from endpoint coordinates.
-     *
      * If x1 is greater than x2, the x values are swapped.
      *
      * @param x1 x coordinate of the first endpoint candidate
@@ -52,7 +49,6 @@ public class Line implements Comparable<Line> {
 
     /**
      * Calculates and stores the slope.
-     *
      * Vertical lines get slope Double.POSITIVE_INFINITY.
      */
     private void calcSlope() {
@@ -253,7 +249,6 @@ public class Line implements Comparable<Line> {
 
     /**
      * Returns the intersection point with another line.
-     *
      * Returns null if there is no intersection or if the intersection is not unique.
      *
      * @param other other segment
