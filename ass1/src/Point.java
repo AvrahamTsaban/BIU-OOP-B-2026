@@ -1,5 +1,6 @@
 /**
 <<<<<<< HEAD
+<<<<<<< HEAD
  * Represents a point in 2D space.
  *
  * <p>Implementation warning: Point.equals and Point.compareTo are altered in a way that is not consistent with the
@@ -25,6 +26,9 @@ public class Point implements Comparable<Point> {
  * - calculate the distance to another point,
  * - check for equality with another point,
  * - and get the x and y values of the point.
+=======
+ * Represents a point in 2D space.
+>>>>>>> 95e5362 (removed colouredLine class)
  *
  * @author Avraham Tsaban
  */
@@ -33,11 +37,16 @@ public class Point {
     private final double y;
 
     /**
-     * Constructor for Point class.
+     * Creates a point from x and y values.
      *
+<<<<<<< HEAD
      * @param x - the x value of the point
      * @param y - the y value of the point
 >>>>>>> 5439265 (stage 1)
+=======
+     * @param x x coordinate
+     * @param y y coordinate
+>>>>>>> 95e5362 (removed colouredLine class)
      */
     public Point(double x, double y) {
         this.x = x;
@@ -45,6 +54,7 @@ public class Point {
     }
 
     /**
+<<<<<<< HEAD
 <<<<<<< HEAD
      * Calculates the distance to another point.
      *
@@ -57,6 +67,12 @@ public class Point {
      *
      * @return the distance between the two points
 >>>>>>> 5439265 (stage 1)
+=======
+     * Calculates the distance to another point.
+     *
+     * @param other point to measure distance to
+     * @return distance between this point and other
+>>>>>>> 95e5362 (removed colouredLine class)
      */
     public double distance(Point other) {
         double dx = this.x - other.x;
@@ -66,31 +82,42 @@ public class Point {
 
     /**
 <<<<<<< HEAD
+<<<<<<< HEAD
      * Returns x.
     *
      * @return x coordinate
 =======
      * Check if this point is equal to another point.
+=======
+     * Checks if this point equals another point.
+>>>>>>> 95e5362 (removed colouredLine class)
      *
-     * @param other - the other point to compare to
-     *
-     * @return true if the points are equal, false otherwise
+     * @param other point to compare with
+     * @return true if both coordinates are equal (up to {@link Helper#doubleEq(double, double)})
      */
     public boolean equals(Point other) {
+        if (other == null) {
+            return false;
+        }
         return (Helper.doubleEq(this.x, other.getX()) && Helper.doubleEq(this.y, other.getY()));
     }
 
     /**
-     * Return the x value of this point.
+     * Returns x.
      *
+<<<<<<< HEAD
      * @return the x value
 >>>>>>> 5439265 (stage 1)
+=======
+     * @return x coordinate
+>>>>>>> 95e5362 (removed colouredLine class)
      */
     public double getX() {
         return this.x;
     }
 
     /**
+<<<<<<< HEAD
 <<<<<<< HEAD
      * Returns y.
      *
@@ -100,6 +127,11 @@ public class Point {
      *
      * @return the y value
 >>>>>>> 5439265 (stage 1)
+=======
+     * Returns y.
+     *
+     * @return y coordinate
+>>>>>>> 95e5362 (removed colouredLine class)
      */
     public double getY() {
         return this.y;

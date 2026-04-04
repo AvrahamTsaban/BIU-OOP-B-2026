@@ -5,14 +5,14 @@ import java.util.Random;
 import java.awt.Color;
 
 /**
- * A simple GUI example that draws random circles.
+ * Simple example that draws random circles in a GUI.
  *
  * @author Marina & computer science staff of BIU
  */
 public class SimpleGuiExample {
 
     /**
-     * Draw random red circles on a GUI surface.
+     * Draws 10 random red circles and shows them.
      */
     public void drawRandomCircles() {
         Random rand = new Random(); // create a random-number generator
@@ -31,7 +31,7 @@ public class SimpleGuiExample {
     }
 
     /**
-     * Main method for running the random circles example.
+     * Runs the random-circle example.
      *
      * @param args ignored
      */

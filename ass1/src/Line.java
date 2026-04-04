@@ -1,5 +1,6 @@
 /**
 <<<<<<< HEAD
+<<<<<<< HEAD
  * Represents a line segment between two points.
  * Constructors normalize endpoints: smaller x first;
  * when x is equal (up to threshold), smaller y first.
@@ -109,20 +110,26 @@ public class Line implements Comparable<Line> {
  * - find the middle point,
  * - check for intersection with another line,
  * - and check for equality with another line.
+=======
+ * Represents a line segment between two points.
+ *
+ * Constructors keep the point with the smaller x value as start.
+>>>>>>> 95e5362 (removed colouredLine class)
  *
  * @author Avraham Tsaban
  */
-public class Line {
+public class Line implements Comparable<Line> {
     private final Point start;
     private final Point end;
     private double slope;
 
     /**
-     * Constructor which takes two Point objects as parameters.
-     * Ensures that the start point x value <= end point x value.
+     * Creates a line from two points.
      *
-     * @param start - the starting point of the line
-     * @param end - the ending point of the line
+     * If start.x is greater than end.x, the points are swapped.
+     *
+     * @param start start point candidate
+     * @param end end point candidate
      */
     public Line(Point start, Point end) {
         if (start.getX() > end.getX()) {
@@ -136,14 +143,14 @@ public class Line {
     }
 
     /**
-     * Constructor which takes four double values as parameters, representing
-     * x and y coordinates of the start and end points of the line.
-     * Ensures that the start point x value <= end point x value.
+     * Creates a line from endpoint coordinates.
      *
-     * @param x1 - x-coordinate of the start point
-     * @param y1 - y-coordinate of the start point
-     * @param x2 - x-coordinate of the end point
-     * @param y2 - y-coordinate of the end point
+     * If x1 is greater than x2, the x values are swapped.
+     *
+     * @param x1 x coordinate of the first endpoint candidate
+     * @param y1 y coordinate of the first endpoint candidate
+     * @param x2 x coordinate of the second endpoint candidate
+     * @param y2 y coordinate of the second endpoint candidate
      */
     public Line(double x1, double y1, double x2, double y2) {
         if (x1 > x2) {
@@ -157,8 +164,9 @@ public class Line {
     }
 
     /**
-     * Calculate the slope of the line and store it in the slope field.
-     * If the line is vertical, the slope is set to Double.POSITIVE_INFINITY.
+     * Calculates and stores the slope.
+     *
+     * Vertical lines get slope Double.POSITIVE_INFINITY.
      */
     private void calcSlope() {
         double dx = this.end.getX() - this.start.getX();
@@ -174,6 +182,7 @@ public class Line {
 
     /**
 <<<<<<< HEAD
+<<<<<<< HEAD
      * Returns the line length.
      *
      * @return line length.
@@ -182,12 +191,18 @@ public class Line {
      *
      * @return line length
 >>>>>>> 5439265 (stage 1)
+=======
+     * Returns the line length.
+     *
+     * @return line length.
+>>>>>>> 95e5362 (removed colouredLine class)
      */
     public double length() {
         return this.start.distance(this.end);
     }
 
     /**
+<<<<<<< HEAD
 <<<<<<< HEAD
      * Returns the middle point.
      *
@@ -197,6 +212,11 @@ public class Line {
      *
      * @return the middle point of the line
 >>>>>>> 5439265 (stage 1)
+=======
+     * Returns the middle point.
+     *
+     * @return middle point of the line
+>>>>>>> 95e5362 (removed colouredLine class)
      */
     public Point middle() {
         double midx = (this.start.getX() + this.end.getX()) / 2;
@@ -208,6 +228,7 @@ public class Line {
 
     /**
      * Returns a copy of the start point.
+<<<<<<< HEAD
      *
      * @return start point copy
      */
@@ -238,33 +259,40 @@ public class Line {
 
     /**
      * Get the start point of the line.
+=======
+>>>>>>> 95e5362 (removed colouredLine class)
      *
-     * @return the start point of the line
+     * @return start point copy
      */
     public Point start() {
         return new Point(this.start.getX(), this.start.getY());
     }
 
     /**
-     * Get the end point of the line.
+     * Returns a copy of the end point.
      *
-     * @return the end point of the line
+     * @return end point copy
      */
     public Point end() {
         return new Point(this.end.getX(), this.end.getY());
     }
 
     /**
-     * Get the slope of the line.
+     * Returns the slope.
      *
+<<<<<<< HEAD
      * @return the slope of the line
 >>>>>>> 5439265 (stage 1)
+=======
+     * @return line slope
+>>>>>>> 95e5362 (removed colouredLine class)
      */
     public double getSlope() {
         return this.slope;
     }
 
     /**
+<<<<<<< HEAD
 <<<<<<< HEAD
      * Checks if this line intersects another line.
      *
@@ -293,19 +321,29 @@ public class Line {
      *    check if the y-intercept is also equal.
      * 5. Otherwise, solve to find intersection x and verify it lies
      *    within both segments' x-ranges.
+=======
+     * Checks if this line intersects another line.
+>>>>>>> 95e5362 (removed colouredLine class)
      *
-     * @param other - the other line to check for intersection
+     * @param other line to check for intersection
      * @return true if the lines intersect, false otherwise
      */
     public boolean isIntersecting(Line other) {
 
-        if (!isXWithinBounds(other)) {
+        if (!isXWithinBounds(other) || !isYWithinBounds(other)) {
             return false;
         }
 
         if (Double.isInfinite(this.getSlope()) && Double.isInfinite(other.getSlope())) {
+<<<<<<< HEAD
             return isYWithinBounds(other);
 >>>>>>> 5439265 (stage 1)
+=======
+            return true;
+        }
+        if (Double.isInfinite(this.getSlope()) || Double.isInfinite(other.getSlope())) {
+            return verticalIntersection(other) != null;
+>>>>>>> 95e5362 (removed colouredLine class)
         }
 
         // assume "this" is y = a1 * x + b1 and "other" is y = a2 * x + b2
@@ -324,6 +362,7 @@ public class Line {
 
     /**
      * Returns a line y-intercept.
+<<<<<<< HEAD
      *
      * @param line line whose intercept is calculated
      * @return y-intercept value
@@ -347,9 +386,11 @@ public class Line {
 =======
     /**
      * Calculate the y-intercept of the line, which is the y value when x is 0.
+=======
+>>>>>>> 95e5362 (removed colouredLine class)
      *
-     * @param line - the line to calculate the y-intercept for
-     * @return the y-intercept of the line
+     * @param line line whose intercept is calculated
+     * @return y-intercept value
      */
 >>>>>>> fee5559 (happy passover)
     private double getYIntercept(Line line) {
@@ -357,6 +398,7 @@ public class Line {
     }
 
     /**
+<<<<<<< HEAD
 <<<<<<< HEAD
      * Checks if the x ranges of two lines overlap.
      *
@@ -368,6 +410,12 @@ public class Line {
      * @param other - the other line
      * @return true if the x-ranges of the two lines overlap, false otherwise.
 >>>>>>> 5439265 (stage 1)
+=======
+     * Checks if the x ranges of two lines overlap.
+     *
+     * @param other other line
+     * @return true if the x projections overlap; otherwise false
+>>>>>>> 95e5362 (removed colouredLine class)
      */
     public boolean isXWithinBounds(Line other) {
         double a1 = this.start.getX();
@@ -379,6 +427,7 @@ public class Line {
 
     /**
 <<<<<<< HEAD
+<<<<<<< HEAD
      * Checks if the y ranges of two lines overlap.
      *
      * @param other other segment
@@ -389,6 +438,12 @@ public class Line {
      * @param other - the other line
      * @return true if the y-ranges of the two lines overlap, false otherwise.
 >>>>>>> 5439265 (stage 1)
+=======
+     * Checks if the y ranges of two lines overlap.
+     *
+     * @param other other segment
+     * @return true if the y projections overlap; otherwise false
+>>>>>>> 95e5362 (removed colouredLine class)
      */
     public boolean isYWithinBounds(Line other) {
         double a1 = this.start.getY();
@@ -416,13 +471,13 @@ public class Line {
 =======
 =======
     /**
-     * Checks if the range defined by a1 and a2 overlaps with the range defined by b1 and b2.
+     * Checks if two ranges overlap.
      *
-     * @param a1
-     * @param a2
-     * @param b1
-     * @param b2
-     * @return true if the ranges overlap, false otherwise
+     * @param a1 first endpoint of the first range
+     * @param a2 second endpoint of the first range
+     * @param b1 first endpoint of the second range
+     * @param b2 second endpoint of the second range
+     * @return true if the closed ranges overlap; otherwise false
      */
 >>>>>>> fee5559 (happy passover)
     private boolean isWithinBounds(double a1, double a2, double b1, double b2) {
@@ -448,11 +503,16 @@ public class Line {
     }
 
     /**
-     * Checks if a given x value is within the x-range of this line.
+     * Checks if an x value is inside this line x range.
      *
+<<<<<<< HEAD
      * @param x - the x value to check
      * @return true if the x value is within the x-range, false otherwise
 >>>>>>> 5439265 (stage 1)
+=======
+     * @param x value to test
+     * @return true if x is between the line endpoint x values
+>>>>>>> 95e5362 (removed colouredLine class)
      */
     public boolean isXWithinBounds(double x) {
         double a1 = this.start.getX();
@@ -461,6 +521,7 @@ public class Line {
     }
 
     /**
+<<<<<<< HEAD
 <<<<<<< HEAD
      * Checks if a y value is inside this line y range.
      *
@@ -472,6 +533,12 @@ public class Line {
      * @param y - the y value to check
      * @return true if the y value is within the y-range, false otherwise
 >>>>>>> 5439265 (stage 1)
+=======
+     * Checks if a y value is inside this line y range.
+     *
+     * @param y value to test
+     * @return true if y is between the line endpoint y values
+>>>>>>> 95e5362 (removed colouredLine class)
      */
     public boolean isYWithinBounds(double y) {
         double a1 = this.start.getY();
@@ -504,12 +571,12 @@ public class Line {
 =======
 =======
     /**
-     * Checks if the value pt is within the range defined by a1 and a2.
+     * Checks if a value is inside a range.
      *
-     * @param a1
-     * @param a2
-     * @param pt
-     * @return true if pt is within the range defined by a1 and a2, false otherwise
+     * @param a1 first endpoint of the range
+     * @param a2 second endpoint of the range
+     * @param pt value to test
+     * @return true if the value is in the closed range
      */
 >>>>>>> fee5559 (happy passover)
     private boolean isWithinBounds(double a1, double a2, double pt) {
@@ -519,18 +586,25 @@ public class Line {
     }
 
     /**
-     * Returns true if this line intersects with the other two lines, false otherwise.
+     * Checks if this line intersects both given lines.
      *
+<<<<<<< HEAD
      * @param other1 - the first other line to check for intersection
      * @param other2 - the second other line to check for intersection
      * @return true if the lines intersect, false otherwise
 >>>>>>> 5439265 (stage 1)
+=======
+     * @param other1 first segment
+     * @param other2 second segment
+     * @return true if both intersections exist
+>>>>>>> 95e5362 (removed colouredLine class)
      */
     public boolean isIntersecting(Line other1, Line other2) {
         return this.isIntersecting(other1) && this.isIntersecting(other2);
     }
 
     /**
+<<<<<<< HEAD
 <<<<<<< HEAD
      * Returns the intersection point with another line.
      * Returns null if there is no intersection or if the intersection is not unique.
@@ -555,12 +629,17 @@ public class Line {
      * If lines are parallel, we arbitrarily return null, even if they are collinear,
      * to keep the method predictable, since in that case there are many intersection points
      * (except if they have single intersection point).
+=======
+     * Returns the intersection point with another line.
+>>>>>>> 95e5362 (removed colouredLine class)
      *
-     * @param other - the other line to check for intersection
-     * @return the intersection point if the lines intersect, null otherwise
+     * Returns null if there is no intersection or if the intersection is not unique.
+     *
+     * @param other other segment
+     * @return intersection point or null
      */
     public Point intersectionWith(Line other) {
-        if (!isXWithinBounds(other)) {
+        if (!isXWithinBounds(other) || !isYWithinBounds(other)) {
             return null;
         }
 
@@ -620,14 +699,11 @@ public class Line {
                 return other.start();
 =======
     /**
-     * Returns the intersection point if the lines are collinear and have a single intersection point,
-     * and null otherwise.
-     * This method assumes the lines are collinear, so it only checks if they have a single intersection point,
-     * which is the case if one of the lines has an endpoint that lies on the other line.
+     * Handles the collinear case for intersectionWith.
      *
-     * @param other - the other line to check for intersection
-     * @return intersection point if the lines are collinear and have a single intersection point, null otherwise
-     * */
+     * @param other other collinear segment
+     * @return single shared point, or null if there is no single point
+     */
     private Point collinearLinesIntersection(Line other) {
         if (this.isXWithinBounds(other.middle().getX()) || other.isXWithinBounds(this.middle().getX())) {
             if (this.end.equals(this.start)) {
@@ -657,6 +733,7 @@ public class Line {
 
     /**
 <<<<<<< HEAD
+<<<<<<< HEAD
      * Handles intersection when exactly one line is vertical.
      *
      * @param other other segment
@@ -680,6 +757,13 @@ public class Line {
      * @return the intersection point if the lines intersect, null otherwise
      * */
 >>>>>>> fee5559 (happy passover)
+=======
+     * Handles intersection when exactly one line is vertical.
+     *
+     * @param other other segment
+     * @return intersection point or null
+     */
+>>>>>>> 95e5362 (removed colouredLine class)
     private Point verticalIntersection(Line other) {
 
         Line nonVertical;
@@ -705,6 +789,7 @@ public class Line {
     }
 
     /**
+<<<<<<< HEAD
 <<<<<<< HEAD
      * Checks if two lines are equal by endpoints.
      *
@@ -744,11 +829,17 @@ public class Line {
      * Returns true if the lines are equal, false otherwise.
      * Two lines are considered equal if their start and end points are equal,
      * regardless of their order.
+=======
+     * Checks if two lines are equal by endpoints.
+>>>>>>> 95e5362 (removed colouredLine class)
      *
-     * @param other - the other line to compare with
-     * @return true if the lines are equal, false otherwise
+     * @param other segment to compare with
+     * @return true if both endpoints match (in any order)
      */
     public boolean equals(Line other) {
+        if (other == null) {
+            return false;
+        }
         Point a1 = this.start;
         Point a2 = this.end;
         Point b1 = other.start;
@@ -756,5 +847,28 @@ public class Line {
         return (a1.equals(b1) && a2.equals(b2)) || (a1.equals(b2) && a2.equals(b1));
     }
 
+<<<<<<< HEAD
 >>>>>>> 5439265 (stage 1)
+=======
+    /**
+     * Compares this line to another line.
+     *
+     * @param other line to compare with
+     * @return negative if this line comes before the other, positive if after, zero if equal
+     */
+    public int compareTo(Line other) {
+        if (other == null) {
+            return -1;
+        }
+        if (!Helper.doubleEq(this.start.getX(), other.start.getX())) {
+            return Double.compare(this.start.getX(), other.start.getX());
+        } else if (!Helper.doubleEq(this.start.getY(), other.start.getY())) {
+            return Double.compare(this.start.getY(), other.start.getY());
+        } else if (!Helper.doubleEq(this.end.getX(), other.end.getX())) {
+            return Double.compare(this.end.getX(), other.end.getX());
+        } else {
+            return Double.compare(this.end.getY(), other.end.getY());
+        }
+    }
+>>>>>>> 95e5362 (removed colouredLine class)
 }

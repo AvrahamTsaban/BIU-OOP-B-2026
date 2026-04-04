@@ -54,33 +54,34 @@ public class LineWrapper {
 
 import java.util.Arrays;
 
-/** A wrapper for a line in the abstract art drawing.
+/**
+ * Wraps a line and keeps extra segments used for coloring.
+ *
  * @author Avraham Tsaban
  */
 public class LineWrapper {
     private final Line line;
     private Line[] triangleLines;
     private final int index;
-    private colouredLine colouredLine;
+    private final ColouredLine colouredLine;
 
     /**
-     * Constructor for LineWrapper class.
+     * Creates a wrapper for a line.
      *
-     * @param line the line to wrap
-     * @param index the index of the line in the drawing
+     * @param line line to wrap
+     * @param index index of this line in the original array
      */
     public LineWrapper(Line line, int index) {
         this.line = new Line(line.start(), line.end());
         this.index = index;
-        this.triangleLines = new Line[];
-        colouredLine = new colouredLine();
+        this.triangleLines = new Line[0];
+        colouredLine = new ColouredLine(this.line.start());
     }
 
     /**
-     * Calculate the intersection points of this line with all the other lines in the drawing,
-     * and add the corresponding triangles to this line.
+     * Finds intersection-based segments on this line.
      *
-     * @param allLines all line wrappers in the drawing
+     * @param allLines all wrapped lines in the drawing
      */
     public void intersections(LineWrapper[] allLines) {
         for (int i = 0; i < allLines.length; ++i) {
@@ -88,7 +89,7 @@ public class LineWrapper {
             if (i == this.index || !this.line.isIntersecting(other1)) {
                 continue;
             }
-            for (int j = 0; j < allLines.length; ++j) {
+            for (int j = i + 1; j < allLines.length; ++j) {
                 if (i == j || j == this.index) {
 >>>>>>> fee5559 (happy passover)
                     continue;
@@ -102,11 +103,15 @@ public class LineWrapper {
                 Point intersection1 = this.line.intersectionWith(other1);
                 Point intersection2 = this.line.intersectionWith(other2);
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 95e5362 (removed colouredLine class)
                 if (intersection1 == null || intersection2 == null) {
                     continue;
                 }
 
                 Line greenLn = new Line(intersection1, intersection2);
+<<<<<<< HEAD
                 this.greenLines = Arrays.copyOf(this.greenLines, this.greenLines.length + 1);
                 this.greenLines[this.greenLines.length - 1] = greenLn;
             }
@@ -145,10 +150,15 @@ public class LineWrapper {
                 trianglePoints = Arrays.copyOf(trianglePoints, trianglePoints.length + 1);
                 trianglePoints[trianglePoints.length - 1] = new Point[]{intersection1, intersection2};
 >>>>>>> fee5559 (happy passover)
+=======
+                this.triangleLines = Arrays.copyOf(this.triangleLines, this.triangleLines.length + 1);
+                this.triangleLines[this.triangleLines.length - 1] = greenLn;
+>>>>>>> 95e5362 (removed colouredLine class)
             }
         }
     }
 
+<<<<<<< HEAD
 <<<<<<< HEAD
     /**
      * Gets an array of Line[] type and returns a copy of it without nulls.
@@ -242,29 +252,109 @@ public class LineWrapper {
      *
 =======
     //TODO: anything. recycle trianglepoints as line array
-
-    public void mapToColor() {
-        int index = 1;
-        Point[] next = findNextLn(line.start().getX());
-        colouredLine.addLine(start, end, index);
-        while (true) {
-            ++index;
-        }
-    }
-
-    private Point[] findNextLn(double x) {
-        Point[] temp = trianglePoints[0];
-        for (Point[] current : trianglePoints) {
-            if (current[0].getX() > x && current[0].getX() < temp[0].getX()) {
-                temp = current;
+=======
+    private void defragGreenLines() {
+        for (int i = 0; i < triangleLines.length; ++i) {
+            if (triangleLines[i] == null) {
+                continue;
+            }
+            for (int j = i + 1; j < triangleLines.length; ++j) {
+                if (triangleLines[j] == null) {
+                    continue;
+                }
+                if (triangleLines[i].isIntersecting(triangleLines[j])) {
+                    Point newStart = triangleLines[i].start();
+                    if (triangleLines[i].start().distance(this.start) > triangleLines[j].start().distance(this.start)) {
+                        newStart = triangleLines[j].start();
+                    }
+                    Point newEnd = triangleLines[i].end();
+                    if (triangleLines[i].end().distance(this.start) < triangleLines[j].end().distance(this.start)) {
+                        newEnd = triangleLines[j].end();
+                    }
+                    triangleLines[j] = new Line(newStart, newEnd);
+                    triangleLines[i] = null;
+                }
             }
         }
-        return temp;
+        removeNulls();
+        Arrays.sort(triangleLines);
+    }
+>>>>>>> 95e5362 (removed colouredLine class)
+
+    private void removeNulls() {
+        int newIndex = 0;
+        Line[] newArr = new Line[0];
+        for (int i = 0; i < triangleLines.length; ++i) {
+            if (triangleLines[i] != null) {
+                newArr = Arrays.copyOf(newArr, newArr.length + 1);
+                newArr[newIndex] = triangleLines[i];
+                ++newIndex;
+            }
+        }
+        this.triangleLines = newArr;
+    }
+
+
+
+    /**
+     * Splits the wrapped line into colored parts.
+     * Triangle segments are saved with color 0, and uncovered parts with color 1.
+     */
+    public void mapToColor() {
+        Line next = findNextLn(line.start().getX(), line.end().getX());
+        if (next == null) {
+            colouredLine.addLine(line.start(), line.end(), 1);
+            return;
+        }
+        colouredLine.addLine(line.start(), next.start(), 1);
+        Point after = next.start();
+        while (next != null) {
+            colouredLine.addLine(next.start(), next.end(), 0);
+            after = next.end();
+            next = findNextLn(after.getX(), line.end().getX());
+        }
+        if (!after.equals(line.end())) {
+            colouredLine.addLine(after, line.end(), 1);
+        }
+
     }
 
     /**
+<<<<<<< HEAD
      * Return a copy of the line wrapped by this class.
 >>>>>>> fee5559 (happy passover)
+=======
+     * Finds the next triangle segment after a given x value.
+     *
+     * @param after lower x bound (exclusive)
+     * @param max upper x bound used as current best candidate
+     * @return segment with the smallest start x above after, or null if none was found
+     */
+    private Line findNextLn(double after, double max) {
+        double temp = max;
+        Line ln = null;
+        for (Line current : triangleLines) {
+            if (current.start().getX() > after && current.start().getX() < temp) {
+                temp = current.start().getX();
+                ln = current;
+            }
+        }
+        return ln;
+    }
+
+    /**
+     * Returns a copy of the colored lines.
+     *
+     * @return copied colored-line representation
+     */
+    public ColouredLine getColouredLine() {
+        return this.colouredLine.getColouredLine();
+    }
+
+    /**
+     * Returns a copy of the wrapped line.
+     *
+>>>>>>> 95e5362 (removed colouredLine class)
      * @return a copy of the line
      */
     public Line getLine() {
@@ -273,10 +363,14 @@ public class LineWrapper {
 
     /**
 <<<<<<< HEAD
+<<<<<<< HEAD
      * Returns the wrapped line start point.
 =======
      * Return the start point of the wrapped line.
 >>>>>>> fee5559 (happy passover)
+=======
+     * Returns the wrapped line start point.
+>>>>>>> 95e5362 (removed colouredLine class)
      *
      * @return the start point
      */
@@ -286,10 +380,14 @@ public class LineWrapper {
 
     /**
 <<<<<<< HEAD
+<<<<<<< HEAD
      * Returns the wrapped line end point.
 =======
      * Return the end point of the wrapped line.
 >>>>>>> fee5559 (happy passover)
+=======
+     * Returns the wrapped line end point.
+>>>>>>> 95e5362 (removed colouredLine class)
      *
      * @return the end point
      */
@@ -299,10 +397,14 @@ public class LineWrapper {
 
     /**
 <<<<<<< HEAD
+<<<<<<< HEAD
      * Returns the wrapped line middle point.
 =======
      * Return the middle point of the wrapped line.
 >>>>>>> fee5559 (happy passover)
+=======
+     * Returns the wrapped line middle point.
+>>>>>>> 95e5362 (removed colouredLine class)
      *
      * @return the middle point
      */
