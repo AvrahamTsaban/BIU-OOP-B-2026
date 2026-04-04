@@ -2,8 +2,13 @@
 <<<<<<< HEAD
     "java.checkstyle.configuration": "${workspaceFolder}/checkstyle/biuoop.xml",
     "java.project.sourcePaths": [
+<<<<<<< HEAD
         "ass3/src",
         "ass3"
+=======
+        "ass1/src",
+        "ass0"
+>>>>>>> 2a01489 (the end?)
     ],
     "java.project.outputPath": "ass1/bin",
     "java.project.referencedLibraries": {
@@ -14,11 +19,14 @@
     },
     "[java]": {
         "editor.defaultFormatter": "redhat.java"
+<<<<<<< HEAD
     },
     "chat.tools.terminal.autoApprove": {
         "ant": true,
         "java": true,
         "javac": true
+=======
+>>>>>>> 2a01489 (the end?)
     }
 =======
     "java.checkstyle.configuration": "${workspaceFolder}/checkstyle/biuoop.xml"
