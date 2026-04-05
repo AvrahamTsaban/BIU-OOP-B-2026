@@ -1,11 +1,17 @@
 /**
- * Small helper methods used by the geometry classes.
+ * Static methods used by the geometry classes.
+ * Currently, only contains a method for comparing doubles with a threshold.
  *
  * @author Avraham Tsaban
  */
-public class Helper {
+public final class Helper {
+    /** Threshold for comparing doubles. */
+    public static final double THRESHOLD = 1e-6;
 
-    private static final double THRESHOLD = 1e-6;
+    /**
+     * Private constructor to prevent instantiation of this utility class.
+     */
+    private Helper() { }
 
     /**
      * Checks if two doubles are almost equal.
