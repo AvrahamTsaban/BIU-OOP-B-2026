@@ -1,27 +1,26 @@
 /**
- * Basic tests for Point and Line.
+ * This class does some simple tessting of the Point and Line classes.
  */
-public class GeometryTester {
+public final class GeometryTester {
 
-    static final double COMPARISON_THRESHOLD = 0.00001;
+    private static final double COMPARISON_THRESHOLD = 0.00001;
 
     /**
-     * Checks if two doubles are almost equal.
      *
-     * @param a first value
-     * @param b second value
-     * @return true if the difference is smaller than the threshold
+     * @param a
+     * @param b
+     * @return true if a and b are equal up to the comparison threshold, false otherwise.
      */
     public static boolean doubleEquals(double a, double b) {
-        return Math.abs(a - b) < GeometryTester.COMPARISON_THRESHOLD;
+        return  Math.abs(a - b) < GeometryTester.COMPARISON_THRESHOLD;
     }
 
     /**
-     * Runs Point tests.
+     * The method is in charge of testing the Point class.
      *
-     * @return true if all point tests pass; otherwise false
+     * @return true if not mistakes were found, false otherwise.
      */
-    public boolean testPoint() {
+    public static boolean testPoint() {
         boolean mistake = false;
         Point p1 = new Point(12, 2);
         Point p2 = new Point(9, -2);
@@ -63,11 +62,11 @@ public class GeometryTester {
     }
 
     /**
-     * Runs Line tests.
+     * The method is in charge of testing the Line class.
      *
-     * @return true if all line tests pass; otherwise false
+     * @return true if not mistakes were found, false otherwise.
      */
-    public boolean testLine() {
+    public static boolean testLine() {
         boolean mistakes = false;
         Line l1 = new Line(12, 2, 9, -2);
         Line l2 = new Line(0, 0, 20, 0);
@@ -91,13 +90,11 @@ public class GeometryTester {
     }
 
     /**
-     * Runs all tests and prints a summary.
-     *
-     * @param args ignored
+     * Main method, running tests on both the point and the line classes.
+     * @param args ignored.
      */
     public static void main(String[] args) {
-        GeometryTester tester = new GeometryTester();
-        if (tester.testPoint() && tester.testLine()) {
+        if (GeometryTester.testPoint() && GeometryTester.testLine()) {
             System.out.println("Test Completed Successfully!");
         } else {
             System.out.println("Found failing tests.");

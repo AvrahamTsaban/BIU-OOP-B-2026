@@ -2,6 +2,11 @@
  * Represents a line segment between two points.
  * Constructors keep the point with the smaller x value as start.
  *
+ * <p>Implementation warning: Line.equals and Line.compareTo are altered in a way that is not consistent with the
+ * general contract and without overriding hashCode.
+ * Both are also not fully transitive (up to the comparison threshold).
+ * This is acceptable for this assignment, but should be used with caution.</p>
+ *
  * @author Avraham Tsaban
  */
 public class Line implements Comparable<Line> {
@@ -17,7 +22,8 @@ public class Line implements Comparable<Line> {
      * @param end end point candidate
      */
     public Line(Point start, Point end) {
-        if (start.getX() > end.getX()) {
+        boolean replace = replaceEndpoints(start.getX(), start.getY(), end.getX(), end.getY());
+        if (replace) {
             Point tmp = start;
             start = end;
             end = tmp;
@@ -37,14 +43,36 @@ public class Line implements Comparable<Line> {
      * @param y2 y coordinate of the second endpoint candidate
      */
     public Line(double x1, double y1, double x2, double y2) {
-        if (x1 > x2) {
-            double tmp = x1;
+        boolean replace = replaceEndpoints(x1, y1, x2, y2);
+        if (replace) {
+            double xTmp = x1;
+            double yTmp = y1;
             x1 = x2;
-            x2 = tmp;
+            y1 = y2;
+            x2 = xTmp;
+            y2 = yTmp;
         }
         this.start = new Point(x1, y1);
         this.end = new Point(x2, y2);
         calcSlope();
+    }
+
+    /**
+     * Determines if the endpoints should be swapped.
+     * Lines are ordered by their start point x coordinate, and then by y coordinate.
+     *
+     * @param x1 x coordinate of the first endpoint candidate
+     * @param y1 y coordinate of the first endpoint candidate
+     * @param x2 x coordinate of the second endpoint candidate
+     * @param y2 y coordinate of the second endpoint candidate
+     * @return if endpoints should be swapped
+     */
+    private boolean replaceEndpoints(double x1, double y1, double x2, double y2) {
+        if (Helper.doubleEq(x1, x2)) {
+            return (y1 > y2 && !Helper.doubleEq(y1, y2));
+        } else {
+            return x1 > x2;
+        }
     }
 
     /**
@@ -55,7 +83,10 @@ public class Line implements Comparable<Line> {
         double dx = this.end.getX() - this.start.getX();
         double dy = this.end.getY() - this.start.getY();
 
-        if (Helper.doubleEq(dx, 0)) {
+        if (Helper.doubleEq(dx, 0) && Helper.doubleEq(dy, 0)) {
+            // line is a point, we mey define arbitrary, easy to handle slope value
+            this.slope = 0;
+        } else if (Helper.doubleEq(dx, 0)) {
             this.slope = Double.POSITIVE_INFINITY;
         } else {
             this.slope = (dy / dx);
@@ -190,12 +221,12 @@ public class Line implements Comparable<Line> {
     private boolean isWithinBounds(double a1, double a2, double b1, double b2) {
         double maxA = Math.max(a1, a2);
         double minB = Math.min(b1, b2);
-        if (maxA < minB) {
+        if (maxA < minB && !Helper.doubleEq(maxA, minB)) {
             return false;
         }
         double minA = Math.min(a1, a2);
         double maxB = Math.max(b1, b2);
-        return maxB >= minA;
+        return (maxB >= minA || Helper.doubleEq(maxB, minA));
     }
 
     /**
@@ -233,7 +264,7 @@ public class Line implements Comparable<Line> {
     private boolean isWithinBounds(double a1, double a2, double pt) {
         double max = Math.max(a1, a2);
         double min = Math.min(a1, a2);
-        return (pt <= max) && (pt >= min);
+        return (pt - Helper.THRESHOLD <= max) && (pt + Helper.THRESHOLD >= min);
     }
 
     /**
@@ -260,7 +291,7 @@ public class Line implements Comparable<Line> {
         }
 
         if (Double.isInfinite(this.getSlope()) && Double.isInfinite(other.getSlope())) {
-            return null;
+            return collinearLinesIntersection(other);
         }
         if (Double.isInfinite(this.getSlope()) || Double.isInfinite(other.getSlope())) {
             return verticalIntersection(other);
@@ -292,19 +323,25 @@ public class Line implements Comparable<Line> {
      * @return single shared point, or null if there is no single point
      */
     private Point collinearLinesIntersection(Line other) {
-        if (this.isXWithinBounds(other.middle().getX()) || other.isXWithinBounds(this.middle().getX())) {
+        boolean middleOverlap;
+        if (Double.isInfinite(this.getSlope())) {
+            middleOverlap = this.isYWithinBounds(other.middle().getY()) || other.isYWithinBounds(this.middle().getY());
+        } else {
+            middleOverlap = this.isXWithinBounds(other.middle().getX()) || other.isXWithinBounds(this.middle().getX());
+        }
+        if (middleOverlap) {
             if (this.end.equals(this.start)) {
                 return this.start;
-            } else if (other.end.equals(other.start)) {
-                return other.start;
+            } else if (other.end().equals(other.start())) {
+                return other.start();
             } else {
                 return null;
             }
         }
 
-        if (this.start.equals(other.start) || this.start.equals(other.end)) {
+        if (this.start.equals(other.start()) || this.start.equals(other.end())) {
             return this.start;
-        } else if (this.end.equals(other.start) || this.end.equals(other.end)) {
+        } else if (this.end.equals(other.start()) || this.end.equals(other.end())) {
             return this.end;
         } else {
             return null;
@@ -344,7 +381,7 @@ public class Line implements Comparable<Line> {
      * Checks if two lines are equal by endpoints.
      *
      * @param other segment to compare with
-     * @return true if both endpoints match (in any order)
+     * @return true if both endpoints match (up to {@link Point#equals(Point)}), false otherwise
      */
     public boolean equals(Line other) {
         if (other == null) {
@@ -352,9 +389,9 @@ public class Line implements Comparable<Line> {
         }
         Point a1 = this.start;
         Point a2 = this.end;
-        Point b1 = other.start;
-        Point b2 = other.end;
-        return (a1.equals(b1) && a2.equals(b2)) || (a1.equals(b2) && a2.equals(b1));
+        Point b1 = other.start();
+        Point b2 = other.end();
+        return (a1.equals(b1) && a2.equals(b2));
     }
 
     /**
@@ -367,14 +404,12 @@ public class Line implements Comparable<Line> {
         if (other == null) {
             return -1;
         }
-        if (!Helper.doubleEq(this.start.getX(), other.start.getX())) {
-            return Double.compare(this.start.getX(), other.start.getX());
-        } else if (!Helper.doubleEq(this.start.getY(), other.start.getY())) {
-            return Double.compare(this.start.getY(), other.start.getY());
-        } else if (!Helper.doubleEq(this.end.getX(), other.end.getX())) {
-            return Double.compare(this.end.getX(), other.end.getX());
+
+        int startComparison = this.start.compareTo(other.start());
+        if (startComparison != 0) {
+            return startComparison;
         } else {
-            return Double.compare(this.end.getY(), other.end.getY());
+            return this.end.compareTo(other.end());
         }
     }
 }
