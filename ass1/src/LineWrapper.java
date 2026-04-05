@@ -1,4 +1,5 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 import java.util.Arrays;
 
 /**
@@ -52,6 +53,8 @@ public class LineWrapper {
                 if (allLines[j] == this || allLines[j] == allLines[i]) {
 =======
 
+=======
+>>>>>>> 3108e30 (clean, javadoc and make random doubles (not ints))
 import java.util.Arrays;
 
 /**
@@ -79,7 +82,8 @@ public class LineWrapper {
      * Uses private methods for defragging, removing nulls and sorting to keep the data usable.
      *
      * <p>Should be called for each line wrapper after all lines are created,
-     * and before any of the segments are accessed.</p>
+     * and before any of the segments are accessed.
+     * Trying to access the segments before calling this method will return null.</p>
      *
      * <p>Best practice: call this method with a copy of LineWrapper array, to avoid accidental modification.</p>
      *
@@ -336,7 +340,8 @@ public class LineWrapper {
 
     /**
      * Returns a copy of the green lines.
-     * @return copied green lines
+     *
+     * @return copied green lines (null if green lines were not calculated yet)
      */
     public Line[] getGreenLines() {
         if (this.greenLines == null) {
@@ -349,7 +354,7 @@ public class LineWrapper {
     /**
     * Returns the black lines of this wrapper, which are the segments before, between and after the green lines.
     *
-    * @return black-line segments
+    * @return black-line segments (null if green lines were not calculated yet)
     */
     public Line[] getBlackLines() {
         if (this.greenLines == null) {
@@ -377,7 +382,7 @@ public class LineWrapper {
     }
 
     /**
-     * Gets the intersection points of this line with all other lines.
+     * Gets the intersection points of this line with lines in the provided array.
      *
      * <p>Should be called for each line wrapper after all lines are created.</p>
      *
@@ -387,9 +392,6 @@ public class LineWrapper {
      * @return array of intersection points
      */
     public Point[] getAllIntersections(LineWrapper[] allLines) {
-        if (this.greenLines == null) {
-            return null;
-        }
         Point[] intersections = new Point[allLines.length * 2];
         int index = 0;
         for (LineWrapper wrapper : allLines) {
@@ -399,6 +401,7 @@ public class LineWrapper {
                 ++index;
             }
         }
+<<<<<<< HEAD
 
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -462,6 +465,8 @@ public class LineWrapper {
         return intersections;
 >>>>>>> 2a01489 (the end?)
 =======
+=======
+>>>>>>> 3108e30 (clean, javadoc and make random doubles (not ints))
         return Arrays.copyOf(intersections, index);
 >>>>>>> 69e61f8 (Seems mature)
     }
