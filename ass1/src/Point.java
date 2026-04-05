@@ -7,6 +7,7 @@
  * general contract, without keeping transitivity and overriding hashCode.
  * This is acceptable for this assignment, but should be used with caution.</p>
  *
+<<<<<<< HEAD
  * @author Avraham Tsaban, avraham.tsaban@gmail.com
  * @version 1.0
  * @since 2024-06-05
@@ -30,9 +31,11 @@ public class Point implements Comparable<Point> {
  * Represents a point in 2D space.
 >>>>>>> 95e5362 (removed colouredLine class)
  *
+=======
+>>>>>>> 69e61f8 (Seems mature)
  * @author Avraham Tsaban
  */
-public class Point {
+public class Point implements Comparable<Point> {
     private final double x;
     private final double y;
 
@@ -81,6 +84,7 @@ public class Point {
     }
 
     /**
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
      * Returns x.
@@ -157,6 +161,11 @@ public class Point {
      *
      * @param other point to compare with
      * @return negative if this < other, positive if this > other, 0 if equal
+=======
+     * Returns x.
+    *
+     * @return x coordinate
+>>>>>>> 69e61f8 (Seems mature)
      */
     public int compareTo(Point other) {
         if (other == null) {
@@ -170,6 +179,42 @@ public class Point {
             return Double.compare(this.y, other.getY());
         }
     }
+<<<<<<< HEAD
 =======
 >>>>>>> 5439265 (stage 1)
+=======
+
+    /**
+     * Checks if this point equals another point.
+     *
+     * @param other point to compare with
+     * @return true if both coordinates are equal (up to {@link Helper#doubleEq(double, double)})
+     */
+    public boolean equals(Point other) {
+        if (other == null) {
+            return false;
+        }
+        return (Helper.doubleEq(this.x, other.getX()) && Helper.doubleEq(this.y, other.getY()));
+    }
+
+    /**
+     * Compares this point to another point for ordering.
+     * First compares x coordinates, then y coordinates if x's are equal.
+     *
+     * @param other point to compare with
+     * @return negative if this < other, positive if this > other, 0 if equal
+     */
+    public int compareTo(Point other) {
+        if (other == null) {
+            return -1;
+        }
+        if (!Helper.doubleEq(this.x, other.getX())) {
+            return Double.compare(this.x, other.getX());
+        } else if (Helper.doubleEq(this.y, other.getY())) {
+            return 0;
+        } else {
+            return Double.compare(this.y, other.getY());
+        }
+    }
+>>>>>>> 69e61f8 (Seems mature)
 }

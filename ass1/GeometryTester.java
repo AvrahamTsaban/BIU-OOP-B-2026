@@ -1,17 +1,21 @@
 /**
- * Basic tests for Point and Line.
+ * This class does some simple tessting of the Point and Line classes.
  */
 public final class GeometryTester {
 
+<<<<<<< HEAD
 <<<<<<< HEAD
     private static final double COMPARISON_THRESHOLD = 0.00001;
 =======
     static final double COMPARISON_THRESHOLD = 0.00001;
 >>>>>>> 5439265 (stage 1)
+=======
+    private static final double COMPARISON_THRESHOLD = 0.00001;
+>>>>>>> 69e61f8 (Seems mature)
 
     /**
-     * Checks if two doubles are almost equal.
      *
+<<<<<<< HEAD
 <<<<<<< HEAD
      * @param a
      * @param b
@@ -31,12 +35,20 @@ public final class GeometryTester {
     public static boolean doubleEquals(double a, double b) {
         return Math.abs(a - b) < GeometryTester.COMPARISON_THRESHOLD;
 >>>>>>> 5439265 (stage 1)
+=======
+     * @param a
+     * @param b
+     * @return true if a and b are equal up to the comparison threshold, false otherwise.
+     */
+    public static boolean doubleEquals(double a, double b) {
+        return  Math.abs(a - b) < GeometryTester.COMPARISON_THRESHOLD;
+>>>>>>> 69e61f8 (Seems mature)
     }
 
     /**
-     * Runs Point tests.
+     * The method is in charge of testing the Point class.
      *
-     * @return true if all point tests pass; otherwise false
+     * @return true if not mistakes were found, false otherwise.
      */
     public static boolean testPoint() {
         boolean mistake = false;
@@ -80,9 +92,9 @@ public final class GeometryTester {
     }
 
     /**
-     * Runs Line tests.
+     * The method is in charge of testing the Line class.
      *
-     * @return true if all line tests pass; otherwise false
+     * @return true if not mistakes were found, false otherwise.
      */
     public static boolean testLine() {
         boolean mistakes = false;
@@ -108,17 +120,20 @@ public final class GeometryTester {
     }
 
     /**
-     * Runs all tests and prints a summary.
-     *
-     * @param args ignored
+     * Main method, running tests on both the point and the line classes.
+     * @param args ignored.
      */
     public static void main(String[] args) {
+<<<<<<< HEAD
 <<<<<<< HEAD
         if (GeometryTester.testPoint() && GeometryTester.testLine()) {
 =======
         GeometryTester tester = new GeometryTester();
         if (tester.testPoint() && tester.testLine()) {
 >>>>>>> 5439265 (stage 1)
+=======
+        if (GeometryTester.testPoint() && GeometryTester.testLine()) {
+>>>>>>> 69e61f8 (Seems mature)
             System.out.println("Test Completed Successfully!");
         } else {
             System.out.println("Found failing tests.");

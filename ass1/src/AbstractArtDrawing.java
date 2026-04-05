@@ -167,26 +167,30 @@ public class AbstractArtDrawing {
  * @author Avraham Tsaban
  */
 public class AbstractArtDrawing {
-
     private Random rand;
     private GUI gui;
     private DrawSurface d;
     private LineWrapper[] lines;
-    private static final int widthPX = 1280;
-    private static final int heightPX = 720;
-    public final static int NUM_LINES = 10;
+    private static final int WIDTH = 1280;
+    private static final int HEIGHT = 720;
+    private final static int NUM_LINES = 10;
+    private final static int POINT_RADIUS = 3;
 
     /**
      * Creates the random generator, window, and draw surface.
      */
     public AbstractArtDrawing() {
         this.rand = new Random();
-        this.gui = new GUI("Random Lines Example", AbstractArtDrawing.widthPX, AbstractArtDrawing.heightPX);
+        this.gui = new GUI("Random Lines Example", AbstractArtDrawing.WIDTH, AbstractArtDrawing.HEIGHT);
         this.d = gui.getDrawSurface();
     }
 
     /**
-     * Creates 10 random lines inside the window bounds.
+     * Creates (numLines) random, non-identical lines inside the window bounds.
+     * Afterwards, calculates the green segments based on intersections with other lines.
+     * Calculations are done and stored inside the LineWrapper objects, so they can be accessed later.
+     * 
+     * @param numLines number of lines to create
      */
     public void createLines(int numLines) {
         this.lines = new LineWrapper[numLines];
@@ -194,7 +198,7 @@ public class AbstractArtDrawing {
             Line line = null;
             boolean duplicate;
             do {
-                line = generateLine(AbstractArtDrawing.widthPX, AbstractArtDrawing.heightPX);
+                line = generateLine(AbstractArtDrawing.WIDTH, AbstractArtDrawing.HEIGHT);
                 duplicate = false;
                 for (int j = 0; j < i; ++j) {
                     if (line.equals(this.lines[j].getLine())) {
@@ -234,9 +238,10 @@ public class AbstractArtDrawing {
     }
 
     /**
-     * Draws the lines on the draw surface:
-     * For each line, draws the green segments (segments that are part of a triangle) in green,
-     * and the remaining segments in black.
+     * Draws the lines on the draw surface. For each line:
+     * - Draws segments that are part of a triangle in green, and the rest in black.
+     * - Draws the middle point in blue.
+     * - Draws all intersection points in red.
      */
     public void drawLines() {
         for (LineWrapper wrapper : this.lines) {
@@ -272,7 +277,7 @@ public class AbstractArtDrawing {
             Line line = wrapper.getLine();
             int x = (int) line.middle().getX();
             int y = (int) line.middle().getY();
-            d.fillCircle(x, y, 3);
+            d.fillCircle(x, y, POINT_RADIUS);
 
             d.setColor(Color.red);
             Point[] intersections = wrapper.getAllIntersections(Arrays.copyOf(this.lines, this.lines.length));
@@ -280,11 +285,12 @@ public class AbstractArtDrawing {
                 if (pt != null) {
                     int ptX = (int) pt.getX();
                     int ptY = (int) pt.getY();
-                    d.fillCircle(ptX, ptY, 3);
+                    d.fillCircle(ptX, ptY, POINT_RADIUS);
                 }
             }
         }
     }
+
     /**
      * Shows the current drawing on the window.
      */

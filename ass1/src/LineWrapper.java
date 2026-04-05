@@ -137,6 +137,7 @@ public class LineWrapper {
 
     /**
      * Defrags the green lines array by merging intersecting segments.
+<<<<<<< HEAD
      */
     private void defragGreenLines() {
         for (int i = 0; i < greenLines.length; ++i) {
@@ -281,6 +282,8 @@ public class LineWrapper {
 =======
     /**
      * Defrags the triangle lines by merging intersecting segments.
+=======
+>>>>>>> 69e61f8 (Seems mature)
      */
     public void defragGreenLines() {
         for (int i = 0; i < greenLines.length; ++i) {
@@ -311,9 +314,9 @@ public class LineWrapper {
 >>>>>>> 95e5362 (removed colouredLine class)
 
     /**
-     * Gets an array and returns a copy of it without nulls.
+     * Gets an array of Line[] type and returns a copy of it without nulls.
      *
-     * @param arr array to remove nulls from
+     * @param arr Line[] array to remove nulls from
      * @return new array without nulls
      */
     private Line[] removeNulls(Line[] arr) {
@@ -332,8 +335,8 @@ public class LineWrapper {
 
 
     /**
-     * Returns a copy of the triangle lines.
-     * @return copied triangle lines
+     * Returns a copy of the green lines.
+     * @return copied green lines
      */
     public Line[] getGreenLines() {
         if (this.greenLines == null) {
@@ -344,8 +347,7 @@ public class LineWrapper {
     }
 
     /**
-    * Returns the black lines of this wrapper, which are the segments
-    * before, between and after the triangle lines.
+    * Returns the black lines of this wrapper, which are the segments before, between and after the green lines.
     *
     * @return black-line segments
     */
@@ -377,6 +379,10 @@ public class LineWrapper {
     /**
      * Gets the intersection points of this line with all other lines.
      *
+     * <p>Should be called for each line wrapper after all lines are created.</p>
+     *
+     * <p>Best practice: only call this method with a copy of LineWrapper array.</p>
+     *
      * @param allLines all wrapped lines in the drawing
      * @return array of intersection points
      */
@@ -394,6 +400,7 @@ public class LineWrapper {
             }
         }
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 
 
@@ -454,6 +461,9 @@ public class LineWrapper {
         intersections = Arrays.copyOf(intersections, index);
         return intersections;
 >>>>>>> 2a01489 (the end?)
+=======
+        return Arrays.copyOf(intersections, index);
+>>>>>>> 69e61f8 (Seems mature)
     }
 
     /**
