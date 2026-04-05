@@ -17,8 +17,8 @@ public class AbstractArtDrawing {
     private LineWrapper[] lines;
     private static final int WIDTH = 1280;
     private static final int HEIGHT = 720;
-    private final static int NUM_LINES = 10;
-    private final static int POINT_RADIUS = 3;
+    private static final int NUM_LINES = 10;
+    private static final int POINT_RADIUS = 3;
 
     /**
      * Creates the random generator, window, and draw surface.
@@ -33,7 +33,7 @@ public class AbstractArtDrawing {
      * Creates (numLines) random, non-identical lines inside the window bounds.
      * Afterwards, calculates the green segments based on intersections with other lines.
      * Calculations are done and stored inside the LineWrapper objects, so they can be accessed later.
-     * 
+     *
      * @param numLines number of lines to create
      */
     public void createLines(int numLines) {
@@ -67,20 +67,28 @@ public class AbstractArtDrawing {
      * @return a random line
      */
     private Line generateLine(int width, int height) {
-        int x1 = rand.nextInt(width) + 1; // get integer in range 1-${width}
-        int y1 = rand.nextInt(height) + 1; // get integer in range 1-${height}
-        int x2 = rand.nextInt(width) + 1;
-        int y2 = rand.nextInt(height) + 1;
+        double x1 = generateRandomDouble(width);
+        double y1 = generateRandomDouble(height);
+        double x2 = generateRandomDouble(width);
+        double y2 = generateRandomDouble(height);
         Point p1 = new Point(x1, y1);
         Point p2 = new Point(x2, y2);
         while (p1.equals(p2)) { // ensure the line is not a point
-            x2 = rand.nextInt(width) + 1;
-            y2 = rand.nextInt(height) + 1;
+            x2 = generateRandomDouble(width);
+            y2 = generateRandomDouble(height);
             p2 = new Point(x2, y2);
         }
         return new Line(p1, p2);
     }
 
+    /**
+     * Generates a random double in the range [0, max).
+     * @param max the upper bound for the random double
+     * @return a random double in the range [0, max)
+     */
+    private double generateRandomDouble(double max) {
+        return max * rand.nextDouble();
+    }
     /**
      * Draws the lines on the draw surface. For each line:
      * - Draws segments that are part of a triangle in green, and the rest in black.

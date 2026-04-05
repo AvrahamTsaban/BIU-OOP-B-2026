@@ -1,22 +1,26 @@
 /**
  * Represents a line segment between two points.
- * Constructors keep the point with the smaller x value as start.
+ * Constructors normalize endpoints: smaller x first;
+ * when x is equal (up to threshold), smaller y first.
  *
  * <p>Implementation warning: Line.equals and Line.compareTo are altered in a way that is not consistent with the
  * general contract and without overriding hashCode.
  * Both are also not fully transitive (up to the comparison threshold).
  * This is acceptable for this assignment, but should be used with caution.</p>
  *
+ * <p>Generally, avoid creating lines that are points (endpoints are the same).
+ * Such case is treated for safety, but not recommended.</p>
+ *
  * @author Avraham Tsaban
  */
 public class Line implements Comparable<Line> {
     private final Point start;
     private final Point end;
-    private double slope;
+    private final double slope;
 
     /**
-     * Creates a line from two points.
-     * If start.x is greater than end.x, the points are swapped.
+     * Creates a line from two points and calculates slope.
+    * Endpoints are swapped when needed to keep normalized order.
      *
      * @param start start point candidate
      * @param end end point candidate
@@ -30,12 +34,12 @@ public class Line implements Comparable<Line> {
         }
         this.start = new Point(start.getX(), start.getY());
         this.end = new Point(end.getX(), end.getY());
-        calcSlope();
+        this.slope = calcSlope();
     }
 
     /**
-     * Creates a line from endpoint coordinates.
-     * If x1 is greater than x2, the x values are swapped.
+     * Creates a line from endpoint coordinates and calculates slope.
+     * Endpoints are swapped when needed to keep normalized order.
      *
      * @param x1 x coordinate of the first endpoint candidate
      * @param y1 y coordinate of the first endpoint candidate
@@ -54,7 +58,7 @@ public class Line implements Comparable<Line> {
         }
         this.start = new Point(x1, y1);
         this.end = new Point(x2, y2);
-        calcSlope();
+        this.slope = calcSlope();
     }
 
     /**
@@ -65,7 +69,7 @@ public class Line implements Comparable<Line> {
      * @param y1 y coordinate of the first endpoint candidate
      * @param x2 x coordinate of the second endpoint candidate
      * @param y2 y coordinate of the second endpoint candidate
-     * @return if endpoints should be swapped
+     * @return wether the endpoints should be swapped
      */
     private boolean replaceEndpoints(double x1, double y1, double x2, double y2) {
         if (Helper.doubleEq(x1, x2)) {
@@ -78,18 +82,21 @@ public class Line implements Comparable<Line> {
     /**
      * Calculates and stores the slope.
      * Vertical lines get slope Double.POSITIVE_INFINITY.
+     * A line that is a point gets slope 0.
+     *
+     * @return slope value (see method description)
      */
-    private void calcSlope() {
+    private double calcSlope() {
         double dx = this.end.getX() - this.start.getX();
         double dy = this.end.getY() - this.start.getY();
 
         if (Helper.doubleEq(dx, 0) && Helper.doubleEq(dy, 0)) {
             // line is a point, we mey define arbitrary, easy to handle slope value
-            this.slope = 0;
+            return 0;
         } else if (Helper.doubleEq(dx, 0)) {
-            this.slope = Double.POSITIVE_INFINITY;
+            return Double.POSITIVE_INFINITY;
         } else {
-            this.slope = (dy / dx);
+            return (dy / dx);
         }
     }
 
@@ -264,7 +271,7 @@ public class Line implements Comparable<Line> {
     private boolean isWithinBounds(double a1, double a2, double pt) {
         double max = Math.max(a1, a2);
         double min = Math.min(a1, a2);
-        return (pt - Helper.THRESHOLD <= max) && (pt + Helper.THRESHOLD >= min);
+        return (((pt <= max) && (pt >= min)) || Helper.doubleEq(pt, max) || Helper.doubleEq(pt, min));
     }
 
     /**
