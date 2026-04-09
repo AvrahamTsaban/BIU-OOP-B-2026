@@ -4,6 +4,7 @@ import java.util.Arrays;
  * Wraps a line and keeps extra segments used for coloring.
  *
  * @author Avraham Tsaban
+ * @since 2024-06-05
  */
 public class LineWrapper {
     private final Line line;
