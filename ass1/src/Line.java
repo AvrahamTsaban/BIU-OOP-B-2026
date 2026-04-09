@@ -12,6 +12,7 @@
  * Such case is treated for safety, but not recommended.</p>
  *
  * @author Avraham Tsaban
+ * @since 2024-06-05
  */
 public class Line implements Comparable<Line> {
     private final Point start;
@@ -398,7 +399,7 @@ public class Line implements Comparable<Line> {
         Point a2 = this.end;
         Point b1 = other.start();
         Point b2 = other.end();
-        return (a1.equals(b1) && a2.equals(b2));
+        return (a1.equals(b1) && a2.equals(b2) || a1.equals(b2) && a2.equals(b1));
     }
 
     /**

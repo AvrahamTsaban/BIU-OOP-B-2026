@@ -8,7 +8,8 @@ import java.awt.Color;
 /**
  * Draws random lines in a GUI window.
  *
- * @author Avraham Tsaban
+ * @author Avraham Tsaban, ID: 207088733
+ * @since 2024-06-05
  */
 public class AbstractArtDrawing {
     private Random rand;
@@ -86,8 +87,8 @@ public class AbstractArtDrawing {
      * @param max the upper bound for the random double
      * @return a random double in the range [0, max)
      */
-    private double generateRandomDouble(double max) {
-        return max * rand.nextDouble();
+    private double generateRandomDouble(int max) {
+        return ((double) max) * rand.nextDouble();
     }
     /**
      * Draws the lines on the draw surface. For each line:

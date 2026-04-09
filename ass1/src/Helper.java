@@ -3,6 +3,7 @@
  * Currently, only contains a method for comparing doubles with a threshold.
  *
  * @author Avraham Tsaban
+ * @since 2024-06-05
  */
 public final class Helper {
     /** Threshold for comparing doubles. */
