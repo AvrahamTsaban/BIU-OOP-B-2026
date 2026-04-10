@@ -3,7 +3,8 @@ import java.util.Arrays;
 /**
  * Wraps a line and keeps extra segments used for coloring.
  *
- * @author Avraham Tsaban
+ * @author Avraham Tsaban, avraham.tsaban@gmail.com
+ * @version 1.0
  * @since 2024-06-05
  */
 public class LineWrapper {
@@ -75,7 +76,7 @@ public class LineWrapper {
     /**
      * Defrags the green lines array by merging intersecting segments.
      */
-    public void defragGreenLines() {
+    private void defragGreenLines() {
         for (int i = 0; i < greenLines.length; ++i) {
             if (greenLines[i] == null) {
                 continue;

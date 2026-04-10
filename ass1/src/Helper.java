@@ -2,7 +2,8 @@
  * Static methods used by the geometry classes.
  * Currently, only contains a method for comparing doubles with a threshold.
  *
- * @author Avraham Tsaban
+ * @author Avraham Tsaban, avraham.tsaban@gmail.com
+ * @version 1.0
  * @since 2024-06-05
  */
 public final class Helper {
