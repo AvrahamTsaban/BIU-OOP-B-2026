@@ -9,11 +9,11 @@ import biuoop.Sleeper;
  * The balls will bounce around the screen, and if they overlap,
  * the one whose command line argument is later in the list will be drawn on top of the earlier ones.
  */
-public final class MultipleBouncingBallsAnimation {
+public final class MultipleFramesBouncingBallsAnimation {
     /**
      * Private constructor to prevent instantiation of this utility class.
      */
-    private MultipleBouncingBallsAnimation() { }
+    private MultipleFramesBouncingBallsAnimation() { }
 
     /**
      * A helper method to create an animation of random balls being drawn on the screen.
@@ -31,6 +31,7 @@ public final class MultipleBouncingBallsAnimation {
         }
         while (true) {
             DrawSurface d = gui.getDrawSurface();
+            Helper.GRAY_SQUARE.drawOn(d);
             for (Ball ball : balls) {
                 boolean validStep = ball.remainsIn(Helper.SCREEN);
                 if (validStep) {
@@ -40,6 +41,7 @@ public final class MultipleBouncingBallsAnimation {
                 }
                 ball.drawOn(d);
             }
+            Helper.YELLOW_SQUARE.drawOn(d);
             gui.show(d);
             sleeper.sleepFor(sleepTime);  // wait for 50 milliseconds.
        }
@@ -57,6 +59,6 @@ public final class MultipleBouncingBallsAnimation {
         for (int i = 0; i < args.length; i++) {
             sizes[i] = Integer.parseUnsignedInt(args[i]);
         }
-        MultipleBouncingBallsAnimation.drawAnimation(sizes);
+        MultipleFramesBouncingBallsAnimation.drawAnimation(sizes);
     }
 }

@@ -84,7 +84,11 @@ public class Velocity {
      * @return a Velocity object with random dx and dy values
      */
     public static Velocity semiRandVelocity(Random rand, double speed) {
-        double angle = rand.nextDouble() * 360; // random angle between 0 and 360 degrees
+        double angle = 0;
+        while (Helper.doubleEq(angle, 0) || Helper.doubleEq(angle, 90)
+                || Helper.doubleEq(angle, 180) || Helper.doubleEq(angle, 270)) {
+            angle = rand.nextDouble() * 360; // random angle between 0 and 360 degrees
+        }
         return Velocity.fromAngleAndSpeed(angle, speed);
     }
 }
