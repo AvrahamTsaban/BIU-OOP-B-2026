@@ -3,7 +3,7 @@ import biuoop.DrawSurface;
 import biuoop.Sleeper;
 
 /**
- * A test class for the Ball class. It creates a GUI and draws multiple balls on it.
+ * A test class for the Ball class. It creates a GUI and draws a bouncing ball on it.
  */
 public final class BouncingBallAnimation {
 
@@ -34,7 +34,10 @@ public final class BouncingBallAnimation {
 
     /**
      * The main method to run the animation.
-     * @param args command line arguments (not used)
+     * Gets the starting point and velocity of the ball from the command line arguments,
+     * and starts the animation with those parameters.
+     * Asserts that the command line arguments are in the correct format and valid.
+     * @param args command line arguments representing x, y, velocity (dx and dy) of the ball in the format: x y dx dy
     */
     public static void main(String[] args) {
         //final int RADIUS = Helper.DEFAULT_RADIUS;
@@ -42,10 +45,6 @@ public final class BouncingBallAnimation {
         double y = Double.parseDouble(args[1]);
         double dx = Double.parseDouble(args[2]);
         double dy = Double.parseDouble(args[3]);
-        /*if (x - RADIUS < 0 || x + RADIUS > Helper.WIDTH || y - RADIUS < 0 || y + RADIUS > Helper.HEIGHT) {
-            System.out.println("Starting point must be within the bounds of the window.");
-            return;
-        }*/
         BouncingBallAnimation.drawAnimation(new Point(x, y), dx, dy);
     }
 }
