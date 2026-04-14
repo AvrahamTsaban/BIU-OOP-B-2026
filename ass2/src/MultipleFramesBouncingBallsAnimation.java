@@ -25,9 +25,20 @@ public final class MultipleFramesBouncingBallsAnimation {
         Random rand = new Random();
         GUI gui = new GUI("title", Helper.WIDTH, Helper.HEIGHT);
         Sleeper sleeper = new biuoop.Sleeper();
-        Ball[] balls = new Ball[sizes.length];
-        for (int i = 0; i < sizes.length; i++) {
-            balls[i] = Ball.generateMovingBallBySize(sizes[i], rand);
+        int numBalls = sizes.length;
+        int numInsideBalls = numBalls / 2;
+        if (numBalls % 2 != 0) {
+            numInsideBalls++;
+        }
+        Ball[] insideBalls = new Ball[numInsideBalls];
+        Ball[] outsideBalls = new Ball[numBalls - numInsideBalls];
+        int arrayIndex = 0;
+        //createBall is hard coded to create balls within the screen, not a given rectangle
+        for (int i = 0; i < numInsideBalls; i++, arrayIndex++) {
+
+        }
+        for (int i = 0; i < numBalls - numInsideBalls; i++, arrayIndex++) {
+            outsideBalls[i] = Ball.generateMovingBallBySize(sizes[arrayIndex], rand);
         }
         while (true) {
             DrawSurface d = gui.getDrawSurface();
