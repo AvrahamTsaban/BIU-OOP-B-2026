@@ -1,0 +1,73 @@
+import biuoop.GUI;
+import biuoop.DrawSurface;
+import biuoop.Sleeper;
+import java.util.Random;
+
+/**
+ * A test class for the Ball class. It creates a GUI and draws multiple balls on it.
+ */
+public class BallsTest3 {
+    /**
+     * A helper method to create an animation of random balls being drawn on the screen.
+     * @param start the starting point for the animation
+     * @param dx the change in x for each ball
+     * @param dy the change in y for each ball
+     */
+    private static void drawAnimation(Point start, double dx, double dy) {
+        Random rand = new Random();
+        GUI gui = new GUI("title", Helper.WIDTH, Helper.HEIGHT);
+        Sleeper sleeper = new biuoop.Sleeper();
+        Ball ball = new Ball(start, 30, java.awt.Color.BLACK);
+        Velocity[] velocities = new Velocity[22];
+        for (int i = 0; i < velocities.length; i++) {
+            velocities[i] = new Velocity (dx, dy);
+        }
+        ball.setVelocity(dx, dy);
+        while (true) {
+            ball.moveOneStep();
+            Velocity newVelocity = randVelocity(rand);
+            for (int i = 0; i < velocities.length - 1; i++) {
+                velocities[i] = velocities[i + 1];
+            }
+            dx = 0;
+            dy = 0;
+            for (int i = 0; i < velocities.length - 1; i++) {
+                dx += (1 - i / 10) * (velocities[i].getDx());
+                dy += (1 - i / 10) * (velocities[i].getDy());
+            }
+            velocities[velocities.length - 1] = newVelocity;
+            dx = dx + newVelocity.getDx() / 2;
+            dy = dy + newVelocity.getDy() / 2;
+            ball.setVelocity(dx, dy);
+            DrawSurface d = gui.getDrawSurface();
+            ball.drawOn(d);
+            gui.show(d);
+            sleeper.sleepFor(10);  // wait for 50 milliseconds.
+       }
+    }
+
+    /**
+     * A helper method to generate a random velocity for the ball.
+     * @param rand a Random object to generate random numbers
+     * @return a Velocity object with random dx and dy values
+     */
+    private static Velocity randVelocity(Random rand) {
+        double speed = (rand.nextDouble() - 0.5) * 10; // random speed between -30 and 30
+        double angle = rand.nextDouble() * 360; // random angle between 0 and 360 degrees
+        return Velocity.fromAngleAndSpeed(angle, speed);
+    }
+
+
+    /**
+     * The main method to run the animation.
+     * @param args command line arguments (not used)
+    */
+    public static void main(String[] args) {
+        java.util.Random rand = new java.util.Random();
+        double x = rand.nextDouble() * Helper.WIDTH;
+        double y = rand.nextDouble() * Helper.HEIGHT;
+        Point start = new Point(x, y);
+        Velocity velocity = randVelocity(rand);
+        BallsTest3.drawAnimation(start, velocity.getDx(), velocity.getDy());
+    }
+}

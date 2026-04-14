@@ -17,8 +17,8 @@ public class AbstractArtDrawing {
     private GUI gui;
     private DrawSurface d;
     private LineWrapper[] lines;
-    private static final int WIDTH = 1280;
-    private static final int HEIGHT = 720;
+    private static final int WIDTH = 800;
+    private static final int HEIGHT = 600;
     private static final int NUM_LINES = 10;
     private static final int POINT_RADIUS = 3;
 
