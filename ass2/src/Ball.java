@@ -1,9 +1,5 @@
 import java.util.Random;
-
-import org.w3c.dom.css.Rect;
-
 import java.awt.Color;
-
 import biuoop.DrawSurface;
 
 /**
@@ -15,9 +11,11 @@ public class Ball {
     private final int radius;
     private final Color color;
     private final Velocity velocity;
-    private static final double BASE_SPEED = 20.0;
+    private static final double BASE_SPEED = 7.0;
 
-    /*todo: implement helper equals*/
+    /*todo: implement helper equals
+    base speed to 20.0, sleep to 50
+    remove collision enum*/
 
     /**
      * Initialize a new ball with the given center, radius, and color.
@@ -64,7 +62,37 @@ public class Ball {
      * its position and velocity will be adjusted to simulate a bounce.
      */
     public void moveOneStep() {
-        this.point = this.getVelocity().applyToPoint(this.point);
+        Collision collision = Helper.SCREEN.collisionFromInside(this.predictMove());
+        if (collision.isEmpty()) {
+            this.point = this.getVelocity().applyToPoint(this.point);
+        } else {
+            this.bounce(collision);
+        }
+    }
+
+
+    public void moveOneStep(Rectangle[] inside, Rectangle[] outside) {
+        Ball predictedBall = this.predictMove();
+        Rectangle.CollisionType[] insideCollision = new Rectangle.CollisionType[inside.length];
+        for (int i = 0; i < inside.length; i++) {
+            insideCollision[i] = inside[i].collisionFromInside(predictedBall);
+        }
+        Rectangle.CollisionType fromInside = Rectangle.unifyCollisions(insideCollision);
+
+        Rectangle.CollisionType[] outsideCollision = new Rectangle.CollisionType[outside.length];
+        for (int i = 0; i < outside.length; i++) {
+            outsideCollision[i] = outside[i].collisionFromOutside(predictedBall);
+        }
+        Rectangle.CollisionType fromOutside = Rectangle.unifyCollisions(outsideCollision);
+
+        Rectangle.CollisionType collision = Rectangle.unifyCollisions(
+            new Rectangle.CollisionType[] {fromInside, fromOutside}
+        );
+        if (collision == Rectangle.CollisionType.NONE) {
+            this.point = this.getVelocity().applyToPoint(this.point);
+        } else {
+            this.bounce(collision);
+        }
     }
 
     /**
@@ -83,25 +111,23 @@ public class Ball {
      * to avoid bouncing loops if the ball starts on a boundary.
      * No need to call velocity.applyToPoint() afterwards;
      * the new position is directly set during the collision handling.
-     * @param r the rectangle representing the boundaries to check against
+     * @param collision the type of collision that occurred
      */
-    public void complexMove(Rectangle r) {
-        double nextX = point.getX() + velocity.getDx();
-        if (nextX - radius < r.leftX()) {
-            bounceOnLeft(r.leftX());
-        } else if (nextX + radius > r.rightX()) {
-            bounceOnRight(r.rightX());
+    public void bounce(Collision collision) {
+        if (collision.isLeft()) {
+            bounceOnLeft(collision.getLeft());
+        } else if (collision.isRight()) {
+            bounceOnRight(collision.getRight());
         } else {
-            point = new Point(nextX, point.getY());
+            point = new Point(point.getX() + velocity.getDx(), point.getY());
         }
 
-        double nextY = point.getY() + velocity.getDy();
-        if (nextY - radius < r.topY()) {
-            bounceOnTop(r.topY());
-        } else if (nextY + radius > r.bottomY()) {
-            bounceOnBottom(r.bottomY());
+        if (collision.isTop()) {
+            bounceOnTop(collision.getTop());
+        } else if (collision.isBottom()) {
+            bounceOnBottom(collision.getBottom());
         } else {
-            point = new Point(point.getX(), nextY);
+            point = new Point(point.getX(), point.getY() + velocity.getDy());
         }
     }
 

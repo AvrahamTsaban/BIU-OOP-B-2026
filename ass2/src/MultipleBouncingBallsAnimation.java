@@ -32,12 +32,7 @@ public final class MultipleBouncingBallsAnimation {
         while (true) {
             DrawSurface d = gui.getDrawSurface();
             for (Ball ball : balls) {
-                boolean validStep = Helper.SCREEN.isInside(ball.predictMove());
-                if (validStep) {
-                    ball.moveOneStep();
-                } else {
-                    ball.complexMove(Helper.SCREEN);
-                }
+                ball.moveOneStep();
                 ball.drawOn(d);
             }
             gui.show(d);

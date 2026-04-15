@@ -16,7 +16,7 @@ public final class Helper {
     /** Default radius for balls in animations. */
     public static final int DEFAULT_RADIUS = 30;
     /** Sleep time in milliseconds for animations. */
-    public static final int SLEEP_TIME = 50;
+    public static final int SLEEP_TIME = 18;
 
     /** Upper-left corner of the gray square frame. */
     private static final Point GRAY_SQUARE_UL = new Point(50, 50);

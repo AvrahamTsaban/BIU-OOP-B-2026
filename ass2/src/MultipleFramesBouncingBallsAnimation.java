@@ -16,15 +16,39 @@ public final class MultipleFramesBouncingBallsAnimation {
     private MultipleFramesBouncingBallsAnimation() { }
 
     /**
-     * A helper method to create an animation of random balls being drawn on the screen.
-     * Each ball's size is determined by the corresponding element in the sizes array.
-     * @param sizes an array of sizes for the balls to be drawn
+     * A helper method to create an animation of given balls being drawn on the screen.
+     * @param allBalls a 2D array of Ball objects, where the first dimension separates inside and outside balls
      */
-    private static void drawAnimation(int[] sizes) {
+    private static void drawAnimation(Ball[][] allBalls) {
         final int sleepTime = Helper.SLEEP_TIME;
-        Random rand = new Random();
         GUI gui = new GUI("title", Helper.WIDTH, Helper.HEIGHT);
         Sleeper sleeper = new biuoop.Sleeper();
+        Ball[] insideBalls = allBalls[0];
+        Ball[] outsideBalls = allBalls[1];
+        allBalls[0] = null; // to GC
+        allBalls[1] = null; // to GC
+        while (true) {
+            DrawSurface d = gui.getDrawSurface();
+            Helper.GRAY_SQUARE.drawOn(d);
+            for (Ball ball : insideBalls) {
+                Ball predictedBall = ball.predictMove();
+                ball.moveOneStep();
+                ball.drawOn(d);
+            }
+            Helper.YELLOW_SQUARE.drawOn(d);
+            gui.show(d);
+            sleeper.sleepFor(sleepTime);  // wait for 50 milliseconds.
+       }
+    }
+
+    /**
+     * A helper method to create an array of balls separated into inside and outside the gray square.
+     * The first half (or one more if odd) of the sizes will be used for inside balls, and the rest for outside balls.
+     * @param sizes an array of sizes for the balls to be created
+     * @return a 2D array of Ball objects, where the first dimension separates inside and outside balls
+     */
+    private static Ball[][] generateBalls(int[] sizes) {
+        Random rand = new Random();
         int numBalls = sizes.length;
         int numInsideBalls = numBalls / 2;
         if (numBalls % 2 != 0) {
@@ -44,24 +68,8 @@ public final class MultipleFramesBouncingBallsAnimation {
             } while (!Helper.GRAY_SQUARE.isOutside(outsideBalls[i])
                 || !Helper.YELLOW_SQUARE.isOutside(outsideBalls[i]));
         }
-        while (true) {
-            DrawSurface d = gui.getDrawSurface();
-            Helper.GRAY_SQUARE.drawOn(d);
-            for (Ball ball : balls) {
-                boolean validStep = ball.remainsIn(Helper.SCREEN);
-                if (validStep) {
-                    ball.moveOneStep();
-                } else {
-                    ball.complexMove();
-                }
-                ball.drawOn(d);
-            }
-            Helper.YELLOW_SQUARE.drawOn(d);
-            gui.show(d);
-            sleeper.sleepFor(sleepTime);  // wait for 50 milliseconds.
-       }
+        return new Ball[][] {insideBalls, outsideBalls};
     }
-
     /**
      * The main method to run the animation.
      * Gets the sizes of the balls to be drawn from the command line arguments,
@@ -74,6 +82,7 @@ public final class MultipleFramesBouncingBallsAnimation {
         for (int i = 0; i < args.length; i++) {
             sizes[i] = Integer.parseUnsignedInt(args[i]);
         }
-        MultipleFramesBouncingBallsAnimation.drawAnimation(sizes);
+        Ball[][] balls = generateBalls(sizes);
+        MultipleFramesBouncingBallsAnimation.drawAnimation(balls);
     }
 }
