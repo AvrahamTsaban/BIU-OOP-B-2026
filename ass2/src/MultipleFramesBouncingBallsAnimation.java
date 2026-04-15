@@ -33,12 +33,16 @@ public final class MultipleFramesBouncingBallsAnimation {
         Ball[] insideBalls = new Ball[numInsideBalls];
         Ball[] outsideBalls = new Ball[numBalls - numInsideBalls];
         int arrayIndex = 0;
-        //createBall is hard coded to create balls within the screen, not a given rectangle
         for (int i = 0; i < numInsideBalls; i++, arrayIndex++) {
-
+            do {
+                insideBalls[i] = Ball.generateMovingBallBySize(sizes[arrayIndex], Helper.GRAY_SQUARE, rand);
+            } while (!Helper.YELLOW_SQUARE.isOutside(insideBalls[i]));
         }
         for (int i = 0; i < numBalls - numInsideBalls; i++, arrayIndex++) {
-            outsideBalls[i] = Ball.generateMovingBallBySize(sizes[arrayIndex], rand);
+            do {
+                outsideBalls[i] = Ball.generateMovingBallBySize(sizes[arrayIndex], Helper.SCREEN, rand);
+            } while (!Helper.GRAY_SQUARE.isOutside(outsideBalls[i])
+                || !Helper.YELLOW_SQUARE.isOutside(outsideBalls[i]));
         }
         while (true) {
             DrawSurface d = gui.getDrawSurface();
