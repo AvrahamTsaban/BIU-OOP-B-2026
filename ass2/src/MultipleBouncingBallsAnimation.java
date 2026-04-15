@@ -27,16 +27,16 @@ public final class MultipleBouncingBallsAnimation {
         Sleeper sleeper = new biuoop.Sleeper();
         Ball[] balls = new Ball[sizes.length];
         for (int i = 0; i < sizes.length; i++) {
-            balls[i] = Ball.generateMovingBallBySize(sizes[i], rand);
+            balls[i] = Ball.generateMovingBallBySize(sizes[i], Helper.SCREEN, rand);
         }
         while (true) {
             DrawSurface d = gui.getDrawSurface();
             for (Ball ball : balls) {
-                boolean validStep = ball.remainsIn(Helper.SCREEN);
+                boolean validStep = Helper.SCREEN.isInside(ball.predictMove());
                 if (validStep) {
                     ball.moveOneStep();
                 } else {
-                    ball.complexMove();
+                    ball.complexMove(Helper.SCREEN);
                 }
                 ball.drawOn(d);
             }

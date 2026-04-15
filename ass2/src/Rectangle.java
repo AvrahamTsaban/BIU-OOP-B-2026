@@ -59,6 +59,22 @@ public class Rectangle {
     }
 
     /**
+     * Get the width of the square.
+     * @return the width of the square
+     */
+    public double width() {
+        return horizontalEdge;
+    }
+
+    /**
+     * Get the height of the square.
+     * @return the height of the square
+     */
+    public double height() {
+        return verticalEdge;
+    }
+
+    /**
      * Draw the square on the given surface.
      * @param surface the surface to draw the square on
      */

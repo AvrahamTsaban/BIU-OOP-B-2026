@@ -1,4 +1,7 @@
 import java.util.Random;
+
+import org.w3c.dom.css.Rect;
+
 import java.awt.Color;
 
 import biuoop.DrawSurface;
@@ -65,60 +68,90 @@ public class Ball {
     }
 
     /**
-     * Check if the predicted step of the ball is within the boundaries of a rectangle.
-     * @param r the rectangle representing the boundaries to check against
-     * @return true if the next step is within the boundaries, false otherwise
+     * Predict the next position of the ball based on its current velocity, without actually moving it.
+     * @return a new Ball object representing the predicted position
      */
-    public boolean remainsIn(Rectangle r) {
-        double nextX = point.getX() + velocity.getDx();
-        double nextY = point.getY() + velocity.getDy();
-        return nextX - radius >= r.leftX() && nextX + radius <= r.rightX()
-            && nextY - radius >= r.topY() && nextY + radius <= r.bottomY();
+    public Ball predictMove() {
+        Point nextPoint = this.getVelocity().applyToPoint(this.point);
+        return new Ball(nextPoint, this.radius, this.color);
     }
 
     /**
-     * Makes pecise movement of the ball when it hits the boundaries,
+     * Makes precise movement of the ball when it hits the boundaries,
      * by calculating the exact point of collision and adjusting the position and velocity accordingly.
      * Absolute value of velocity components is used instead of flipping the sign,
      * to avoid bouncing loops if the ball starts on a boundary.
      * No need to call velocity.applyToPoint() afterwards;
      * the new position is directly set during the collision handling.
+     * @param r the rectangle representing the boundaries to check against
      */
-    public void complexMove() {
-        double absDX = Math.abs(velocity.getDx());
+    public void complexMove(Rectangle r) {
         double nextX = point.getX() + velocity.getDx();
-        //Bouncing velocity is calculated by math.abs to avoid bouncing loops if the ball starts on a boundary.
-        if (nextX < radius) {
-            double distanceFromBoundary = point.getX() - radius;
-            double newX = Math.max(absDX - distanceFromBoundary, radius);
-            point = new Point(newX, point.getY());
-            velocity.reassign(Math.abs(velocity.getDx()), velocity.getDy());
-        } else if (nextX + radius > Helper.WIDTH) {
-            double distanceFromBoundary = Helper.WIDTH - radius - point.getX();
-            double newX = Math.min(Helper.WIDTH - (absDX - distanceFromBoundary), Helper.WIDTH - radius);
-            point = new Point(newX, point.getY());
-            velocity.reassign(-absDX, velocity.getDy());
+        if (nextX - radius < r.leftX()) {
+            bounceOnLeft(r.leftX());
+        } else if (nextX + radius > r.rightX()) {
+            bounceOnRight(r.rightX());
         } else {
             point = new Point(nextX, point.getY());
         }
 
-        double absDY = Math.abs(velocity.getDy());
         double nextY = point.getY() + velocity.getDy();
-        if (nextY < radius) {
-            double distanceFromBoundary = point.getY() - radius;
-            double newY = Math.max(absDY - distanceFromBoundary, radius);
-            point = new Point(point.getX(), newY);
-            velocity.reassign(velocity.getDx(), absDY);
-        } else if (nextY + radius > Helper.HEIGHT) {
-            double distanceFromBoundary = Helper.HEIGHT - radius - point.getY();
-            double newY = Math.min(Helper.HEIGHT - (absDY - distanceFromBoundary), Helper.HEIGHT - radius);
-            point = new Point(point.getX(), newY);
-            velocity.reassign(velocity.getDx(), -absDY);
+        if (nextY - radius < r.topY()) {
+            bounceOnTop(r.topY());
+        } else if (nextY + radius > r.bottomY()) {
+            bounceOnBottom(r.bottomY());
         } else {
             point = new Point(point.getX(), nextY);
         }
     }
 
+    /**
+     * Helper method to handle bouncing on the left boundary.
+     * @param leftX the x-coordinate of the left boundary
+     */
+    private void bounceOnLeft(double leftX) {
+        double distanceFromBoundary = (point.getX() - radius) - leftX;
+        double absDX = Math.abs(velocity.getDx());
+        double newX = leftX + Math.max(absDX - distanceFromBoundary, radius);
+        point = new Point(newX, point.getY());
+        velocity.reassign(Math.abs(velocity.getDx()), velocity.getDy());
+    }
+
+    /**
+     * Helper method to handle bouncing on the right boundary.
+     * @param rightX the x-coordinate of the right boundary
+     */
+    private void bounceOnRight(double rightX) {
+        double distanceFromBoundary = rightX - (point.getX() + radius);
+        double absDX = Math.abs(velocity.getDx());
+        double newX = rightX - Math.max((absDX - distanceFromBoundary), radius);
+        point = new Point(newX, point.getY());
+        velocity.reassign(-absDX, velocity.getDy());
+    }
+
+    /**
+     * Helper method to handle bouncing on the top boundary.
+     * @param topY the y-coordinate of the top boundary
+     */
+    private void bounceOnTop(double topY) {
+        double distanceFromBoundary = (point.getY() - radius) - topY;
+        double absDY = Math.abs(velocity.getDy());
+        double newY = topY + Math.max(absDY - distanceFromBoundary, radius);
+        point = new Point(point.getX(), newY);
+        velocity.reassign(velocity.getDx(), absDY);
+    }
+
+    /**
+     * Helper method to handle bouncing on the bottom boundary.
+     * @param bottomY the y-coordinate of the bottom boundary
+     */
+    private void bounceOnBottom(double bottomY) {
+        double distanceFromBoundary = bottomY - (point.getY() + radius);
+        double absDY = Math.abs(velocity.getDy());
+        double newY = bottomY - Math.max(absDY - distanceFromBoundary, radius);
+        point = new Point(point.getX(), newY);
+        velocity.reassign(velocity.getDx(), -absDY);
+    }
     /**
      * Get the x-coordinate of the ball's center.
      * @return the x-coordinate of the ball's center
@@ -171,16 +204,17 @@ public class Ball {
     /**
      * A helper method to create a ball with a random color and position, given a radius and a Random object.
      * @param radius the radius of the ball to create
+     * @param inside the rectangle representing the area in which the ball should be created
      * @param rand the Random object to use for generating random values
      * @return a new Ball object with the specified radius and a random color and position
      */
-    public static Ball createBall(int radius, Random rand) {
+    public static Ball createBall(int radius, Rectangle inside, Random rand) {
         float hue = rand.nextFloat(); // 0.0 to 1.0 - full spectrum of colors
         float saturation = 0.5f + rand.nextFloat() * 0.5f; // 0.5 to 1.0 - vibrant colors
         float brightness = 0.3f + rand.nextFloat() * 0.7f; // 0.3 to 1.0 - visible colors
         Color color = Color.getHSBColor(hue, saturation, brightness);
-        double x = rand.nextDouble() * (Helper.WIDTH - 2 * radius) + radius;
-        double y = rand.nextDouble() * (Helper.HEIGHT - 2 * radius) + radius;
+        double x = rand.nextDouble() * (inside.width() - 2 * radius) + radius + inside.leftX();
+        double y = rand.nextDouble() * (inside.height() - 2 * radius) + radius + inside.topY();
         Point start = new Point(x, y);
         return new Ball(start, radius, color);
     }
@@ -190,15 +224,16 @@ public class Ball {
      * Ball's speed is determined by its size, with larger balls moving slower,
      * while balls larger than 50 get the same speed.
      * @param size the size of the ball to create
+     * @param inside the rectangle representing the area in which the ball should be created
      * @param rand the Random object to use for generating random values
      * @return a new Ball object with the specified size and a random color and position
      */
-    public static Ball generateMovingBallBySize(int size, Random rand) {
+    public static Ball generateMovingBallBySize(int size, Rectangle inside, Random rand) {
         double adjustedSize = Math.min(size, 50);
         // using log(adjustedSize + 2) to avoid division by zero and to create a more natural speed scaling
         double speed = BASE_SPEED / Math.log(adjustedSize + 2);
         Velocity velocity = Velocity.semiRandVelocity(rand, speed);
-        Ball ball = Ball.createBall(size, rand);
+        Ball ball = Ball.createBall(size, inside, rand);
         ball.setVelocity(velocity);
         return ball;
     }
