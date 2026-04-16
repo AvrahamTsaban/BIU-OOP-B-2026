@@ -32,6 +32,23 @@ public class Velocity {
     }
 
     /**
+     * Get the angle of this velocity in degrees.
+     * @return the angle of this velocity in degrees (0 degrees is up, 90 degrees is right)
+     */
+    public double getAngle() {
+        double angle = Math.toDegrees(Math.atan2(dy, dx));
+        return (90 - angle + 360) % 360; // Convert to the desired angle format
+    }
+
+    /**
+    * Get the speed of this velocity.
+    * @return the speed of this velocity, calculated as the magnitude of the dx and dy components
+    */
+    public double getSpeed() {
+        return Math.sqrt(dx * dx + dy * dy);
+    }
+
+    /**
      * Apply this velocity to the given point, returning a new point with the updated position.
      * @param p the point to apply the velocity to
      * @return a new Point with the updated position after applying the velocity

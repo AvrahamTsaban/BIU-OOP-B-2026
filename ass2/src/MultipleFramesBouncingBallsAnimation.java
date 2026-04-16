@@ -25,20 +25,21 @@ public final class MultipleFramesBouncingBallsAnimation {
         Sleeper sleeper = new biuoop.Sleeper();
         Ball[] insideBalls = allBalls[0];
         Ball[] outsideBalls = allBalls[1];
-        allBalls[0] = null; // to GC
-        allBalls[1] = null; // to GC
         while (true) {
             DrawSurface d = gui.getDrawSurface();
             Helper.GRAY_SQUARE.drawOn(d);
             for (Ball ball : insideBalls) {
-                Ball predictedBall = ball.predictMove();
-                ball.moveOneStep();
+                ball.moveOneStep(Helper.GRAY_SQUARE, Helper.YELLOW_SQUARE);
+                ball.drawOn(d);
+            }
+            for (Ball ball : outsideBalls) {
+                ball.moveOneStep(new Rectangle[0], Helper.ALL_SQUARES);
                 ball.drawOn(d);
             }
             Helper.YELLOW_SQUARE.drawOn(d);
             gui.show(d);
-            sleeper.sleepFor(sleepTime);  // wait for 50 milliseconds.
-       }
+            sleeper.sleepFor(sleepTime);
+        }
     }
 
     /**
