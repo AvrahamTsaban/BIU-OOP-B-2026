@@ -32,10 +32,11 @@ public final class Helper {
     /** Yellow square frame used as an inner region. */
     public static final Rectangle YELLOW_SQUARE =
         new Rectangle(YELLOW_SQUARE_UL, YELLOW_SQUARE_EDGE, YELLOW_SQUARE_EDGE, java.awt.Color.YELLOW);
+    public static final Rectangle[] ALL_SQUARES = new Rectangle[] {GRAY_SQUARE, YELLOW_SQUARE};
     /** Full screen rectangle representing the drawable area. */
     public static final Rectangle SCREEN =
-        new Rectangle(new Point(0, 0), Helper.WIDTH, Helper.HEIGHT, java.awt.Color.WHITE);
-
+        new Rectangle(new Point(0, 0), WIDTH, HEIGHT, java.awt.Color.WHITE);
+    public static final double MAX_LINE_LENGTH = Math.sqrt(WIDTH * WIDTH + HEIGHT * HEIGHT);
     /**
      * Private constructor to prevent instantiation of this utility class.
      */

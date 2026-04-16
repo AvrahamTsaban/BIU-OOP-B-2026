@@ -71,29 +71,63 @@ public class Ball {
     }
 
 
+    /**
+     * Move the ball one step according to its current velocity,
+     * while checking for collisions with both inside and outside rectangles.
+     * If a collision is predicted with any of the rectangles, the ball will bounce accordingly.
+     * This method allows for interactions with multiple rectangles in the environment.
+     *
+     * <p>If there are no collisions, the ball will move using moveOneStep() without parameters,
+     * which will handle bouncing on the screen boundaries if needed.
+     * Therefore, no need to check for collisions with the screen boundaries separately. </p>
+     *
+     * @param inside an array of rectangles representing the inside boundaries
+     * @param outside an array of rectangles representing the outside boundaries
+     */
     public void moveOneStep(Rectangle[] inside, Rectangle[] outside) {
-        Ball predictedBall = this.predictMove();
-        Rectangle.CollisionType[] insideCollision = new Rectangle.CollisionType[inside.length];
-        for (int i = 0; i < inside.length; i++) {
-            insideCollision[i] = inside[i].collisionFromInside(predictedBall);
+        int insideLen = inside == null ? 0 : inside.length;
+        Collision[] insideCollision = new Collision[insideLen];
+        for (int i = 0; i < insideLen; i++) {
+            insideCollision[i] = inside[i].collisionFromInside(this.predictMove());
         }
-        Rectangle.CollisionType fromInside = Rectangle.unifyCollisions(insideCollision);
+        Collision fromInside = Collision.mergeMultipleCollisions(insideCollision);
 
-        Rectangle.CollisionType[] outsideCollision = new Rectangle.CollisionType[outside.length];
-        for (int i = 0; i < outside.length; i++) {
-            outsideCollision[i] = outside[i].collisionFromOutside(predictedBall);
+        int outsideLen = outside == null ? 0 : outside.length;
+        Collision[] outsideCollision = new Collision[outsideLen];
+        for (int i = 0; i < outsideLen; i++) {
+            outsideCollision[i] = outside[i].collisionFromOutside(this);
         }
-        Rectangle.CollisionType fromOutside = Rectangle.unifyCollisions(outsideCollision);
+        Collision fromOutside = Collision.mergeMultipleCollisions(outsideCollision);
 
-        Rectangle.CollisionType collision = Rectangle.unifyCollisions(
-            new Rectangle.CollisionType[] {fromInside, fromOutside}
-        );
-        if (collision == Rectangle.CollisionType.NONE) {
-            this.point = this.getVelocity().applyToPoint(this.point);
+        Collision sumCollision = new Collision(fromInside, fromOutside);
+        if (sumCollision.isEmpty()) {
+            moveOneStep();
         } else {
-            this.bounce(collision);
+            this.bounce(sumCollision);
         }
     }
+
+    /**
+     * A wrapper method for moveOneStep for passing a single inside and outside rectangle instead of arrays.
+     * @param inside the rectangle representing the inside boundary, or null if there is no inside boundary
+     * @param outside the rectangle representing the outside boundary, or null if there is no outside boundary
+     */
+    public void moveOneStep(Rectangle inside, Rectangle outside) {
+        Rectangle[] insideArr = inside == null ? new Rectangle[0] : new Rectangle[]{inside};
+        Rectangle[] outsideArr = outside == null ? new Rectangle[0] : new Rectangle[]{outside};
+        this.moveOneStep(insideArr, outsideArr);
+    }
+
+    /**
+     * A wrapper method for moveOneStep for passing a single inside rectangle instead of arrays.
+     * @param inside the rectangle representing the inside boundary, or null if there is no inside boundary
+     * @param outside the rectangle representing the outside boundary, or null if there is no outside boundary
+     */
+    public void moveOneStep(Rectangle inside, Rectangle[] outside) {
+        Rectangle[] insideArr = inside == null ? new Rectangle[0] : new Rectangle[]{inside};
+        this.moveOneStep(insideArr, outside);
+    }
+
 
     /**
      * Predict the next position of the ball based on its current velocity, without actually moving it.

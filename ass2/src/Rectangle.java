@@ -1,6 +1,4 @@
 import java.awt.Color;
-import java.util.Arrays;
-
 import biuoop.DrawSurface;
 
 /****
@@ -9,8 +7,6 @@ import biuoop.DrawSurface;
  * It also provides methods to check if a ball is inside or outside the square.
  */
 public class Rectangle {
-    private static final int MAX_COLLISIONS = 4;
-
     private final Point upperLeft;
     private final double horizontalEdge;
     private final double verticalEdge;
@@ -79,6 +75,38 @@ public class Rectangle {
     }
 
     /**
+     * Get a Line representing the left edge of the square.
+     * @return the line representing the left edge
+     */
+    public Line LeftLine() {
+        return new Line(new Point(leftX(), topY()), new Point(leftX(), bottomY()));
+    }
+
+    /**
+     * Get a Line representing the right edge of the square.
+     * @return the line representing the right edge
+     */
+    public Line RightLine() {
+        return new Line(new Point(rightX(), topY()), new Point(rightX(), bottomY()));
+    }
+
+    /**
+     * Get a Line representing the top edge of the square.
+     * @return the line representing the top edge
+     */
+    public Line TopLine() {
+        return new Line(new Point(leftX(), topY()), new Point(rightX(), topY()));
+    }
+
+    /**
+     * Get a Line representing the bottom edge of the square.
+     * @return the line representing the bottom edge
+     */
+    public Line BottomLine() {
+        return new Line(new Point(leftX(), bottomY()), new Point(rightX(), bottomY()));
+    }
+
+    /**
      * Draw the square on the given surface.
      * @param surface the surface to draw the square on
      */
@@ -90,9 +118,9 @@ public class Rectangle {
     /**
       * Check if the given point is inside the square. Otherwise, returns the corresponding type of collision.
       * @param p the point to check
-      * @return an array of CollisionType representing the corresponding collisions
+      * @return an array of CollisionCase representing the corresponding collisions
       */
-    private CollisionCase deviation(Point p) {
+    private CollisionCase deviationFromInside(Point p) {
         boolean hasTop = false;
         boolean hasBottom = false;
         boolean hasLeft = false;
@@ -110,7 +138,7 @@ public class Rectangle {
             hasBottom = true;
         }
 
-        return new CollisionCase(hasTop, hasBottom, hasLeft, hasRight);
+        return new CollisionCase(hasTop, hasBottom, hasLeft, hasRight, false);
     }
 
     /**
@@ -121,14 +149,9 @@ public class Rectangle {
     public Collision collisionFromInside(Ball b) {
         Point topLeft = new Point(b.getX() - b.getSize(), b.getY() - b.getSize());
         Point bottomRight = new Point(b.getX() + b.getSize(), b.getY() + b.getSize());
-        CollisionCase collisionsTL = deviation(topLeft);
-        CollisionCase collisionsBR = deviation(bottomRight);
-        CollisionCase collisions = new CollisionCase(
-            collisionsTL.isTop() || collisionsBR.isTop(),
-            collisionsTL.isBottom() || collisionsBR.isBottom(),
-            collisionsTL.isLeft() || collisionsBR.isLeft(),
-            collisionsTL.isRight() || collisionsBR.isRight()
-        );
+        CollisionCase collisionsTL = deviationFromInside(topLeft);
+        CollisionCase collisionsBR = deviationFromInside(bottomRight);
+        CollisionCase collisions = new CollisionCase(collisionsTL, collisionsBR);
         return new Collision(this, collisions);
     }
 
@@ -137,8 +160,26 @@ public class Rectangle {
      * @param p the point to check
      * @return true if the point is inside the square, false otherwise
      */
-    public boolean isInside(Point p) {
-        return p.getX() > leftX() && p.getX() < rightX() && p.getY() > topY() && p.getY() < bottomY();
+    private boolean isInside(Point p) {
+        return isInXRange(p) && isInYRange(p);
+    }
+
+    /**
+     * Check if the given point is outside the square.
+     * @param p the point to check
+     * @return true if the point is outside the square, false otherwise
+     */
+    private boolean isInXRange(Point p) {
+        return p.getX() > leftX() && p.getX() < rightX();
+    }
+
+    /**
+     * Check if the given point is outside the square.
+     * @param p the point to check
+     * @return true if the point is outside the square, false otherwise
+     */
+    private boolean isInYRange(Point p) {
+        return p.getY() > topY() && p.getY() < bottomY();
     }
 
     /**
@@ -154,75 +195,104 @@ public class Rectangle {
 
     /**
      * Check if the given ball is outside the square.
-     * @param b the ball to check
+     * @param b the ball to check (should be the predicted position of the ball)
      * @return true if the ball is outside the square, false otherwise
      */
     public boolean isOutside(Ball b) {
-        return collisionFromOutside(b).isEmpty();
+        Point topLeft = new Point(b.getX() - b.getSize(), b.getY() - b.getSize());
+        Point bottomRight = new Point(b.getX() + b.getSize(), b.getY() + b.getSize());
+        if (isInside(topLeft) || isInside(bottomRight)) {
+            return false;
+        }
+        else return !cornerTouch(b);
     }
 
     /**
-     * Check if the given ball is colliding with the square from the outside, and return the type of collision.
-     * Note that this method assumes the ball was previously outside the square.
+     * Check if the given ball is touching the square at a corner.
      * @param b the ball to check
-     * @return the type of collision that is occurring between the ball and the square, NONE if there is no collision
+     * @return true if the ball is touching the square at a corner, false otherwise
      */
-    public Collision collisionFromOutside(Ball b) {
+    private boolean cornerTouch(Ball b) {
         Point c = b.getCenter();
         double r = b.getSize();
-        boolean collidesTop = false;
-        boolean collidesBottom = false;
-        boolean collidesLeft = false;
-        boolean collidesRight = false;
-        boolean done = false;
         if (c.distance(upperLeft) < r) {
-            collidesLeft = true;
-            collidesTop = true;
-            done = true;
+            return true;
         } else if (c.distance(new Point(rightX(), topY())) < r) {
-            collidesRight = true;
-            collidesTop = true;
-            done = true;
+            return true;
         } else if (c.distance(new Point(leftX(), bottomY())) < r) {
-            collidesLeft = true;
-            collidesBottom = true;
-            done = true;
+            return true;
         } else if (c.distance(new Point(rightX(), bottomY())) < r) {
-            collidesRight = true;
-            collidesBottom = true;
-            done = true;
+            return true;
+        }
+        else return false;
+    }
+
+    /**
+     * Check for collisions from the outside.
+     * @param b the ball to check
+     * @return the type of collision that is occurring between the ball and the square,
+     * or empty Collision if there is no collision
+     */
+    public Collision collisionFromOutside(Ball b) {
+        Velocity v = b.getVelocity();
+        Point p = b.getCenter();
+        double r = b.getSize();
+        Point collisionPtR = null;
+        Point collisionPtL = null;
+        Point collisionPtT = null;
+        Point collisionPtB = null;
+        if (v.getDx() < 0) {
+            Point leftmost = new Point(p.getX() - r, p.getY());
+            Line vector = new Line(leftmost, v);
+            if (vector.length() <= v.getSpeed()) {
+                collisionPtR = this.RightLine().intersectionWith(vector);
+            }
+        } else if (v.getDx() > 0) {
+            Point rightmost = new Point(p.getX() + r, p.getY());
+            Line vector = new Line(rightmost, v);
+            if (vector.length() <= v.getSpeed()) {
+                collisionPtL = this.LeftLine().intersectionWith(vector);
+            }
+        }
+        if (v.getDy() < 0) {
+            Point uppermost = new Point(p.getX(), p.getY() - r);
+            Line vector = new Line(uppermost, v);
+            if (vector.length() <= v.getSpeed()) {
+                collisionPtB = this.BottomLine().intersectionWith(vector);
+            }
+        } else if (v.getDy() > 0) {
+            Point lowermost = new Point(p.getX(), p.getY() + r);
+            Line vector = new Line(lowermost, v);
+            if (vector.length() <= v.getSpeed()) {
+                collisionPtT = this.TopLine().intersectionWith(vector);
+            }
         }
 
-        if (done) {
-            return new Collision(this, collidesTop, collidesBottom, collidesLeft, collidesRight);
+        Point collision = nearbyCollision(p, collisionPtT, collisionPtB);
+        collision = nearbyCollision(p, collision, collisionPtL);
+        collision = nearbyCollision(p, collision, collisionPtR);
+        if (collision == null || collision.distance(p) > r) {
+            return Collision.none();
         }
+        
+        if (collision.equals(collisionPtR)) {
+            return new Collision(this, false, false, true, false, true);
+        } else if (collision.equals(collisionPtL)) {
+            return new Collision(this, false, false, false, true, true);
+        } else if (collision.equals(collisionPtT)) {
+            return new Collision(this, true, false, false, false, true);
+        } else { // collision.equals(collisionPtB)
+            return new Collision(this, false, true, false, false, true);
+        }
+    }
 
-        double x = c.getX();
-        double y = c.getY();
-        boolean rightPtInside = isInside(new Point(x + r, y));
-        boolean leftPtInside = isInside(new Point(x - r, y));
-        boolean topPtInside = isInside(new Point(x, y - r));
-        boolean bottomPtInside = isInside(new Point(x, y + r));
-
-        // asserts no corner collision, as they are handled above
-        if (topPtInside && !bottomPtInside) {
-            collidesTop = true;
+    private Point nearbyCollision(Point root, Point first, Point second) {
+        if (first == null){
+            return second;
+        } else if (second == null) {
+            return first;
+        } else {
+            return root.distance(first) < root.distance(second) ? first : second;
         }
-        if (bottomPtInside && !topPtInside) {
-            collidesBottom = true;
-        }
-        if (leftPtInside && !rightPtInside) {
-            collidesLeft = true;
-        }
-        if (rightPtInside && !leftPtInside) {
-            collidesRight = true;
-        }
-        if (topPtInside && bottomPtInside) {
-            collidesTop = true;
-            collidesBottom = true;
-            collidesRight = true;
-            collidesLeft = true;
-        }
-        return new Collision(this, collidesTop, collidesBottom, collidesLeft, collidesRight);
     }
 }
