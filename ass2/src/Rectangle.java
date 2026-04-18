@@ -78,7 +78,7 @@ public class Rectangle {
      * Get a Line representing the left edge of the square.
      * @return the line representing the left edge
      */
-    public Line LeftLine() {
+    public Line leftLine() {
         return new Line(new Point(leftX(), topY()), new Point(leftX(), bottomY()));
     }
 
@@ -86,7 +86,7 @@ public class Rectangle {
      * Get a Line representing the right edge of the square.
      * @return the line representing the right edge
      */
-    public Line RightLine() {
+    public Line rightLine() {
         return new Line(new Point(rightX(), topY()), new Point(rightX(), bottomY()));
     }
 
@@ -94,7 +94,7 @@ public class Rectangle {
      * Get a Line representing the top edge of the square.
      * @return the line representing the top edge
      */
-    public Line TopLine() {
+    public Line topLine() {
         return new Line(new Point(leftX(), topY()), new Point(rightX(), topY()));
     }
 
@@ -102,7 +102,7 @@ public class Rectangle {
      * Get a Line representing the bottom edge of the square.
      * @return the line representing the bottom edge
      */
-    public Line BottomLine() {
+    public Line bottomLine() {
         return new Line(new Point(leftX(), bottomY()), new Point(rightX(), bottomY()));
     }
 
@@ -126,16 +126,16 @@ public class Rectangle {
         boolean hasLeft = false;
         boolean hasRight = false;
         if (p.getX() < leftX()) {
-            hasLeft = true;
-        }
-        if (p.getX() > rightX()) {
             hasRight = true;
         }
+        if (p.getX() > rightX()) {
+            hasLeft = true;
+        }
         if (p.getY() < topY()) {
-            hasTop = true;
+            hasBottom = true;
         }
         if (p.getY() > bottomY()) {
-            hasBottom = true;
+            hasTop = true;
         }
 
         return new CollisionCase(hasTop, hasBottom, hasLeft, hasRight, false);
@@ -143,7 +143,7 @@ public class Rectangle {
 
     /**
      * Check if the given ball is colliding with the square from the inside, and return the type of collision.
-     * @param b the ball to check
+     * @param b the ball to check (should be the predicted position of the ball)
      * @return the type of collision that is occurring between the ball and the square, or NONE if there is no collision
      */
     public Collision collisionFromInside(Ball b) {
@@ -203,8 +203,9 @@ public class Rectangle {
         Point bottomRight = new Point(b.getX() + b.getSize(), b.getY() + b.getSize());
         if (isInside(topLeft) || isInside(bottomRight)) {
             return false;
+        } else {
+            return !cornerTouch(b);
         }
-        else return !cornerTouch(b);
     }
 
     /**
@@ -217,19 +218,22 @@ public class Rectangle {
         double r = b.getSize();
         if (c.distance(upperLeft) < r) {
             return true;
-        } else if (c.distance(new Point(rightX(), topY())) < r) {
-            return true;
-        } else if (c.distance(new Point(leftX(), bottomY())) < r) {
-            return true;
-        } else if (c.distance(new Point(rightX(), bottomY())) < r) {
+        }
+        if (c.distance(new Point(rightX(), topY())) < r) {
             return true;
         }
-        else return false;
+        if (c.distance(new Point(leftX(), bottomY())) < r) {
+            return true;
+        }
+        if (c.distance(new Point(rightX(), bottomY())) < r) {
+            return true;
+        }
+        return false;
     }
 
     /**
      * Check for collisions from the outside.
-     * @param b the ball to check
+     * @param b the ball to check (should be the current position of the ball, not the predicted position)
      * @return the type of collision that is occurring between the ball and the square,
      * or empty Collision if there is no collision
      */
@@ -237,62 +241,76 @@ public class Rectangle {
         Velocity v = b.getVelocity();
         Point p = b.getCenter();
         double r = b.getSize();
-        Point collisionPtR = null;
-        Point collisionPtL = null;
-        Point collisionPtT = null;
-        Point collisionPtB = null;
+        Point collisionPtFromR = null;
+        Point collisionPtFromL = null;
+        Point collisionPtFromT = null;
+        Point collisionPtFromB = null;
+        Point leftmost = new Point(p.getX() - r, p.getY());
+        Point rightmost = new Point(p.getX() + r, p.getY());
+        Point uppermost = new Point(p.getX(), p.getY() - r);
+        Point lowermost = new Point(p.getX(), p.getY() + r);
         if (v.getDx() < 0) {
-            Point leftmost = new Point(p.getX() - r, p.getY());
             Line vector = new Line(leftmost, v);
-            if (vector.length() <= v.getSpeed()) {
-                collisionPtR = this.RightLine().intersectionWith(vector);
+            Point intersection = this.rightLine().intersectionWith(vector);
+            if (intersection != null && intersection.distance(leftmost) <= v.getSpeed() + Helper.THRESHOLD) {
+                collisionPtFromR = intersection;
             }
         } else if (v.getDx() > 0) {
-            Point rightmost = new Point(p.getX() + r, p.getY());
             Line vector = new Line(rightmost, v);
-            if (vector.length() <= v.getSpeed()) {
-                collisionPtL = this.LeftLine().intersectionWith(vector);
+            Point intersection = this.leftLine().intersectionWith(vector);
+            if (intersection != null && intersection.distance(rightmost) <= v.getSpeed() + Helper.THRESHOLD) {
+                collisionPtFromL = intersection;
             }
         }
         if (v.getDy() < 0) {
-            Point uppermost = new Point(p.getX(), p.getY() - r);
             Line vector = new Line(uppermost, v);
-            if (vector.length() <= v.getSpeed()) {
-                collisionPtB = this.BottomLine().intersectionWith(vector);
+            Point intersection = this.bottomLine().intersectionWith(vector);
+            if (intersection != null && intersection.distance(uppermost) <= v.getSpeed() + Helper.THRESHOLD) {
+                collisionPtFromB = intersection;
             }
         } else if (v.getDy() > 0) {
-            Point lowermost = new Point(p.getX(), p.getY() + r);
             Line vector = new Line(lowermost, v);
-            if (vector.length() <= v.getSpeed()) {
-                collisionPtT = this.TopLine().intersectionWith(vector);
+            Point intersection = this.topLine().intersectionWith(vector);
+            if (intersection != null && intersection.distance(lowermost) <= v.getSpeed() + Helper.THRESHOLD) {
+                collisionPtFromT = intersection;
             }
         }
 
-        Point collision = nearbyCollision(p, collisionPtT, collisionPtB);
-        collision = nearbyCollision(p, collision, collisionPtL);
-        collision = nearbyCollision(p, collision, collisionPtR);
-        if (collision == null || collision.distance(p) > r) {
+        Point[] roots = new Point[] {leftmost, rightmost, lowermost, uppermost};
+        Point[] targets = new Point[] {collisionPtFromR, collisionPtFromL, collisionPtFromT, collisionPtFromB};
+        Point collision = nearbyCollision(roots, targets);
+        if (collision == null) {
             return Collision.none();
         }
-        
-        if (collision.equals(collisionPtR)) {
+
+        if (collision.equals(collisionPtFromR)) {
             return new Collision(this, false, false, true, false, true);
-        } else if (collision.equals(collisionPtL)) {
+        } else if (collision.equals(collisionPtFromL)) {
             return new Collision(this, false, false, false, true, true);
-        } else if (collision.equals(collisionPtT)) {
-            return new Collision(this, true, false, false, false, true);
-        } else { // collision.equals(collisionPtB)
+        } else if (collision.equals(collisionPtFromT)) {
             return new Collision(this, false, true, false, false, true);
+        } else { // collision.equals(collisionPtFromB)
+            return new Collision(this, true, false, false, false, true);
         }
     }
 
-    private Point nearbyCollision(Point root, Point first, Point second) {
-        if (first == null){
-            return second;
-        } else if (second == null) {
-            return first;
-        } else {
-            return root.distance(first) < root.distance(second) ? first : second;
+
+    private Point nearbyCollision(Point[] roots, Point[] targets) {
+        double minDistance = Double.POSITIVE_INFINITY;
+        Point closestTarget = null;
+        if (roots == null || targets == null || roots.length != targets.length) {
+            return null;
         }
+        for (int i = 0; i < roots.length; i++) {
+            if (roots[i] == null || targets[i] == null) {
+                continue;
+            }
+            double distance = roots[i].distance(targets[i]);
+            if (distance < minDistance) {
+                minDistance = distance;
+                closestTarget = targets[i];
+            }
+        }
+        return closestTarget;
     }
 }

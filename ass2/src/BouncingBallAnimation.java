@@ -40,7 +40,10 @@ public final class BouncingBallAnimation {
      * @param args command line arguments representing x, y, velocity (dx and dy) of the ball in the format: x y dx dy
     */
     public static void main(String[] args) {
-        //final int RADIUS = Helper.DEFAULT_RADIUS;
+        if (args.length != 4) {
+            System.err.println("Usage: java BouncingBallAnimation <x> <y> <dx> <dy>");
+            return;
+        }
         double x = Double.parseDouble(args[0]);
         double y = Double.parseDouble(args[1]);
         double dx = Double.parseDouble(args[2]);

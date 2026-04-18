@@ -4,43 +4,43 @@
  * A side with no collision is stored as NaN.
  */
 public class Collision {
-    private final Double rightX;
-    private final Double leftX;
-    private final Double topY;
-    private final Double bottomY;
+    private final Double fromRightX;
+    private final Double fromLeftX;
+    private final Double fromTopY;
+    private final Double fromBottomY;
 
     /**
      * Creates a collision from point and type.
      * Relevant sides get the point coordinate.
      * Other sides get infinite values adjusted for comparison (see Collision(Collision, Collision) constructor).
      * @param r the rectangle involved in the collision
-     * @param fromBottom true if there is a collision with the top edge, false otherwise
-     * @param fromTop true if there is a collision with the bottom edge, false otherwise
-     * @param fromRight true if there is a collision with the left edge, false otherwise
-     * @param fromLeft true if there is a collision with the right edge, false otherwise
+     * @param fromBottom true if there is a collision from the bottom, false otherwise
+     * @param fromTop true if there is a collision from the top, false otherwise
+     * @param fromRight true if there is a collision from the right, false otherwise
+     * @param fromLeft true if there is a collision from the left, false otherwise
      * @param outside true if the collision is from the outside, false otherwise
      */
     public Collision(Rectangle r,
             boolean fromBottom, boolean fromTop, boolean fromRight, boolean fromLeft, boolean outside) {
         if (fromBottom) {
-            this.topY = outside ? r.topY() : r.bottomY();
+            this.fromBottomY = outside ? r.bottomY() : r.topY();
         } else {
-            this.topY = Double.NEGATIVE_INFINITY;
+            this.fromBottomY = Double.NEGATIVE_INFINITY;
         }
         if (fromTop) {
-            this.bottomY = outside ? r.bottomY() : r.topY();
+            this.fromTopY = outside ? r.topY() : r.bottomY();
         } else {
-            this.bottomY = Double.POSITIVE_INFINITY;
+            this.fromTopY = Double.POSITIVE_INFINITY;
         }
         if (fromRight) {
-            this.leftX = outside ? r.rightX() : r.leftX();
+            this.fromRightX = outside ? r.rightX() : r.leftX();
         } else {
-            this.leftX = Double.NEGATIVE_INFINITY;
+            this.fromRightX = Double.NEGATIVE_INFINITY;
         }
         if (fromLeft) {
-            this.rightX = outside ? r.leftX() : r.rightX();
+            this.fromLeftX = outside ? r.leftX() : r.rightX();
         } else {
-            this.rightX = Double.POSITIVE_INFINITY;
+            this.fromLeftX = Double.POSITIVE_INFINITY;
         }
     }
 
@@ -60,10 +60,10 @@ public class Collision {
      * @param second the second collision
      */
     public Collision(Collision first, Collision second) {
-        this.rightX = Math.min(first.rightX, second.rightX);
-        this.leftX = Math.max(first.leftX, second.leftX);
-        this.topY = Math.max(first.topY, second.topY);
-        this.bottomY = Math.min(first.bottomY, second.bottomY);
+        this.fromRightX = Math.max(first.fromRightX, second.fromRightX);
+        this.fromLeftX = Math.min(first.fromLeftX, second.fromLeftX);
+        this.fromTopY = Math.min(first.fromTopY, second.fromTopY);
+        this.fromBottomY = Math.max(first.fromBottomY, second.fromBottomY);
     }
 
     /**
@@ -99,7 +99,7 @@ public class Collision {
      * @return right x or NaN
      */
     public Double getRight() {
-        return rightX;
+        return fromRightX;
     }
 
     /**
@@ -107,7 +107,7 @@ public class Collision {
      * @return left x or NaN
      */
     public Double getLeft() {
-        return leftX;
+        return fromLeftX;
     }
 
     /**
@@ -115,7 +115,7 @@ public class Collision {
      * @return top y or NaN
      */
     public Double getTop() {
-        return topY;
+        return fromTopY;
     }
 
     /**
@@ -123,39 +123,39 @@ public class Collision {
      * @return bottom y or NaN
      */
     public Double getBottom() {
-        return bottomY;
+        return fromBottomY;
     }
 
     /**
      * Checks if right side is missing.
      * @return true when right value is not finite
      */
-    public boolean isRight() {
-        return Double.isFinite(rightX);
+    public boolean isFromRight() {
+        return Double.isFinite(fromRightX);
     }
 
     /**
      * Checks if left side is missing.
      * @return true when left value is not finite
      */
-    public boolean isLeft() {
-        return Double.isFinite(leftX);
+    public boolean isFromLeft() {
+        return Double.isFinite(fromLeftX);
     }
 
     /**
      * Checks if top side is missing.
      * @return true when top value is not finite
      */
-    public boolean isTop() {
-        return Double.isFinite(topY);
+    public boolean isFromTop() {
+        return Double.isFinite(fromTopY);
     }
 
     /**
      * Checks if bottom side is missing.
      * @return true when bottom value is not finite
      */
-    public boolean isBottom() {
-        return Double.isFinite(bottomY);
+    public boolean isFromBottom() {
+        return Double.isFinite(fromBottomY);
     }
 
     /**
@@ -163,6 +163,6 @@ public class Collision {
      * @return true when all sides are missing
      */
     public boolean isEmpty() {
-        return !isRight() && !isLeft() && !isTop() && !isBottom();
+        return !isFromRight() && !isFromLeft() && !isFromTop() && !isFromBottom();
     }
 }
