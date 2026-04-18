@@ -2,25 +2,25 @@
  * A temporary class to hold the collision edges of a ball with a rectangle.
  */
 public class CollisionCase {
-    private final boolean hasTop;
-    private final boolean hasBottom;
-    private final boolean hasLeft;
-    private final boolean hasRight;
+    private final boolean fromTop;
+    private final boolean fromBottom;
+    private final boolean fromLeft;
+    private final boolean fromRight;
     private final boolean outside;
 
     /**
      * Creates a collision case with the given edges.
-     * @param hasTop true if there is a collision with the top edge, false otherwise
-     * @param hasBottom true if there is a collision with the bottom edge, false otherwise
-     * @param hasLeft true if there is a collision with the left edge, false otherwise
-     * @param hasRight true if there is a collision with the right edge, false otherwise
+     * @param fromTop true if there is a collision with the top edge, false otherwise
+     * @param fromBottom true if there is a collision with the bottom edge, false otherwise
+     * @param fromLeft true if there is a collision with the left edge, false otherwise
+     * @param fromRight true if there is a collision with the right edge, false otherwise
      * @param outside true if the collision is from the outside, false otherwise
      */
-    public CollisionCase(boolean hasTop, boolean hasBottom, boolean hasLeft, boolean hasRight, boolean outside) {
-        this.hasTop = hasTop;
-        this.hasBottom = hasBottom;
-        this.hasLeft = hasLeft;
-        this.hasRight = hasRight;
+    public CollisionCase(boolean fromTop, boolean fromBottom, boolean fromLeft, boolean fromRight, boolean outside) {
+        this.fromTop = fromTop;
+        this.fromBottom = fromBottom;
+        this.fromLeft = fromLeft;
+        this.fromRight = fromRight;
         this.outside = outside;
     }
 
@@ -34,50 +34,50 @@ public class CollisionCase {
      */
     public CollisionCase(CollisionCase first, CollisionCase second) {
         if (first.isOutside() != second.isOutside()) {
-            this.hasTop = false;
-            this.hasBottom = false;
-            this.hasLeft = false;
-            this.hasRight = false;
+            this.fromTop = false;
+            this.fromBottom = false;
+            this.fromLeft = false;
+            this.fromRight = false;
             this.outside = false;
             return;
         }
-        this.hasTop = first.hasTop || second.hasTop;
-        this.hasBottom = first.hasBottom || second.hasBottom;
-        this.hasLeft = first.hasLeft || second.hasLeft;
-        this.hasRight = first.hasRight || second.hasRight;
+        this.fromTop = first.fromTop || second.fromTop;
+        this.fromBottom = first.fromBottom || second.fromBottom;
+        this.fromLeft = first.fromLeft || second.fromLeft;
+        this.fromRight = first.fromRight || second.fromRight;
         this.outside = first.outside;
     }
 
     /**
      * Checks if right side exists.
-     * @return true when hasRight is true
+     * @return true when fromRight is true
      */
     public boolean isRight() {
-        return hasRight;
+        return fromRight;
     }
 
     /**
      * Checks if left side exists.
-     * @return true when hasLeft is true
+     * @return true when fromLeft is true
      */
     public boolean isLeft() {
-        return hasLeft;
+        return fromLeft;
     }
 
     /**
      * Checks if top side exists.
-     * @return true when hasTop is true
+     * @return true when fromTop is true
      */
     public boolean isTop() {
-        return hasTop;
+        return fromTop;
     }
 
     /**
      * Checks if bottom side exists.
-     * @return true when hasBottom is true
+     * @return true when fromBottom is true
      */
     public boolean isBottom() {
-        return hasBottom;
+        return fromBottom;
     }
 
     /**

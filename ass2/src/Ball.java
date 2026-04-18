@@ -148,28 +148,40 @@ public class Ball {
      * @param collision the type of collision that occurred
      */
     public void bounce(Collision collision) {
-        if (collision.isLeft()) {
-            bounceOnLeft(collision.getLeft());
-        } else if (collision.isRight()) {
-            bounceOnRight(collision.getRight());
+        if (collision.isFromLeft()) {
+            bounceFromLeft(collision.getLeft());
+        } else if (collision.isFromRight()) {
+            bounceFromRight(collision.getRight());
         } else {
             point = new Point(point.getX() + velocity.getDx(), point.getY());
         }
 
-        if (collision.isTop()) {
-            bounceOnTop(collision.getTop());
-        } else if (collision.isBottom()) {
-            bounceOnBottom(collision.getBottom());
+        if (collision.isFromTop()) {
+            bounceAbove(collision.getTop());
+        } else if (collision.isFromBottom()) {
+            bounceBelow(collision.getBottom());
         } else {
             point = new Point(point.getX(), point.getY() + velocity.getDy());
         }
     }
 
     /**
+     * Helper method to handle bouncing on the right boundary.
+     * @param rightX the x-coordinate of the right boundary
+    */
+   private void bounceFromLeft(double rightX) {
+       double distanceFromBoundary = rightX - (point.getX() + radius);
+       double absDX = Math.abs(velocity.getDx());
+       double newX = rightX - Math.max((absDX - distanceFromBoundary), radius);
+       point = new Point(newX, point.getY());
+       velocity.reassign(-absDX, velocity.getDy());
+    }
+
+    /**
      * Helper method to handle bouncing on the left boundary.
      * @param leftX the x-coordinate of the left boundary
      */
-    private void bounceOnLeft(double leftX) {
+    private void bounceFromRight(double leftX) {
         double distanceFromBoundary = (point.getX() - radius) - leftX;
         double absDX = Math.abs(velocity.getDx());
         double newX = leftX + Math.max(absDX - distanceFromBoundary, radius);
@@ -178,22 +190,10 @@ public class Ball {
     }
 
     /**
-     * Helper method to handle bouncing on the right boundary.
-     * @param rightX the x-coordinate of the right boundary
-     */
-    private void bounceOnRight(double rightX) {
-        double distanceFromBoundary = rightX - (point.getX() + radius);
-        double absDX = Math.abs(velocity.getDx());
-        double newX = rightX - Math.max((absDX - distanceFromBoundary), radius);
-        point = new Point(newX, point.getY());
-        velocity.reassign(-absDX, velocity.getDy());
-    }
-
-    /**
      * Helper method to handle bouncing on the top boundary.
      * @param topY the y-coordinate of the top boundary
      */
-    private void bounceOnTop(double topY) {
+    private void bounceBelow(double topY) {
         double distanceFromBoundary = (point.getY() - radius) - topY;
         double absDY = Math.abs(velocity.getDy());
         double newY = topY + Math.max(absDY - distanceFromBoundary, radius);
@@ -205,7 +205,7 @@ public class Ball {
      * Helper method to handle bouncing on the bottom boundary.
      * @param bottomY the y-coordinate of the bottom boundary
      */
-    private void bounceOnBottom(double bottomY) {
+    private void bounceAbove(double bottomY) {
         double distanceFromBoundary = bottomY - (point.getY() + radius);
         double absDY = Math.abs(velocity.getDy());
         double newY = bottomY - Math.max(absDY - distanceFromBoundary, radius);
