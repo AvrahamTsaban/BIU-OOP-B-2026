@@ -3,7 +3,7 @@
  *
  * <p>Holds collision boundary coordinates organized by approach direction (left, right, top, bottom).
  * A direction with no collision is stored as a sentinel value (non-finite double: positive/negative infinity).
- * May also hold a reference to a ball representing a corner collision from outside, 
+ * May also hold a reference to a ball representing a corner collision from outside,
  * which should contain the new position after bounce and reflected velocity.</p>
  *
  * <p><strong>Best practice:</strong> If possible, avoid merging collisions that contain ball references

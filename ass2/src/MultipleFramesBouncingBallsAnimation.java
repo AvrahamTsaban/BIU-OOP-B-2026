@@ -7,7 +7,7 @@ import biuoop.Sleeper;
  * Displays an animation of multiple bouncing balls within rectangular boundaries.
  *
  * <p>Balls are separated into two groups:
- * those bouncing inside a gray square (bouncing off a yellow overlapped square), 
+ * those bouncing inside a gray square (bouncing off a yellow overlapped square),
  * and those bouncing outside both squares. Each ball's size is specified
  * by command-line arguments. If balls overlap, those specified later in arguments are drawn on top.</p>
  *
