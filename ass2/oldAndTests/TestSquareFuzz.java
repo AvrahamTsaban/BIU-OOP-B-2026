@@ -32,7 +32,7 @@ public class TestSquareFuzz {
                 if (!gray.isOutside(b) || !yellow.isOutside(b)) {
                     outsideFailures++;
                     System.out.println("OUTSIDE_FAIL t=" + t + " step=" + i
-                        + " x=" + b.getX() + " y=" + b.getY() + " r=" + b.getSize());
+                        + " x=" + b.getCenter().getX() + " y=" + b.getCenter().getY() + " r=" + b.getSize());
                     break;
                 }
             }
@@ -50,7 +50,7 @@ public class TestSquareFuzz {
                 if (!gray.isInside(b) || !yellow.isOutside(b)) {
                     insideFailures++;
                     System.out.println("INSIDE_FAIL t=" + t + " step=" + i
-                        + " x=" + b.getX() + " y=" + b.getY() + " r=" + b.getSize()
+                        + " x=" + b.getCenter().getX() + " y=" + b.getCenter().getY() + " r=" + b.getSize()
                         + " inGray=" + gray.isInside(b) + " outYellow=" + yellow.isOutside(b));
                     break;
                 }

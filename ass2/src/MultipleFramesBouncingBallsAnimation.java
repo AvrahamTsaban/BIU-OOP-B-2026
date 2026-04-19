@@ -4,15 +4,21 @@ import biuoop.DrawSurface;
 import biuoop.GUI;
 import biuoop.Sleeper;
 /**
- * Creates an animation of multiple bouncing balls on the screen.
- * Each ball's size is determined by the corresponding element in the sizes array.
- * The balls will bounce around the screen, and if they overlap,
- * the one whose command line argument is later in the list will be drawn on top of the earlier ones.
+ * Displays an animation of multiple bouncing balls within rectangular boundaries.
+ *
+ * <p>Balls are separated into two groups:
+ * those bouncing inside a gray square (bouncing off a yellow overlapped square), 
+ * and those bouncing outside both squares. Each ball's size is specified
+ * by command-line arguments. If balls overlap, those specified later in arguments are drawn on top.</p>
+ *
+ * <p>This is a utility class with a private constructor to prevent instantiation.</p>
+ *
+ * @author Avraham Tsaban, avraham.tsaban@gmail.com
+ * @version 1.0
+ * @since 2024-06-05
  */
 public final class MultipleFramesBouncingBallsAnimation {
-    /**
-     * Private constructor to prevent instantiation of this utility class.
-     */
+    /** Private constructor to prevent instantiation of this utility class. */
     private MultipleFramesBouncingBallsAnimation() { }
 
     /**

@@ -4,10 +4,18 @@ import biuoop.DrawSurface;
 import biuoop.GUI;
 import biuoop.Sleeper;
 /**
- * Creates an animation of multiple bouncing balls on the screen.
- * Each ball's size is determined by the corresponding element in the sizes array.
- * The balls will bounce around the screen, and if they overlap,
- * the one whose command line argument is later in the list will be drawn on top of the earlier ones.
+ * Displays an animation of multiple bouncing balls on the screen.
+ *
+ * <p>Each ball is created with a size specified by command-line arguments.
+ * Ball sizes determine both appearance and movement speed (larger balls move slower).
+ * Balls bounce within the window boundaries. If balls overlap, those specified later
+ * in arguments are drawn on top of earlier ones.</p>
+ *
+ * <p>This is a utility class with a private constructor to prevent instantiation.</p>
+ *
+ * @author Avraham Tsaban, avraham.tsaban@gmail.com
+ * @version 1.0
+ * @since 2024-06-05
  */
 public final class MultipleBouncingBallsAnimation {
     /**
@@ -36,7 +44,7 @@ public final class MultipleBouncingBallsAnimation {
                 ball.drawOn(d);
             }
             gui.show(d);
-            sleeper.sleepFor(sleepTime);  // wait for 50 milliseconds.
+            sleeper.sleepFor(sleepTime);  // wait for the animation frame time
        }
     }
 

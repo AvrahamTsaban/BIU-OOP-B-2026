@@ -97,9 +97,9 @@ public class Line implements Comparable<Line> {
     }
 
     /**
-     * Calculates and stores the slope.
+     * Calculates and stores the slope of this line.
      * Vertical lines get slope Double.POSITIVE_INFINITY.
-     * A line that is a point gets slope 0.
+     * A line that is a point (start equals end) gets slope 0.
      *
      * @return slope value (see method description)
      */
@@ -108,7 +108,7 @@ public class Line implements Comparable<Line> {
         double dy = this.end.getY() - this.start.getY();
 
         if (Helper.doubleEq(dx, 0) && Helper.doubleEq(dy, 0)) {
-            // line is a point, we mey define arbitrary, easy to handle slope value
+            // line is a point, we may define arbitrary, easy to handle slope value
             return 0;
         } else if (Helper.doubleEq(dx, 0)) {
             return Double.POSITIVE_INFINITY;
@@ -196,9 +196,9 @@ public class Line implements Comparable<Line> {
     }
 
     /**
-     * Returns a line y-intercept.
+     * Returns the y-intercept of a line (where it crosses the y-axis).
      *
-     * @param line line whose intercept is calculated
+     * @param line the line whose intercept is calculated
      * @return y-intercept value
      */
     private double getYIntercept(Line line) {
@@ -291,16 +291,6 @@ public class Line implements Comparable<Line> {
         return (((pt <= max) && (pt >= min)) || Helper.doubleEq(pt, max) || Helper.doubleEq(pt, min));
     }
 
-    /**
-     * Checks if this line intersects both given lines.
-     *
-     * @param other1 first segment
-     * @param other2 second segment
-     * @return true if both intersections exist
-     */
-    public boolean isIntersecting(Line other1, Line other2) {
-        return this.isIntersecting(other1) && this.isIntersecting(other2);
-    }
 
     /**
      * Returns the intersection point with another line.

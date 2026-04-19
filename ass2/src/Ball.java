@@ -4,16 +4,28 @@ import biuoop.DrawSurface;
 
 /**
  * Represents a ball with a center point, radius, and color.
- * Provides methods to access the ball's properties and to draw the ball on a given surface.
+ *
+ * <p>Provides methods to access and modify the ball's properties,
+ * simulate movement with collision detection, and render the ball on a DrawSurface.
+ * The ball can move within boundaries and bounce off rectangles (from inside or outside).
+ * Movement is determined by a velocity vector.</p>
+ *
+ * <p><strong>Precision Note:</strong> {@link #getX()} and {@link #getY()} cast to int, which loses
+ * precision. For precise position, use {@link #getCenter()}.</p>
+ *
+ * @author Avraham Tsaban, avraham.tsaban@gmail.com
+ * @version 1.0
+ * @since 2024-06-05
  */
 public class Ball {
+    private static final double LOG_SHIFT = 2.0; // to avoid division by zero and make speed scaling natural
     private Point point;
     private final int radius;
     private final Color color;
     private final Velocity velocity;
-    private static final double BASE_SPEED = 7.0;
+    private static final double BASE_SPEED = Helper.SLEEP_TIME * 0.4;
 
-    /*todo: implement helper equals
+    /*TODO: implement helper equals
     base speed to 20.0, sleep to 50
     remove collision enum*/
 
@@ -62,9 +74,9 @@ public class Ball {
      * its position and velocity will be adjusted to simulate a bounce.
      */
     public void moveOneStep() {
-        Collision collision = Helper.SCREEN.collisionFromInside(this.predictMove());
+        Collision collision = Helper.SCREEN.collisionFromInside(this);
         if (collision.isEmpty()) {
-            this.point = this.getVelocity().applyToPoint(this.point);
+            this.point = velocity.applyToPoint(this.point);
         } else {
             this.bounce(collision);
         }
@@ -88,7 +100,7 @@ public class Ball {
         int insideLen = inside == null ? 0 : inside.length;
         Collision[] insideCollision = new Collision[insideLen];
         for (int i = 0; i < insideLen; i++) {
-            insideCollision[i] = inside[i].collisionFromInside(this.predictMove());
+            insideCollision[i] = inside[i].collisionFromInside(this);
         }
         Collision fromInside = Collision.mergeMultipleCollisions(insideCollision);
 
@@ -102,6 +114,11 @@ public class Ball {
         Collision sumCollision = new Collision(fromInside, fromOutside);
         if (sumCollision.isEmpty()) {
             moveOneStep();
+        } else if (sumCollision.isOutCorner()) {
+            Ball b = sumCollision.getCollidingBall();
+            this.point = b.getCenter();
+            Velocity v = b.getVelocity();
+            this.velocity.reassign(v.getDx(), v.getDy());
         } else {
             this.bounce(sumCollision);
         }
@@ -134,7 +151,7 @@ public class Ball {
      * @return a new Ball object representing the predicted position
      */
     public Ball predictMove() {
-        Point nextPoint = this.getVelocity().applyToPoint(this.point);
+        Point nextPoint = this.velocity.applyToPoint(this.point);
         return new Ball(nextPoint, this.radius, this.color);
     }
 
@@ -147,7 +164,7 @@ public class Ball {
      * the new position is directly set during the collision handling.
      * @param collision the type of collision that occurred
      */
-    public void bounce(Collision collision) {
+    private void bounce(Collision collision) {
         if (collision.isFromLeft()) {
             bounceFromLeft(collision.getLeft());
         } else if (collision.isFromRight()) {
@@ -166,49 +183,49 @@ public class Ball {
     }
 
     /**
-     * Helper method to handle bouncing on the right boundary.
-     * @param rightX the x-coordinate of the right boundary
+     * Helper method to handle bouncing on a boundary to the right (from the left).
+     * @param x the x-coordinate of the right boundary
     */
-   private void bounceFromLeft(double rightX) {
-       double distanceFromBoundary = rightX - (point.getX() + radius);
+   private void bounceFromLeft(double x) {
+       double distanceFromBoundary = x - (point.getX() + radius);
        double absDX = Math.abs(velocity.getDx());
-       double newX = rightX - Math.max((absDX - distanceFromBoundary), radius);
+       double newX = x - Math.max((absDX - distanceFromBoundary), radius);
        point = new Point(newX, point.getY());
        velocity.reassign(-absDX, velocity.getDy());
     }
 
     /**
-     * Helper method to handle bouncing on the left boundary.
-     * @param leftX the x-coordinate of the left boundary
+     * Helper method to handle bouncing on a boundary to the left (from the right).
+     * @param x the x-coordinate of the left boundary
      */
-    private void bounceFromRight(double leftX) {
-        double distanceFromBoundary = (point.getX() - radius) - leftX;
+    private void bounceFromRight(double x) {
+        double distanceFromBoundary = (point.getX() - radius) - x;
         double absDX = Math.abs(velocity.getDx());
-        double newX = leftX + Math.max(absDX - distanceFromBoundary, radius);
+        double newX = x + Math.max(absDX - distanceFromBoundary, radius);
         point = new Point(newX, point.getY());
         velocity.reassign(Math.abs(velocity.getDx()), velocity.getDy());
     }
 
     /**
-     * Helper method to handle bouncing on the top boundary.
-     * @param topY the y-coordinate of the top boundary
+     * Helper method to handle bouncing on a boundary to the top (from the bottom).
+     * @param y the y-coordinate of the top boundary
      */
-    private void bounceBelow(double topY) {
-        double distanceFromBoundary = (point.getY() - radius) - topY;
+    private void bounceBelow(double y) {
+        double distanceFromBoundary = (point.getY() - radius) - y;
         double absDY = Math.abs(velocity.getDy());
-        double newY = topY + Math.max(absDY - distanceFromBoundary, radius);
+        double newY = y + Math.max(absDY - distanceFromBoundary, radius);
         point = new Point(point.getX(), newY);
         velocity.reassign(velocity.getDx(), absDY);
     }
 
     /**
-     * Helper method to handle bouncing on the bottom boundary.
-     * @param bottomY the y-coordinate of the bottom boundary
+     * Helper method to handle bouncing on a boundary to the bottom (from the top).
+     * @param y the y-coordinate of the bottom boundary
      */
-    private void bounceAbove(double bottomY) {
-        double distanceFromBoundary = bottomY - (point.getY() + radius);
+    private void bounceAbove(double y) {
+        double distanceFromBoundary = y - (point.getY() + radius);
         double absDY = Math.abs(velocity.getDy());
-        double newY = bottomY - Math.max(absDY - distanceFromBoundary, radius);
+        double newY = y - Math.max(absDY - distanceFromBoundary, radius);
         point = new Point(point.getX(), newY);
         velocity.reassign(velocity.getDx(), -absDY);
     }
@@ -258,7 +275,7 @@ public class Ball {
      */
     public void drawOn(DrawSurface surface) {
         surface.setColor(this.color);
-        surface.fillCircle((int) this.point.getX(), (int) this.point.getY(), this.radius);
+        surface.fillCircle(getX(), getY(), this.radius);
     }
 
     /**
@@ -290,8 +307,8 @@ public class Ball {
      */
     public static Ball generateMovingBallBySize(int size, Rectangle inside, Random rand) {
         double adjustedSize = Math.min(size, 50);
-        // using log(adjustedSize + 2) to avoid division by zero and to create a more natural speed scaling
-        double speed = BASE_SPEED / Math.log(adjustedSize + 2);
+        // log(adjustedSize + LOG_SHIFT) to prevent division by zero and enforce speeds < BASE_SPEED for tiny balls
+        double speed = BASE_SPEED / Math.log(adjustedSize + LOG_SHIFT);
         Velocity velocity = Velocity.semiRandVelocity(rand, speed);
         Ball ball = Ball.createBall(size, inside, rand);
         ball.setVelocity(velocity);
