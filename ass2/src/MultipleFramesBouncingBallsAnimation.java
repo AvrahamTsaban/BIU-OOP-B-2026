@@ -3,6 +3,7 @@ import java.util.Random;
 import biuoop.DrawSurface;
 import biuoop.GUI;
 import biuoop.Sleeper;
+
 /**
  * Displays an animation of multiple bouncing balls within rectangular boundaries.
  *
@@ -18,6 +19,8 @@ import biuoop.Sleeper;
  * @since 2024-06-05
  */
 public final class MultipleFramesBouncingBallsAnimation {
+    /** An array containing all the predefined squares for easy access. */
+    private static final Rectangle[] ALL_SQUARES = new Rectangle[] {Helper.GRAY_SQUARE, Helper.YELLOW_SQUARE};
     /** Private constructor to prevent instantiation of this utility class. */
     private MultipleFramesBouncingBallsAnimation() { }
 
@@ -39,7 +42,7 @@ public final class MultipleFramesBouncingBallsAnimation {
                 ball.drawOn(d);
             }
             for (Ball ball : outsideBalls) {
-                ball.moveOneStep(new Rectangle[0], Helper.ALL_SQUARES);
+                ball.moveOneStep(new Rectangle[0], ALL_SQUARES);
                 ball.drawOn(d);
             }
             Helper.YELLOW_SQUARE.drawOn(d);

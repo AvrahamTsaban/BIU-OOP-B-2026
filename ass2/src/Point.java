@@ -2,14 +2,7 @@
  * Represents a point in 2D space with immutable coordinates.
  *
  * <p>Implementation warning: {@link #equals(Point)} and {@link #compareTo(Point)} are altered
- * in a way that is not consistent with the general contract. Specifically:
- * <ul>
- *   <li>equals() does not override Object.equals(Object), only provides a custom equals(Point)</li>
- *   <li>equals() and compareTo() use a threshold tolerance (up to {@link Helper#THRESHOLD})</li>
- *   <li>compareTo() may return 0 when equals() returns false (or vice versa)</li>
- *   <li>hashCode() is not overridden, violating the equals-hashCode contract</li>
- *   <li>compareTo() is not fully transitive</li>
- * </ul>
+ * in a way that is not consistent with the general contract.
  * These deviations are acceptable for this assignment but should be used with caution.</p>
  *
  * @author Avraham Tsaban, avraham.tsaban@gmail.com
@@ -79,7 +72,7 @@ public class Point implements Comparable<Point> {
      * First compares x coordinates, then y coordinates if x's are equal.
      *
      * @param other point to compare with
-     * @return negative if this < other, positive if this > other, 0 if equal
+     * @return negative if this is less than other, positive if greater, 0 if equal
      */
     public int compareTo(Point other) {
         if (other == null) {

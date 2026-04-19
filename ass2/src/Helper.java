@@ -20,7 +20,7 @@ public final class Helper {
     /** Default radius for balls in animations. */
     public static final int DEFAULT_RADIUS = 30;
     /** Sleep time in milliseconds for animations. */
-    public static final int SLEEP_TIME = 20;
+    public static final int SLEEP_TIME = 50;
 
     /** Upper-left corner of the gray square frame. */
     private static final Point GRAY_SQUARE_UL = new Point(50, 50);
@@ -36,10 +36,10 @@ public final class Helper {
     /** Yellow square frame used as an inner region. */
     public static final Rectangle YELLOW_SQUARE =
         new Rectangle(YELLOW_SQUARE_UL, YELLOW_SQUARE_EDGE, YELLOW_SQUARE_EDGE, java.awt.Color.YELLOW);
-    public static final Rectangle[] ALL_SQUARES = new Rectangle[] {GRAY_SQUARE, YELLOW_SQUARE};
     /** Full screen rectangle representing the drawable area. */
     public static final Rectangle SCREEN =
         new Rectangle(new Point(0, 0), WIDTH, HEIGHT, java.awt.Color.WHITE);
+    /** Maximum possible distance between any two points in the window, used for collision detection. */
     public static final double MAX_LINE_LENGTH = Math.sqrt(WIDTH * WIDTH + HEIGHT * HEIGHT);
     /**
      * Private constructor to prevent instantiation of this utility class.
