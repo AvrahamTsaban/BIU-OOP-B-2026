@@ -1,7 +1,7 @@
 /**
  * Utility class for calculating ball-corner collisions with rectangles.
  *
- * <p>This class handles the complex calculations for determining the collision point of the ball with corners. 
+ * <p>This class handles the complex calculations for determining the collision point of the ball with corners.
  * While calculating the time to collision, the reflected velocity, and the final position after the bounce.
  * </p>
  *
@@ -43,20 +43,34 @@ public final class CornerCalc {
         Ball colliding = new Ball(simCenter, ball.getSize(), ball.getColor());
 
         Point rLT = new Point(r.leftX(), r.topY());
-        Point rRT = new Point(r.rightX(), r.topY());
-        Point rLB = new Point(r.leftX(), r.bottomY());
-        Point rRB = new Point(r.rightX(), r.bottomY());
+        // default value to avoid null pointer errors, overridden if there is a closer corner
         Point collisionPt = rLT;
-        if (simCenter.distance(rRT) < ball.getSize() + Helper.THRESHOLD) {
+        double minDistance = simCenter.distance(rLT);
+
+        Point rRT = new Point(r.rightX(), r.topY());
+        double distRT = simCenter.distance(rRT);
+        if (distRT < minDistance) {
+            minDistance = distRT;
             collisionPt = rRT;
-        } else if (simCenter.distance(rLB) < ball.getSize() + Helper.THRESHOLD) {
+        }
+
+        Point rLB = new Point(r.leftX(), r.bottomY());
+        double dist = simCenter.distance(rLB);
+        if (dist < minDistance) {
+            minDistance = dist;
             collisionPt = rLB;
-        } else if (simCenter.distance(rRB) < ball.getSize() + Helper.THRESHOLD) {
+        }
+
+        Point rRB = new Point(r.rightX(), r.bottomY());
+        dist = simCenter.distance(rRB);
+        if (dist < minDistance) {
+            minDistance = dist;
             collisionPt = rRB;
         }
+
         Velocity newV = reflectVelocity(v, collisionPt, colliding);
         colliding.setVelocity(newV);
-        double remainingT = 1 - t;
+        double remainingT = Math.max(1 - t, 0); // ensure non-negative remaining time
         double finalX = simCenter.getX() + remainingT * newV.getDx();
         double finalY = simCenter.getY() + remainingT * newV.getDy();
         Point finalCenter = new Point(finalX, finalY);
@@ -79,7 +93,7 @@ public final class CornerCalc {
         double ny = (colliding.getCenter().getY() - collisionPt.getY()) / colliding.getSize();
         // Reflect velocity: v' = v - 2(v·n)n
         double projection = v.getDx() * nx + v.getDy() * ny;
-        if (projection > 0) {
+        if (projection > 0) { // using threshold is negligible
             // If projection is positive, the velocity is already moving away from the corner
             return v;
         }
@@ -120,12 +134,15 @@ public final class CornerCalc {
      * f(t) == (x0 + t*dx)^2 + (y0 + t*dy)^2 - radius^2.
      * f(t) == 0 is the time of collision.
      * (x0 + t*dx)^2 + (y0 + t*dy)^2 - radius^2 == 0
-     * expands to
+     * It expands to
      * t^2(dx^2 + dy^2) + 2*t*(x0*dx + y0*dy) + x0^2 + y0^2 - radius^2 == 0
      * solving for t using the quadratic formula gives
      * a = dx^2 + dy^2
      * b = 2*(x0*dx + y0*dy)
-     * c = x0^2 + y0^2 - radius^2</p>
+     * c = x0^2 + y0^2 - radius^2
+     * Afterwards, we may neglect the higher root because it represents a collision of the far side of the ball,
+     * meaning a collision have already occurred.</p>
+     *
      * @param simPt the point to calculate the time to
      * @param ball the ball to check for collision
      * @return the time to the simulation point, or Double.POSITIVE_INFINITY if there is no collision
@@ -147,7 +164,7 @@ public final class CornerCalc {
 
         double sqrtDisc = Math.sqrt(discriminant);
         double t1 = (-b - sqrtDisc) / (2 * a);
-        if (t1 > 0 && t1 <= 1) {
+        if (t1 > 0 - Helper.THRESHOLD && t1 <= 1 + Helper.THRESHOLD) {
             return t1; // collision occurs during the move
         }
         return Double.POSITIVE_INFINITY; // collision does not occur during the move

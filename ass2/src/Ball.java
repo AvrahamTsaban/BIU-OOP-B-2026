@@ -18,16 +18,17 @@ import biuoop.DrawSurface;
  * @since 2024-06-05
  */
 public class Ball {
-    private static final double LOG_SHIFT = 2.0; // to avoid division by zero and make speed scaling natural
+    /**
+     * Base speed for generating moving balls, used in relation to ball size. 
+     * relates to the sleep time of the animation to ensure consistency across different frame rates.
+     */
+    private static final double BASE_SPEED = Helper.SLEEP_TIME * 0.4;
+    /** used to avoid division by zero and make speed scaling natural */
+    private static final double LOG_SHIFT = 2.0;
     private Point point;
     private final int radius;
     private final Color color;
     private final Velocity velocity;
-    private static final double BASE_SPEED = Helper.SLEEP_TIME * 0.4;
-
-    /*TODO: implement helper equals
-    base speed to 20.0, sleep to 50
-    remove collision enum*/
 
     /**
      * Initialize a new ball with the given center, radius, and color.
@@ -160,8 +161,13 @@ public class Ball {
      * by calculating the exact point of collision and adjusting the position and velocity accordingly.
      * Absolute value of velocity components is used instead of flipping the sign,
      * to avoid bouncing loops if the ball starts on a boundary.
-     * No need to call velocity.applyToPoint() afterwards;
-     * the new position is directly set during the collision handling.
+     *
+     * <p>No need to call velocity.applyToPoint() afterwards;
+     * the new position is directly set during the collision handling.</p>
+     *
+     * <p>This method avoids applying threshold,
+     * since it would make a gap between the ball and the rectangle after bounce, and introduce inconsistent behavior.
+     *
      * @param collision the type of collision that occurred
      */
     private void bounce(Collision collision) {

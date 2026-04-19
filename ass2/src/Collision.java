@@ -128,6 +128,15 @@ public class Collision {
         this.collidingBall = null;
     }
 
+    /**
+     * Merges a collision with a ball representing a collision with the corner of the rectangle from outside,
+     * by adjusting the ball's position to fit the regular collision boundaries if needed.
+     * This is used to handle cases where a corner collision from outside is merged with regular collisions.
+     *
+     * @param outCorner the ball representing the collision with the corner of the rectangle from outside
+     * @param regular the collision representing the regular collision boundaries
+     * @return the merged ball (with adjusted position if needed)
+     */
     private Ball mergeBallWithRegular(Ball outCorner, Collision regular) {
         int size = outCorner.getSize();
         Point center = outCorner.getCenter();

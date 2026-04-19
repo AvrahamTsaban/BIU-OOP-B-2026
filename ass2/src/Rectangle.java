@@ -128,8 +128,12 @@ public class Rectangle {
      * Determines the collision direction(s) when a point deviates from inside the rectangle.
      *
      * <p>The collision direction indicates which side of the rectangle the point crosses from.
-     * For example, if a point is to the left of the rectangle (p.getX() < leftX()),
+     * For example, if a point is to the left of the rectangle (p.getX() is smaller than leftX()),
      * it collides from the left side (fromLeft = true).</p>
+     *
+     * <p>Threshold values are not applied in this method, as it is used for determining collision directions,
+     * so it should be consistent with the Ball.bounce() method,
+     * which avoids using threshold values by itself (see there)</p>
      *
      * @param p the point to check
      * @return a CollisionCase describing the collision directions
@@ -243,10 +247,10 @@ public class Rectangle {
     /**
      * Check if the given ball is colliding with the square from the outside, and return the type of collision.
      *
-     * <p>If collision is with the corner of the rectangle, the returned collision is wrapping a ball, 
+     * <p>If collision is with the corner of the rectangle, the returned collision is wrapping a ball,
      * containing the new position after step and reflected velocity.
      * If no collision occurs, returns a collision with type NONE.</p>
-     * 
+     *
      * @param b the ball to check (before the move)
      * @return collision between the ball and the square (may be ball wrapperor none if needed)
      */
@@ -291,9 +295,14 @@ public class Rectangle {
 
         Point[] roots = new Point[] {leftmost, rightmost, lowermost, uppermost};
         Point[] targets = new Point[] {collisionPtFromR, collisionPtFromL, collisionPtFromT, collisionPtFromB};
-        Point collision = nearbyCollision(roots, targets);
+        Point collision = nearestCollision(roots, targets);
         if (collision == null) {
-            return Collision.none();
+            Ball colliding = CornerCalc.calc(this, b);
+            if (colliding == null) {
+                return Collision.none();
+            } else {
+                return new Collision(colliding);
+            }
         }
 
         if (collision.equals(collisionPtFromR)) {
@@ -314,7 +323,13 @@ public class Rectangle {
     }
 
 
-    private Point nearbyCollision(Point[] roots, Point[] targets) {
+    /**
+     * Helper method to find the nearest collision point from an array of potential collision points.
+     * @param roots the original points representing the edges of the ball in the direction of movement
+     * @param targets the potential collision points, ordered corresponding to each root
+     * @return the nearest collision point from the targets array, or null if no valid collision points are found
+     */
+    private Point nearestCollision(Point[] roots, Point[] targets) {
         double minDistance = Double.POSITIVE_INFINITY;
         Point closestTarget = null;
         if (roots == null || targets == null || roots.length != targets.length) {
