@@ -1,9 +1,16 @@
 /**
- * Represents a point in 2D space.
+ * Represents a point in 2D space with immutable coordinates.
  *
- * <p>Implementation warning: Point.equals and Point.compareTo are altered in a way that is not consistent with the
- * general contract, without keeping transitivity and overriding hashCode.
- * This is acceptable for this assignment, but should be used with caution.</p>
+ * <p>Implementation warning: {@link #equals(Point)} and {@link #compareTo(Point)} are altered
+ * in a way that is not consistent with the general contract. Specifically:
+ * <ul>
+ *   <li>equals() does not override Object.equals(Object), only provides a custom equals(Point)</li>
+ *   <li>equals() and compareTo() use a threshold tolerance (up to {@link Helper#THRESHOLD})</li>
+ *   <li>compareTo() may return 0 when equals() returns false (or vice versa)</li>
+ *   <li>hashCode() is not overridden, violating the equals-hashCode contract</li>
+ *   <li>compareTo() is not fully transitive</li>
+ * </ul>
+ * These deviations are acceptable for this assignment but should be used with caution.</p>
  *
  * @author Avraham Tsaban, avraham.tsaban@gmail.com
  * @version 1.0

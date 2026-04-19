@@ -1,7 +1,16 @@
 import java.util.Random;
 
 /**
- * A class representing a velocity in 2D space, defined by changes in x and y coordinates.
+ * Represents a velocity in 2D space, defined by changes in x and y coordinates (dx and dy).
+ * Provides operations to compute speed, angle, apply velocity to points, and generate
+ * random velocities.
+ *
+ * <p>Velocity can be created from raw dx/dy components, from an angle and speed,
+ * or copied from another Velocity instance.</p>
+ *
+ * @author Avraham Tsaban, avraham.tsaban@gmail.com
+ * @version 1.0
+ * @since 2024-06-05
  */
 public class Velocity {
         private double dx;
@@ -29,6 +38,15 @@ public class Velocity {
         double dx = Math.cos(radians) * speed;
         double dy = Math.sin(radians) * speed;
         return new Velocity(dx, dy);
+    }
+
+    /**
+     * Copy constructor to create a new Velocity instance with the same dx and dy values as another Velocity.
+     * @param other the Velocity to copy
+     */
+    public Velocity(Velocity other) {
+        this.dx = other.dx;
+        this.dy = other.dy;
     }
 
     /**
@@ -82,17 +100,6 @@ public class Velocity {
     public double getDy() {
         return this.dy;
      }
-
-     /**
-     * A helper method to generate a random velocity for the ball.
-     * @param rand a Random object to generate random numbers
-     * @return a Velocity object with random dx and dy values
-     */
-    public static Velocity randVelocity(Random rand) {
-        double speed = (rand.nextDouble() - 0.5) * 10; // random speed between -30 and 30
-        double angle = rand.nextDouble() * 360; // random angle between 0 and 360 degrees
-        return Velocity.fromAngleAndSpeed(angle, speed);
-    }
 
      /**
      * A helper method to generate a random velocity for the ball.

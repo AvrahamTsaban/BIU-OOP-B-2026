@@ -3,7 +3,16 @@ import biuoop.DrawSurface;
 import biuoop.Sleeper;
 
 /**
- * A test class for the Ball class. It creates a GUI and draws a bouncing ball on it.
+ * Displays an animation of a single bouncing ball on the screen.
+ *
+ * <p>The ball bounces within the window boundaries. Initial position and velocity
+ * are provided as command-line arguments.</p>
+ *
+ * <p>This is a utility class with a private constructor to prevent instantiation.</p>
+ *
+ * @author Avraham Tsaban, avraham.tsaban@gmail.com
+ * @version 1.0
+ * @since 2024-06-05
  */
 public final class BouncingBallAnimation {
 
@@ -28,17 +37,17 @@ public final class BouncingBallAnimation {
             DrawSurface d = gui.getDrawSurface();
             ball.drawOn(d);
             gui.show(d);
-            sleeper.sleepFor(Helper.SLEEP_TIME);  // wait for 50 milliseconds.
+            sleeper.sleepFor(Helper.SLEEP_TIME);  // wait for the animation frame time
        }
     }
 
     /**
-     * The main method to run the animation.
-     * Gets the starting point and velocity of the ball from the command line arguments,
-     * and starts the animation with those parameters.
-     * Asserts that the command line arguments are in the correct format and valid.
-     * @param args command line arguments representing x, y, velocity (dx and dy) of the ball in the format: x y dx dy
-    */
+     * The main entry point to run the animation.
+     * Parses command-line arguments for initial ball position (first 2 arguments for x, y positions)
+     * and velocity (last 2 arguments for dx, dy), then starts the animation.
+     *
+     * @param args command line arguments in the format: {@code x y dx dy}
+     */
     public static void main(String[] args) {
         if (args.length != 4) {
             System.err.println("Usage: java BouncingBallAnimation <x> <y> <dx> <dy>");

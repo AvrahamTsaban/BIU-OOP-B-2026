@@ -1,6 +1,10 @@
 /**
- * Static methods used by the geometry classes.
- * Currently, only contains a method for comparing doubles with a threshold.
+ * Static utility methods and constants used by geometry and animation classes.
+ *
+ * <p>Contains threshold values for floating-point comparisons, window dimensions,
+ * default animation parameters, and pre-configured rectangles.</p>
+ *
+ * <p>This is a utility class with a private constructor to prevent instantiation.</p>
  *
  * @author Avraham Tsaban, avraham.tsaban@gmail.com
  * @version 1.0
@@ -16,7 +20,7 @@ public final class Helper {
     /** Default radius for balls in animations. */
     public static final int DEFAULT_RADIUS = 30;
     /** Sleep time in milliseconds for animations. */
-    public static final int SLEEP_TIME = 18;
+    public static final int SLEEP_TIME = 20;
 
     /** Upper-left corner of the gray square frame. */
     private static final Point GRAY_SQUARE_UL = new Point(50, 50);
