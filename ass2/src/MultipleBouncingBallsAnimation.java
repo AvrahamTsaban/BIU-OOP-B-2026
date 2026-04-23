@@ -58,7 +58,8 @@ public final class MultipleBouncingBallsAnimation {
     public static void main(String[] args) {
         int[] sizes = new int[args.length];
         for (int i = 0; i < args.length; i++) {
-            sizes[i] = Integer.parseUnsignedInt(args[i]);
+            int size = Math.abs(Integer.parseInt(args[i]));
+            sizes[i] = Math.min(size, Helper.MAX_RADIUS);
         }
         MultipleBouncingBallsAnimation.drawAnimation(sizes);
     }

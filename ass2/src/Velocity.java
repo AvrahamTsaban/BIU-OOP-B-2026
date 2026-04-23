@@ -76,6 +76,17 @@ public class Velocity {
     }
 
     /**
+     * Apply this velocity to the given point for a partial step, returning a new point with the updated position.
+     * @param p the point to apply the velocity to
+     * @param partialStep the fraction of the full step to apply (between 0 and 1)
+     * @return a new Point with the updated position after applying the velocity for the specified fraction of the step
+     */
+    public Point applyToPoint(Point p, double partialStep) {
+        partialStep = Math.max(0, Math.min(partialStep, 1)); // ensure partialStep is between 0 and 1
+        return new Point(p.getX() + dx * partialStep, p.getY() + dy * partialStep);
+    }
+
+    /**
      * Get new dx, dy values.
      * @param dx the change in x
      * @param dy the change in y
@@ -83,6 +94,15 @@ public class Velocity {
     public void reassign(double dx, double dy) {
         this.dx = dx;
         this.dy = dy;
+    }
+
+    /**
+     * Reassign this velocity's dx and dy values to match another Velocity instance.
+     * @param other the Velocity to copy values from
+     */
+    public void reassign(Velocity other) {
+        this.dx = other.dx;
+        this.dy = other.dy;
     }
 
     /**

@@ -19,12 +19,13 @@ import biuoop.DrawSurface;
  */
 public class Ball {
     /**
-     * Base speed for generating moving balls, used in relation to ball size. 
+     * Base speed for generating moving balls, used in relation to ball size.
      * relates to the sleep time of the animation to ensure consistency across different frame rates.
      */
     private static final double BASE_SPEED = Helper.SLEEP_TIME * 0.4;
-    /** used to avoid division by zero and make speed scaling natural */
+    /** used to avoid division by zero and make speed scaling natural. */
     private static final double LOG_SHIFT = 2.0;
+
     private Point point;
     private final int radius;
     private final Color color;
@@ -70,19 +71,37 @@ public class Ball {
     }
 
     /**
-     * Move the ball one step according to its current velocity.
-     * If the ball is predicted to hit the boundaries of the window,
-     * its position and velocity will be adjusted to simulate a bounce.
+     * Move the ball a partial step according to its current velocity.
+     * @param partialStep the fraction of the step to move
+     * @return a new Ball object representing the ball at its new position
      */
-    public void moveOneStep() {
-        Collision collision = Helper.SCREEN.collisionFromInside(this);
-        if (collision.isEmpty()) {
-            this.point = velocity.applyToPoint(this.point);
-        } else {
-            this.bounce(collision);
-        }
+    public Ball movePartialStep(double partialStep) {
+        Point newPoint = velocity.applyToPoint(this.point, partialStep);
+        Ball afterStep = new Ball(newPoint, this.radius, this.color);
+        afterStep.setVelocity(this.velocity);
+        return afterStep;
     }
 
+    /**
+     * Move the ball one step according to its current velocity.
+     * If the ball is predicted to hit the boundaries of the window,
+     * its position and velocity will be adjusted to simulate a bounce, as many times as needed.
+     */
+    public void moveOneStep() {
+        PartialStep collision = Helper.SCREEN.collisionFromInside(this, PartialStep.FULL_STEP);
+        if (collision == null || collision.isEmpty() || collision.isMaxStep()) {
+            this.point = velocity.applyToPoint(this.point);
+            return; // no collision to handle
+        }
+        double remainingStep;
+        do {
+            Ball collidingBall = collision.getCollidingBall();
+            this.point = collidingBall.getCenter();
+            this.velocity.reassign(collidingBall.getVelocity());
+            remainingStep = collision.getRemainingStep();
+            collision = Helper.SCREEN.collisionFromInside(this, remainingStep);
+        } while (collision != null && !collision.isEmpty() && remainingStep > Helper.THRESHOLD);
+    }
 
     /**
      * Move the ball one step according to its current velocity,
@@ -98,31 +117,51 @@ public class Ball {
      * @param outside an array of rectangles representing the outside boundaries
      */
     public void moveOneStep(Rectangle[] inside, Rectangle[] outside) {
-        int insideLen = inside == null ? 0 : inside.length;
-        Collision[] insideCollision = new Collision[insideLen];
-        for (int i = 0; i < insideLen; i++) {
-            insideCollision[i] = inside[i].collisionFromInside(this);
+        if ((inside == null || inside.length == 0) && (outside == null || outside.length == 0)) {
+            this.moveOneStep(); // this method takes care of bouncing on screen boundaries
+            return;
         }
-        Collision fromInside = Collision.mergeMultipleCollisions(insideCollision);
+        PartialStep collision = this.getSumCollision(inside, outside, PartialStep.FULL_STEP);
+        double remainingStep;
+        do {
+            Ball collidingBall = collision.getCollidingBall();
+            this.point = collidingBall.getCenter();
+            this.velocity.reassign(collidingBall.getVelocity());
+            remainingStep = collision.getRemainingStep();
+            collision = this.getSumCollision(inside, outside, remainingStep);
+        } while (collision != null && !collision.isEmpty() && remainingStep > Helper.THRESHOLD);
+        return;
+    }
+
+    /**
+     * Calculate the combined collision of the ball with multiple inside and outside rectangles for a given step.
+     * @param inside an array of rectangles representing the boundaries to check for collisions from the inside
+     * @param outside an array of rectangles representing the boundaries to check for collisions from the outside
+     * @param step the fraction of the original step to consider
+     * @return Partialstep of the earliest collision and reflected velocity (empty PartialStep if no collision)
+     */
+    private PartialStep getSumCollision(Rectangle[] inside, Rectangle[] outside, double step) {
+        if (step < Helper.THRESHOLD) {
+            return PartialStep.emptyStep(this);
+        }
+        int insideLen = inside == null ? 0 : inside.length;
+        PartialStep[] insideCollision = new PartialStep[insideLen];
+        for (int i = 0; i < insideLen; i++) {
+            insideCollision[i] = inside[i].collisionFromInside(this, step);
+        }
+        PartialStep fromInside = new PartialStep(this, insideCollision);
 
         int outsideLen = outside == null ? 0 : outside.length;
-        Collision[] outsideCollision = new Collision[outsideLen];
+        PartialStep[] outsideCollision = new PartialStep[outsideLen];
         for (int i = 0; i < outsideLen; i++) {
-            outsideCollision[i] = outside[i].collisionFromOutside(this);
+            outsideCollision[i] = outside[i].collisionFromOutside(this, step);
         }
-        Collision fromOutside = Collision.mergeMultipleCollisions(outsideCollision);
+        PartialStep fromOutside = new PartialStep(this, outsideCollision);
 
-        Collision sumCollision = new Collision(fromInside, fromOutside);
-        if (sumCollision.isEmpty()) {
-            moveOneStep();
-        } else if (sumCollision.isOutCorner()) {
-            Ball b = sumCollision.getCollidingBall();
-            this.point = b.getCenter();
-            Velocity v = b.getVelocity();
-            this.velocity.reassign(v.getDx(), v.getDy());
-        } else {
-            this.bounce(sumCollision);
-        }
+        PartialStep sumCollision = new PartialStep(this, fromInside, fromOutside);
+        PartialStep screenCollision = Helper.SCREEN.collisionFromInside(this, step);
+        sumCollision = new PartialStep(this, sumCollision, screenCollision);
+        return sumCollision;
     }
 
     /**
@@ -156,85 +195,18 @@ public class Ball {
         return new Ball(nextPoint, this.radius, this.color);
     }
 
+
     /**
-     * Makes precise movement of the ball when it hits the boundaries,
-     * by calculating the exact point of collision and adjusting the position and velocity accordingly.
-     * Absolute value of velocity components is used instead of flipping the sign,
-     * to avoid bouncing loops if the ball starts on a boundary.
-     *
-     * <p>No need to call velocity.applyToPoint() afterwards;
-     * the new position is directly set during the collision handling.</p>
-     *
-     * <p>This method avoids applying threshold,
-     * since it would make a gap between the ball and the rectangle after bounce, and introduce inconsistent behavior.
-     *
-     * @param collision the type of collision that occurred
+     * Predict the next position of the ball based on its current velocity, without actually moving it.
+     * @param partialStep the fraction of the step to predict for
+     * @return a new Ball object representing the predicted position
      */
-    private void bounce(Collision collision) {
-        if (collision.isFromLeft()) {
-            bounceFromLeft(collision.getLeft());
-        } else if (collision.isFromRight()) {
-            bounceFromRight(collision.getRight());
-        } else {
-            point = new Point(point.getX() + velocity.getDx(), point.getY());
-        }
-
-        if (collision.isFromTop()) {
-            bounceAbove(collision.getTop());
-        } else if (collision.isFromBottom()) {
-            bounceBelow(collision.getBottom());
-        } else {
-            point = new Point(point.getX(), point.getY() + velocity.getDy());
-        }
+    public Ball predictMove(double partialStep) {
+        Point nextPoint = this.velocity.applyToPoint(this.point, partialStep);
+        return new Ball(nextPoint, this.radius, this.color);
     }
 
-    /**
-     * Helper method to handle bouncing on a boundary to the right (from the left).
-     * @param x the x-coordinate of the right boundary
-    */
-   private void bounceFromLeft(double x) {
-       double distanceFromBoundary = x - (point.getX() + radius);
-       double absDX = Math.abs(velocity.getDx());
-       double newX = x - Math.max((absDX - distanceFromBoundary), radius);
-       point = new Point(newX, point.getY());
-       velocity.reassign(-absDX, velocity.getDy());
-    }
 
-    /**
-     * Helper method to handle bouncing on a boundary to the left (from the right).
-     * @param x the x-coordinate of the left boundary
-     */
-    private void bounceFromRight(double x) {
-        double distanceFromBoundary = (point.getX() - radius) - x;
-        double absDX = Math.abs(velocity.getDx());
-        double newX = x + Math.max(absDX - distanceFromBoundary, radius);
-        point = new Point(newX, point.getY());
-        velocity.reassign(Math.abs(velocity.getDx()), velocity.getDy());
-    }
-
-    /**
-     * Helper method to handle bouncing on a boundary to the top (from the bottom).
-     * @param y the y-coordinate of the top boundary
-     */
-    private void bounceBelow(double y) {
-        double distanceFromBoundary = (point.getY() - radius) - y;
-        double absDY = Math.abs(velocity.getDy());
-        double newY = y + Math.max(absDY - distanceFromBoundary, radius);
-        point = new Point(point.getX(), newY);
-        velocity.reassign(velocity.getDx(), absDY);
-    }
-
-    /**
-     * Helper method to handle bouncing on a boundary to the bottom (from the top).
-     * @param y the y-coordinate of the bottom boundary
-     */
-    private void bounceAbove(double y) {
-        double distanceFromBoundary = y - (point.getY() + radius);
-        double absDY = Math.abs(velocity.getDy());
-        double newY = y - Math.max(absDY - distanceFromBoundary, radius);
-        point = new Point(point.getX(), newY);
-        velocity.reassign(velocity.getDx(), -absDY);
-    }
     /**
      * Get the x-coordinate of the ball's center.
      * @return the x-coordinate of the ball's center
@@ -292,6 +264,7 @@ public class Ball {
      * @return a new Ball object with the specified radius and a random color and position
      */
     public static Ball createBall(int radius, Rectangle inside, Random rand) {
+        radius = validateRadius(radius, inside.getMaxRadius());
         float hue = rand.nextFloat(); // 0.0 to 1.0 - full spectrum of colors
         float saturation = 0.5f + rand.nextFloat() * 0.5f; // 0.5 to 1.0 - vibrant colors
         float brightness = 0.3f + rand.nextFloat() * 0.7f; // 0.3 to 1.0 - visible colors
@@ -300,6 +273,23 @@ public class Ball {
         double y = rand.nextDouble() * (inside.height() - 2 * radius) + radius + inside.topY();
         Point start = new Point(x, y);
         return new Ball(start, radius, color);
+    }
+
+    /**
+     * A helper method to validate and adjust the radius of a ball,
+     * based on the maximum allowed radius and the size of the inside rectangle.
+     * @param radius the radius to validate
+     * @param maxRadius the maximum radius allowed based on the inside rectangle's dimensions
+     * @return the validated radius
+     */
+    private static int validateRadius(int radius, int maxRadius) {
+        if (radius >= maxRadius) {
+            return maxRadius;
+        }
+        if (radius <= 0) {
+            return Helper.DEFAULT_RADIUS;
+        }
+        return radius;
     }
 
     /**
@@ -312,7 +302,8 @@ public class Ball {
      * @return a new Ball object with the specified size and a random color and position
      */
     public static Ball generateMovingBallBySize(int size, Rectangle inside, Random rand) {
-        double adjustedSize = Math.min(size, 50);
+        int adjustedSize = Math.min(size, 50);
+        adjustedSize = Math.max(adjustedSize, 1); // prevent zero size for speed calculation
         // log(adjustedSize + LOG_SHIFT) to prevent division by zero and enforce speeds < BASE_SPEED for tiny balls
         double speed = BASE_SPEED / Math.log(adjustedSize + LOG_SHIFT);
         Velocity velocity = Velocity.semiRandVelocity(rand, speed);

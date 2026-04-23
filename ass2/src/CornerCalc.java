@@ -12,6 +12,9 @@
  * @since 2024-06-05
  */
 public final class CornerCalc {
+    /** Tiny distance used to move away from the wall after a bounce and avoid t=0 re-collision. */
+    private static final double DEPENETRATION_DISTANCE = 10 * Helper.THRESHOLD;
+
     /** Private constructor to prevent instantiation. */
     private CornerCalc() { }
 
@@ -28,37 +31,44 @@ public final class CornerCalc {
      *
      * @param r the rectangle involved in the collision
      * @param ball the ball involved in the collision
-     * @return a new Ball representing the state of the ball (position and velocity) after collision
+     * @param stepToMove the step size the ball is trying to move
+     * @return a new Ball representing the state of the ball (position and velocity) just after collision
      */
-    public static Ball calc(Rectangle r, Ball ball) {
+    public static Ball calc(Rectangle r, Ball ball, double stepToMove) {
+        if (ball == null || r == null) {
+            return null;
+        }
         Velocity v = ball.getVelocity();
-        double t = findTimeToCollision(ball, r);
+        double t = findTimeToCollision(ball, r, stepToMove);
         if (Double.isInfinite(t)) {
             // collision does not occur during the move
             return null;
         }
-        double newX = ball.getCenter().getX() + t * v.getDx();
-        double newY = ball.getCenter().getY() + t * v.getDy();
-        Point simCenter = new Point(newX, newY);
-        Ball colliding = new Ball(simCenter, ball.getSize(), ball.getColor());
+
+        Ball colliding = ball.movePartialStep(t);
 
         Point rLT = new Point(r.leftX(), r.topY());
         // default value to avoid null pointer errors, overridden if there is a closer corner
         Point collisionPt = rLT;
+        Point simCenter = colliding.getCenter();
         double minDistance = simCenter.distance(rLT);
+        // reflects top-left position, overridden if there is a closer corner
+        CollisionCase c = new CollisionCase(true, false, false, true, true);
 
         Point rRT = new Point(r.rightX(), r.topY());
-        double distRT = simCenter.distance(rRT);
-        if (distRT < minDistance) {
-            minDistance = distRT;
+        double dist = simCenter.distance(rRT);
+        if (dist < minDistance) {
+            minDistance = dist;
             collisionPt = rRT;
+            c = new CollisionCase(true, false, true, false, true); // reflects top-right position
         }
 
         Point rLB = new Point(r.leftX(), r.bottomY());
-        double dist = simCenter.distance(rLB);
+        dist = simCenter.distance(rLB);
         if (dist < minDistance) {
             minDistance = dist;
             collisionPt = rLB;
+            c = new CollisionCase(false, true, false, true, true); // reflects bottom-left position
         }
 
         Point rRB = new Point(r.rightX(), r.bottomY());
@@ -66,17 +76,51 @@ public final class CornerCalc {
         if (dist < minDistance) {
             minDistance = dist;
             collisionPt = rRB;
+            c = new CollisionCase(false, true, true, false, true); // reflects bottom-right position
         }
 
         Velocity newV = reflectVelocity(v, collisionPt, colliding);
         colliding.setVelocity(newV);
-        double remainingT = Math.max(1 - t, 0); // ensure non-negative remaining time
-        double finalX = simCenter.getX() + remainingT * newV.getDx();
-        double finalY = simCenter.getY() + remainingT * newV.getDy();
-        Point finalCenter = new Point(finalX, finalY);
-        Ball finalB = new Ball(finalCenter, ball.getSize(), ball.getColor());
-        finalB.setVelocity(newV);
-        return finalB;
+        return pushOutAfterBounce(collisionPt, colliding, c);
+    }
+
+    /**
+     * Gets a ball near a corner of the rectangle,
+     * and returns a new ball with the same velocity but slightly pushed out from the corner.
+     * @param collisionPt the point of collision, used to determine the direction to push the ball out
+     * @param b the ball to push out
+     * @param c the collision case
+     * @return a new ball with the same velocity but slightly pushed out from the corner
+     */
+    private static Ball pushOutAfterBounce(Point collisionPt, Ball b, CollisionCase c) {
+        Point center = b.getCenter();
+        double oldX = center.getX();
+        double oldY = center.getY();
+        double cornerX = collisionPt.getX();
+        double cornerY = collisionPt.getY();
+        double dx = oldX - cornerX;
+        double dy = oldY - cornerY;
+        double oldDistance = Math.sqrt(dx * dx + dy * dy);
+        double newDistance = Math.max(oldDistance, b.getSize() + DEPENETRATION_DISTANCE);
+
+        double newX;
+        double newY;
+        if (Helper.doubleEq(oldDistance, 0)) {
+            // safety measure to forbid zero division, ball should stop before its center reaches the corner
+            double oneSideDistance = newDistance / Math.sqrt(2);
+            newX = c.isFromLeft() ? cornerX - oneSideDistance : cornerX + oneSideDistance;
+            newY = c.isFromTop() ? cornerY - oneSideDistance : cornerY + oneSideDistance;
+        } else {
+            double multiplier = newDistance / oldDistance;
+            dx *= multiplier;
+            dy *= multiplier;
+            newX = cornerX + dx;
+            newY = cornerY + dy;
+        }
+
+        Ball pushed = new Ball(new Point(newX, newY), b.getSize(), b.getColor());
+        pushed.setVelocity(b.getVelocity());
+        return pushed;
     }
 
     /**
@@ -110,19 +154,20 @@ public final class CornerCalc {
      *
      * @param b the ball to check for collision
      * @param r the rectangle whose corners to check
+     * @param stepToMove the step size the ball is trying to move
      * @return the time to collision (0 to 1], or Double.POSITIVE_INFINITY if no collision occurs during the move
      */
-    private static double findTimeToCollision(Ball b, Rectangle r) {
+    private static double findTimeToCollision(Ball b, Rectangle r, double stepToMove) {
         Point rLT = new Point(r.leftX(), r.topY());
         Point rRT = new Point(r.rightX(), r.topY());
         Point rLB = new Point(r.leftX(), r.bottomY());
         Point rRB = new Point(r.rightX(), r.bottomY());
         double t = Double.POSITIVE_INFINITY;
-        t = Math.min(t, timeTo(rLT, b));
-        t = Math.min(t, timeTo(rRT, b));
-        t = Math.min(t, timeTo(rLB, b));
-        t = Math.min(t, timeTo(rRB, b));
-        return t;
+        t = Math.min(t, timeTo(rLT, b, stepToMove));
+        t = Math.min(t, timeTo(rRT, b, stepToMove));
+        t = Math.min(t, timeTo(rLB, b, stepToMove));
+        t = Math.min(t, timeTo(rRB, b, stepToMove));
+        return Math.max(t, 0); // ensure non-negative time, if there is a collision within the move;
     }
 
     /**
@@ -145,9 +190,10 @@ public final class CornerCalc {
      *
      * @param simPt the point to calculate the time to
      * @param ball the ball to check for collision
+     * @param stepToMove the step size the ball is trying to move, used to determine if collision occurs during the move
      * @return the time to the simulation point, or Double.POSITIVE_INFINITY if there is no collision
      */
-    private static double timeTo(Point simPt, Ball ball) {
+    private static double timeTo(Point simPt, Ball ball, double stepToMove) {
         double x0 = ball.getCenter().getX() - simPt.getX();
         double y0 = ball.getCenter().getY() - simPt.getY();
         double dx = ball.getVelocity().getDx();
@@ -158,14 +204,14 @@ public final class CornerCalc {
         double b = 2 * (x0 * dx + y0 * dy);
         double c = x0 * x0 + y0 * y0 - radius * radius;
         double discriminant = b * b - 4 * a * c;
-        if (discriminant < 0) {
+        if (discriminant < 0 || Helper.doubleEq(a, 0)) {
             return Double.POSITIVE_INFINITY; // no collision
         }
 
         double sqrtDisc = Math.sqrt(discriminant);
         double t1 = (-b - sqrtDisc) / (2 * a);
-        if (t1 > 0 - Helper.THRESHOLD && t1 <= 1 + Helper.THRESHOLD) {
-            return t1; // collision occurs during the move
+        if (t1 > Helper.THRESHOLD && t1 <= stepToMove + Helper.THRESHOLD) {
+            return Math.max(0, t1); // collision occurs during the move
         }
         return Double.POSITIVE_INFINITY; // collision does not occur during the move
         /* If t1 < 0, collision occurs before the move starts, so t2 is irrelevant

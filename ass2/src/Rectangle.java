@@ -116,12 +116,65 @@ public class Rectangle {
     }
 
     /**
+     * Get the center point of the square.
+     * @return the center point of the square
+     */
+    public Point getCenter() {
+        return new Point(upperLeft.getX() + horizontalEdge / 2, upperLeft.getY() + verticalEdge / 2);
+    }
+
+    /**
      * Draw the square on the given surface.
      * @param surface the surface to draw the square on
      */
     public void drawOn(DrawSurface surface) {
         surface.setColor(this.color);
         surface.fillRectangle((int) upperLeft.getX(), (int) upperLeft.getY(), (int) horizontalEdge, (int) verticalEdge);
+    }
+
+    /**
+     * Get the maximum radius of a ball that can fit inside the square without overlapping the edges.
+     * @return the maximum radius of a ball that can fit inside the square
+     */
+    public int getMaxRadius() {
+        return (int) Math.min(horizontalEdge, verticalEdge) / 2;
+    }
+
+    /**
+     * Check if the given ball is inside the square.
+     * @param b the ball to check
+     * @return true if the ball is inside the square, false otherwise
+     */
+    public boolean isInside(Ball b) {
+        Point p = b.getCenter();
+        double x = p.getX();
+        double y = p.getY();
+        double r = b.getSize();
+        // Expand acceptance slightly to avoid treating a legal boundary position as outside due to FP drift.
+        if (x - r < leftX() - Helper.THRESHOLD || x + r > rightX() + Helper.THRESHOLD) {
+            return false;
+        }
+        if (y - r < topY() - Helper.THRESHOLD || y + r > bottomY() + Helper.THRESHOLD) {
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * Check if the given ball is outside the square.
+     * @param b the ball to check (should be the predicted position of the ball)
+     * @return true if the ball is outside the square, false otherwise
+     */
+    public boolean isOutside(Ball b) {
+        Point c = b.getCenter();
+        // get the nearest point on the rectangle to the center of the ball
+        double nearestX = Math.max(leftX(), Math.min(c.getX(), rightX()));
+        double nearestY = Math.max(topY(), Math.min(c.getY(), bottomY()));
+        // check if the nearest point is inside the ball
+        double dx = c.getX() - nearestX;
+        double dy = c.getY() - nearestY;
+        double adjustedR = b.getSize() + Helper.THRESHOLD;
+        return dx * dx + dy * dy > adjustedR * adjustedR;
     }
 
     /**
@@ -141,107 +194,28 @@ public class Rectangle {
     private CollisionCase deviationFromInside(Point p) {
         double x = p.getX();
         double y = p.getY();
-        return new CollisionCase(y > bottomY(), y < topY(), x > rightX(), x < leftX(), false);
+        return new CollisionCase(y > bottomY(), y < topY(), x < leftX(), x > rightX(), false);
     }
 
     /**
      * Check if the given ball is colliding with the square from the inside, and return the type of collision.
      * @param b the ball to check (before the move)
+     * @param remainingStep the fraction of the step to check for collision
      * @return the type of collision that is occurring between the ball and the square, or NONE if there is no collision
      */
-    public Collision collisionFromInside(Ball b) {
-        b = b.predictMove();
-        Point p = b.getCenter();
-        Point topLeft = new Point(p.getX() - b.getSize(), p.getY() - b.getSize());
-        Point bottomRight = new Point(p.getX() + b.getSize(), p.getY() + b.getSize());
+    public PartialStep collisionFromInside(Ball b, double remainingStep) {
+        if (!isInside(b) || remainingStep <= Helper.THRESHOLD) {
+            return PartialStep.emptyStep(b);
+        }
+
+        Ball predictedBall = b.predictMove(remainingStep);
+        Point p = predictedBall.getCenter();
+        Point topLeft = new Point(p.getX() - predictedBall.getSize(), p.getY() - predictedBall.getSize());
+        Point bottomRight = new Point(p.getX() + predictedBall.getSize(), p.getY() + predictedBall.getSize());
         CollisionCase collisionsTL = deviationFromInside(topLeft);
         CollisionCase collisionsBR = deviationFromInside(bottomRight);
         CollisionCase collisions = new CollisionCase(collisionsTL, collisionsBR);
-        return new Collision(this, collisions);
-    }
-
-    /**
-     * Checks if a point is within rectangle bounds.
-     *
-     * @param p the point to check
-     * @return true if the point is inside the rectangle, false otherwise
-     */
-    private boolean isInside(Point p) {
-        return isInXRange(p) && isInYRange(p);
-    }
-
-    /**
-     * Checks if a point's x-coordinate is within the rectangle's x-range (with threshold tolerance).
-     *
-     * @param p the point to check
-     * @return true if the point's x is within bounds, false otherwise
-     */
-    private boolean isInXRange(Point p) {
-        double x = p.getX();
-        return x > leftX() - Helper.THRESHOLD && x < rightX() + Helper.THRESHOLD;
-    }
-
-    /**
-     * Checks if a point's y-coordinate is within the rectangle's y-range (with threshold tolerance).
-     *
-     * @param p the point to check
-     * @return true if the point's y is within bounds, false otherwise
-     */
-    private boolean isInYRange(Point p) {
-        double y = p.getY();
-        return y > topY() - Helper.THRESHOLD && y < bottomY() + Helper.THRESHOLD;
-    }
-
-    /**
-     * Check if the given ball is inside the square.
-     * @param b the ball to check
-     * @return true if the ball is inside the square, false otherwise
-     */
-    public boolean isInside(Ball b) {
-        Point p = b.getCenter();
-        Point topLeft = new Point(p.getX() - b.getSize(), p.getY() - b.getSize());
-        Point bottomRight = new Point(p.getX() + b.getSize(), p.getY() + b.getSize());
-        return isInside(topLeft) && isInside(bottomRight);
-    }
-
-    /**
-     * Check if the given ball is outside the square.
-     * @param b the ball to check (should be the predicted position of the ball)
-     * @return true if the ball is outside the square, false otherwise
-     */
-    public boolean isOutside(Ball b) {
-        Point p = b.getCenter();
-        Point topLeft = new Point(p.getX() - b.getSize(), p.getY() - b.getSize());
-        Point bottomRight = new Point(p.getX() + b.getSize(), p.getY() + b.getSize());
-        if (isInside(topLeft) || isInside(bottomRight)) {
-            return false;
-        } else {
-            return !cornerTouch(b);
-        }
-    }
-
-    /**
-     * Checks if a ball is touching (within threshold) any corner of the rectangle.
-     *
-     * @param b the ball to check
-     * @return true if the ball is touching a corner, false otherwise
-     */
-    private boolean cornerTouch(Ball b) {
-        Point c = b.getCenter();
-        double adjustedR = b.getSize() + Helper.THRESHOLD;
-        if (c.distance(upperLeft) < adjustedR) {
-            return true;
-        }
-        if (c.distance(new Point(rightX(), topY())) < adjustedR) {
-            return true;
-        }
-        if (c.distance(new Point(leftX(), bottomY())) < adjustedR) {
-            return true;
-        }
-        if (c.distance(new Point(rightX(), bottomY())) < adjustedR) {
-            return true;
-        }
-        return false;
+        return new PartialStep(this, b, collisions, remainingStep);
     }
 
     /**
@@ -252,10 +226,16 @@ public class Rectangle {
      * If no collision occurs, returns a collision with type NONE.</p>
      *
      * @param b the ball to check (before the move)
+     * @param remainingStep the fraction of the step to check for collision
      * @return collision between the ball and the square (may be ball wrapperor none if needed)
      */
-    public Collision collisionFromOutside(Ball b) {
+    public PartialStep collisionFromOutside(Ball b, double remainingStep) {
+        if (!isOutside(b) || remainingStep <= Helper.THRESHOLD) {
+            return PartialStep.emptyStep(b);
+        }
+
         Velocity v = b.getVelocity();
+        double remainingDist = v.getSpeed() * remainingStep;
         Point p = b.getCenter();
         double r = b.getSize();
         Point collisionPtFromR = null;
@@ -266,60 +246,70 @@ public class Rectangle {
         Point rightmost = new Point(p.getX() + r, p.getY());
         Point uppermost = new Point(p.getX(), p.getY() - r);
         Point lowermost = new Point(p.getX(), p.getY() + r);
+
+        int collisionCount = 0;
+        /* Collisions amount shall be checked to determine if there is a corner collision.
+        Hence, only collisions of appropriate direction are checked, based on the velocity of the ball. */
         if (v.getDx() < 0) {
             Line vector = new Line(leftmost, v);
             Point intersection = this.rightLine().intersectionWith(vector);
-            if (intersection != null && intersection.distance(leftmost) <= v.getSpeed() + Helper.THRESHOLD) {
+            if (intersection != null && intersection.distance(leftmost) <= remainingDist + Helper.THRESHOLD) {
                 collisionPtFromR = intersection;
+                collisionCount++;
             }
         } else if (v.getDx() > 0) {
             Line vector = new Line(rightmost, v);
             Point intersection = this.leftLine().intersectionWith(vector);
-            if (intersection != null && intersection.distance(rightmost) <= v.getSpeed() + Helper.THRESHOLD) {
+            if (intersection != null && intersection.distance(rightmost) <= remainingDist + Helper.THRESHOLD) {
                 collisionPtFromL = intersection;
+                collisionCount++;
             }
         }
         if (v.getDy() < 0) {
             Line vector = new Line(uppermost, v);
             Point intersection = this.bottomLine().intersectionWith(vector);
-            if (intersection != null && intersection.distance(uppermost) <= v.getSpeed() + Helper.THRESHOLD) {
+            if (intersection != null && intersection.distance(uppermost) <= remainingDist + Helper.THRESHOLD) {
                 collisionPtFromB = intersection;
+                collisionCount++;
             }
         } else if (v.getDy() > 0) {
             Line vector = new Line(lowermost, v);
             Point intersection = this.topLine().intersectionWith(vector);
-            if (intersection != null && intersection.distance(lowermost) <= v.getSpeed() + Helper.THRESHOLD) {
+            if (intersection != null && intersection.distance(lowermost) <= remainingDist + Helper.THRESHOLD) {
                 collisionPtFromT = intersection;
+                collisionCount++;
             }
         }
 
+        if (collisionCount != 1) {
+            // no collision with edges, check for corner collision
+            Ball colliding = CornerCalc.calc(this, b, remainingStep);
+            if (colliding != null) {
+                return new PartialStep(b, colliding, remainingStep);
+            }
+        }
         Point[] roots = new Point[] {leftmost, rightmost, lowermost, uppermost};
         Point[] targets = new Point[] {collisionPtFromR, collisionPtFromL, collisionPtFromT, collisionPtFromB};
         Point collision = nearestCollision(roots, targets);
         if (collision == null) {
-            Ball colliding = CornerCalc.calc(this, b);
-            if (colliding == null) {
-                return Collision.none();
-            } else {
-                return new Collision(colliding);
-            }
+            // dummy point to avoid null pointer errors, will not be equal to any valid collision point
+            collision = new Point(Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY);
+        } else if (collision.equals(collisionPtFromR)) {
+            CollisionCase caseR = new CollisionCase(false, false, true, false, true);
+            return new PartialStep(this, b, caseR, remainingStep);
+        } else if (collision.equals(collisionPtFromL)) {
+            CollisionCase caseL = new CollisionCase(false, false, false, true, true);
+            return new PartialStep(this, b, caseL, remainingStep);
+        } else if (collision.equals(collisionPtFromT)) {
+            CollisionCase caseT = new CollisionCase(true, false, false, false, true);
+            return new PartialStep(this, b, caseT, remainingStep);
+        } else if (collision.equals(collisionPtFromB)) {
+            CollisionCase caseB = new CollisionCase(false, true, false, false, true);
+            return new PartialStep(this, b, caseB, remainingStep);
         }
 
-        if (collision.equals(collisionPtFromR)) {
-            return new Collision(this, false, false, true, false, true);
-        } else if (collision.equals(collisionPtFromL)) {
-            return new Collision(this, false, false, false, true, true);
-        } else if (collision.equals(collisionPtFromT)) {
-            return new Collision(this, false, true, false, false, true);
-        } else if (collision.equals(collisionPtFromB)) {
-            return new Collision(this, true, false, false, false, true);
-        }
-        Ball colliding = CornerCalc.calc(this, b);
-        if (colliding == null) {
-            return Collision.none();
-        } else {
-            return new Collision(colliding);
-        }
+        Ball colliding = CornerCalc.calc(this, b, remainingStep);
+        return colliding == null ? PartialStep.maxStep(b, remainingStep) : new PartialStep(b, colliding, remainingStep);
     }
 
 

@@ -72,10 +72,7 @@ public class Line implements Comparable<Line> {
      * @param v the velocity to apply to the start point to get the end point
      */
     public Line(Point p, Velocity v) {
-        double angle = v.getAngle();
-        Velocity tmp = Velocity.fromAngleAndSpeed(angle, Helper.MAX_LINE_LENGTH);
-        Point end = tmp.applyToPoint(p);
-        this(p, end);
+        this(p, Velocity.fromAngleAndSpeed(v.getAngle(), Helper.MAX_LINE_LENGTH).applyToPoint(p));
     }
 
     /**
