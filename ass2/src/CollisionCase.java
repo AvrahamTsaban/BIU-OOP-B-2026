@@ -2,7 +2,7 @@
  * A temporary data class to hold collision direction flags between a ball and a rectangle.
  *
  * <p>The stored flags describe the direction(s) from which the ball approaches a boundary,
- * providing a simple way to represent collision geometry before being converted to a {@link Collision} object.</p>
+ * providing a simple way to represent collision geometry before being converted to a {@link PartialStep} object.</p>
  *
  * @author Avraham Tsaban, avraham.tsaban@gmail.com
  * @version 1.0
@@ -23,11 +23,11 @@ public class CollisionCase {
      * @param fromRight true if there is a collision from the right, false otherwise
      * @param outside true if the collision is from the outside, false otherwise
      */
-    public CollisionCase(boolean fromTop, boolean fromBottom, boolean fromLeft, boolean fromRight, boolean outside) {
+    public CollisionCase(boolean fromTop, boolean fromBottom, boolean fromRight, boolean fromLeft, boolean outside) {
         this.fromTop = fromTop;
         this.fromBottom = fromBottom;
-        this.fromLeft = fromLeft;
         this.fromRight = fromRight;
+        this.fromLeft = fromLeft;
         this.outside = outside;
     }
 

@@ -15,7 +15,6 @@ import biuoop.Sleeper;
  * @since 2024-06-05
  */
 public final class BouncingBallAnimation {
-
     /**
      * Private constructor to prevent instantiation of this utility class.
      */
@@ -49,14 +48,27 @@ public final class BouncingBallAnimation {
      * @param args command line arguments in the format: {@code x y dx dy}
      */
     public static void main(String[] args) {
-        if (args.length != 4) {
+        if (args.length < 4) {
             System.err.println("Usage: java BouncingBallAnimation <x> <y> <dx> <dy>");
             return;
         }
-        double x = Double.parseDouble(args[0]);
-        double y = Double.parseDouble(args[1]);
-        double dx = Double.parseDouble(args[2]);
-        double dy = Double.parseDouble(args[3]);
+
+        double x = (double) Integer.parseInt(args[0]);
+        x = Math.min(x, Helper.WIDTH - Helper.DEFAULT_RADIUS);
+        x = Math.max(x, Helper.DEFAULT_RADIUS);
+
+        double y = (double) Integer.parseInt(args[1]);
+        y = Math.min(y, Helper.HEIGHT - Helper.DEFAULT_RADIUS);
+        y = Math.max(y, Helper.DEFAULT_RADIUS);
+
+        double dx = (double) Integer.parseInt(args[2]);
+        dx = Math.min(dx, Helper.MAX_SPEED);
+        dx = Math.max(dx, -Helper.MAX_SPEED);
+
+        double dy = (double) Integer.parseInt(args[3]);
+        dy = Math.min(dy, Helper.MAX_SPEED);
+        dy = Math.max(dy, -Helper.MAX_SPEED);
+
         BouncingBallAnimation.drawAnimation(new Point(x, y), dx, dy);
     }
 }

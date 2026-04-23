@@ -21,6 +21,8 @@ import biuoop.Sleeper;
 public final class MultipleFramesBouncingBallsAnimation {
     /** An array containing all the predefined squares for easy access. */
     private static final Rectangle[] ALL_SQUARES = new Rectangle[] {Helper.GRAY_SQUARE, Helper.YELLOW_SQUARE};
+    /** The maximum number of attempts to generate a valid ball position. */
+    private static final int MAX_ATTEMPTS = 20;
     /** Private constructor to prevent instantiation of this utility class. */
     private MultipleFramesBouncingBallsAnimation() { }
 
@@ -68,13 +70,23 @@ public final class MultipleFramesBouncingBallsAnimation {
         Ball[] outsideBalls = new Ball[numBalls - numInsideBalls];
         int arrayIndex = 0;
         for (int i = 0; i < numInsideBalls; i++, arrayIndex++) {
+            int attempts = 0;
             do {
                 insideBalls[i] = Ball.generateMovingBallBySize(sizes[arrayIndex], Helper.GRAY_SQUARE, rand);
+                attempts++;
+                if (attempts > MAX_ATTEMPTS) {
+                    sizes[arrayIndex] = Helper.DEFAULT_RADIUS; // Fallback to default size if too many attempts
+                }
             } while (!Helper.YELLOW_SQUARE.isOutside(insideBalls[i]));
         }
         for (int i = 0; i < numBalls - numInsideBalls; i++, arrayIndex++) {
+            int attempts = 0;
             do {
                 outsideBalls[i] = Ball.generateMovingBallBySize(sizes[arrayIndex], Helper.SCREEN, rand);
+                attempts++;
+                if (attempts > MAX_ATTEMPTS) {
+                    sizes[arrayIndex] = Helper.DEFAULT_RADIUS; // Fallback to default size if too many attempts
+                }
             } while (!Helper.GRAY_SQUARE.isOutside(outsideBalls[i])
                 || !Helper.YELLOW_SQUARE.isOutside(outsideBalls[i]));
         }
@@ -90,7 +102,8 @@ public final class MultipleFramesBouncingBallsAnimation {
     public static void main(String[] args) {
         int[] sizes = new int[args.length];
         for (int i = 0; i < args.length; i++) {
-            sizes[i] = Integer.parseUnsignedInt(args[i]);
+            int size = Math.abs(Integer.parseInt(args[i]));
+            sizes[i] = Math.min(size, Helper.MAX_RADIUS);
         }
         Ball[][] balls = generateBalls(sizes);
         MultipleFramesBouncingBallsAnimation.drawAnimation(balls);
