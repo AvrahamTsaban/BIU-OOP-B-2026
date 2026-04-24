@@ -147,6 +147,9 @@ public class Ball {
         int insideLen = inside == null ? 0 : inside.length;
         PartialStep[] insideCollision = new PartialStep[insideLen];
         for (int i = 0; i < insideLen; i++) {
+            if (inside[i] == null) {
+                continue; // skip null rectangles
+            }
             insideCollision[i] = inside[i].collisionFromInside(this, step);
         }
         PartialStep fromInside = new PartialStep(this, insideCollision);
@@ -154,6 +157,9 @@ public class Ball {
         int outsideLen = outside == null ? 0 : outside.length;
         PartialStep[] outsideCollision = new PartialStep[outsideLen];
         for (int i = 0; i < outsideLen; i++) {
+            if (outside[i] == null) {
+                continue; // skip null rectangles
+            }
             outsideCollision[i] = outside[i].collisionFromOutside(this, step);
         }
         PartialStep fromOutside = new PartialStep(this, outsideCollision);
