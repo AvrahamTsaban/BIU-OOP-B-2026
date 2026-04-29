@@ -22,11 +22,11 @@ public class Rectangle {
     private final Color color;
 
     /**
-     * Initialize a new square with the given upper left corner, edge length, and color.
-     * @param upperLeft the upper left corner of the square
-     * @param horizontalEdge the length of the horizontal side of the square
-     * @param verticalEdge the length of the vertical side of the square
-     * @param color the color of the square
+     * Initialize a new rectangle with the given upper left corner, edge length, and color.
+     * @param upperLeft the upper left corner of the rectangle
+     * @param horizontalEdge the length of the horizontal side of the rectangle
+     * @param verticalEdge the length of the vertical side of the rectangle
+     * @param color the color of the rectangle
      */
     public Rectangle(Point upperLeft, double horizontalEdge, double verticalEdge, Color color) {
         this.upperLeft = upperLeft;
@@ -36,7 +36,7 @@ public class Rectangle {
     }
 
     /**
-     * Get the x-coordinate of the right edge of the square.
+     * Get the x-coordinate of the right edge of the rectangle.
      * @return the x-coordinate of the right edge
      */
     public double rightX() {
@@ -44,7 +44,7 @@ public class Rectangle {
     }
 
     /**
-     * Get the y-coordinate of the bottom edge of the square.
+     * Get the y-coordinate of the bottom edge of the rectangle.
      * @return the y-coordinate of the bottom edge
      */
     public double bottomY() {
@@ -52,7 +52,7 @@ public class Rectangle {
     }
 
     /**
-     * Get the x-coordinate of the left edge of the square.
+     * Get the x-coordinate of the left edge of the rectangle.
      * @return the x-coordinate of the left edge
      */
     public double leftX() {
@@ -60,7 +60,7 @@ public class Rectangle {
     }
 
     /**
-     * Get the y-coordinate of the top edge of the square.
+     * Get the y-coordinate of the top edge of the rectangle.
      * @return the y-coordinate of the top edge
      */
     public double topY() {
@@ -68,23 +68,23 @@ public class Rectangle {
     }
 
     /**
-     * Get the width of the square.
-     * @return the width of the square
+     * Get the width of the rectangle.
+     * @return the width of the rectangle
      */
     public double width() {
         return horizontalEdge;
     }
 
     /**
-     * Get the height of the square.
-     * @return the height of the square
+     * Get the height of the rectangle.
+     * @return the height of the rectangle
      */
     public double height() {
         return verticalEdge;
     }
 
     /**
-     * Get a Line representing the left edge of the square.
+     * Get a Line representing the left edge of the rectangle.
      * @return the line representing the left edge
      */
     public Line leftLine() {
@@ -92,7 +92,7 @@ public class Rectangle {
     }
 
     /**
-     * Get a Line representing the right edge of the square.
+     * Get a Line representing the right edge of the rectangle.
      * @return the line representing the right edge
      */
     public Line rightLine() {
@@ -100,7 +100,7 @@ public class Rectangle {
     }
 
     /**
-     * Get a Line representing the top edge of the square.
+     * Get a Line representing the top edge of the rectangle.
      * @return the line representing the top edge
      */
     public Line topLine() {
@@ -108,7 +108,7 @@ public class Rectangle {
     }
 
     /**
-     * Get a Line representing the bottom edge of the square.
+     * Get a Line representing the bottom edge of the rectangle.
      * @return the line representing the bottom edge
      */
     public Line bottomLine() {
@@ -116,16 +116,16 @@ public class Rectangle {
     }
 
     /**
-     * Get the center point of the square.
-     * @return the center point of the square
+     * Get the center point of the rectangle.
+     * @return the center point of the rectangle
      */
     public Point getCenter() {
         return new Point(upperLeft.getX() + horizontalEdge / 2, upperLeft.getY() + verticalEdge / 2);
     }
 
     /**
-     * Draw the square on the given surface.
-     * @param surface the surface to draw the square on
+     * Draw the rectangle on the given surface.
+     * @param surface the surface to draw the rectangle on
      */
     public void drawOn(DrawSurface surface) {
         surface.setColor(this.color);
@@ -133,17 +133,17 @@ public class Rectangle {
     }
 
     /**
-     * Get the maximum radius of a ball that can fit inside the square without overlapping the edges.
-     * @return the maximum radius of a ball that can fit inside the square
+     * Get the maximum radius of a ball that can fit inside the rectangle without overlapping the edges.
+     * @return the maximum radius of a ball that can fit inside the rectangle
      */
     public int getMaxRadius() {
         return (int) Math.min(horizontalEdge, verticalEdge) / 2;
     }
 
     /**
-     * Check if the given ball is inside the square.
+     * Check if the given ball is inside the rectangle.
      * @param b the ball to check
-     * @return true if the ball is inside the square, false otherwise
+     * @return true if the ball is inside the rectangle, false otherwise
      */
     public boolean isInside(Ball b) {
         Point p = b.getCenter();
@@ -161,9 +161,9 @@ public class Rectangle {
     }
 
     /**
-     * Check if the given ball is outside the square.
+     * Check if the given ball is outside the rectangle.
      * @param b the ball to check (should be the predicted position of the ball)
-     * @return true if the ball is outside the square, false otherwise
+     * @return true if the ball is outside the rectangle, false otherwise
      */
     public boolean isOutside(Ball b) {
         Point c = b.getCenter();
@@ -198,10 +198,10 @@ public class Rectangle {
     }
 
     /**
-     * Check if the given ball is colliding with the square from the inside, and return the type of collision.
+     * Check if the given ball is colliding with the rectangle from the inside, and return the type of collision.
      * @param b the ball to check (before the move)
      * @param remainingStep the fraction of the step to check for collision
-     * @return the type of collision that is occurring between the ball and the square, or NONE if there is no collision
+     * @return the type of collision that is between the ball and the rectangle, or NONE if there is no collision
      */
     public PartialStep collisionFromInside(Ball b, double remainingStep) {
         if (!isInside(b) || remainingStep <= Helper.THRESHOLD) {
@@ -219,7 +219,7 @@ public class Rectangle {
     }
 
     /**
-     * Check if the given ball is colliding with the square from the outside, and return the type of collision.
+     * Check if the given ball is colliding with the rectangle from the outside, and return the type of collision.
      *
      * <p>If collision is with the corner of the rectangle, the returned collision is wrapping a ball,
      * containing the new position after step and reflected velocity.
@@ -227,7 +227,7 @@ public class Rectangle {
      *
      * @param b the ball to check (before the move)
      * @param remainingStep the fraction of the step to check for collision
-     * @return collision between the ball and the square (may be ball wrapperor none if needed)
+     * @return collision between the ball and the rectangle (may be ball wrapperor none if needed)
      */
     public PartialStep collisionFromOutside(Ball b, double remainingStep) {
         if (!isOutside(b) || remainingStep <= Helper.THRESHOLD) {
