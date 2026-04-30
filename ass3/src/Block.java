@@ -1,17 +1,24 @@
+import biuoop.DrawSurface;
+import java.awt.Color;
+
 /**
  * Block class represents a rectangular block that can be collided with.
  * It extends the Rectangle class and implements the Collidable interface,
  * providing methods to get its collision shape and to handle collisions with a ball.
  */
-public class Block extends Rectangle implements Collidable {
+public class Block extends Rectangle implements Collidable, Sprite {
+    private final Color color;
+
     /**
      * Create a new block with the specified upper left corner, width, and height.
      * @param upperLeft the upper left corner of the block
      * @param width the length of the horizontal side of the block
      * @param height the length of the vertical side of the block
+     * @param color the color of the block
      */
-    public Block(Point upperLeft, double width, double height) {
+    public Block(Point upperLeft, double width, double height, Color color) {
         super(upperLeft, width, height);
+        this.color = color;
     }
 
     /**
@@ -56,5 +63,24 @@ public class Block extends Rectangle implements Collidable {
             newDy = oldDy;
         }
         return new Velocity(newDx, newDy);
+    }
+
+    /**
+     * Draw this block on the given DrawSurface, filling it with its color and drawing a black border around it.
+     * @param d the DrawSurface on which to draw the block
+     */
+    public void drawOn(DrawSurface d) {
+        Point upperLeft = this.getUpperLeft();
+        d.setColor(this.color);
+        d.fillRectangle((int) upperLeft.getX(), (int) upperLeft.getY(), (int) this.getWidth(), (int) this.getHeight());
+        d.setColor(java.awt.Color.BLACK);
+        d.drawRectangle((int) upperLeft.getX(), (int) upperLeft.getY(), (int) this.getWidth(), (int) this.getHeight());
+    }
+
+    /**
+     * Notify the block that time has passed.
+     */
+    public void timePassed() {
+        // do nothing, blocks are static for now
     }
 }

@@ -18,7 +18,7 @@ import biuoop.DrawSurface;
  * @version 1.0
  * @since 2024-06-05
  */
-public class Ball {
+public class Ball implements Sprite {
     /**
      * Base speed for generating moving balls, used in relation to ball size.
      * relates to the sleep time of the animation to ensure consistency across different frame rates.
@@ -26,13 +26,16 @@ public class Ball {
     private static final double BASE_SPEED = Helper.SLEEP_TIME * 0.4;
     /** used to avoid division by zero and make speed scaling natural. */
     private static final double LOG_SHIFT = 2.0;
-    /** */
+    /** maximum radius for which to apply speed scaling. */
     private static final int MAX_RADIUS_FOR_SPEED = 50;
+    /** the full step size for movement. */
+    private static final double FULL_STEP = 1.0;
 
     private Point point;
     private final int radius;
     private final Color color;
     private final Velocity velocity;
+    private final GameEnvironment gameEnvironment;
 
     /**
      * Initialize a new ball with the given center, radius, and color.
@@ -40,12 +43,14 @@ public class Ball {
      * @param point the center point of the ball
      * @param radius the radius of the ball
      * @param color the color of the ball
+     * @param gameEnvironment the game environment in which the ball exists
      */
-    public Ball(Point point, int radius, java.awt.Color color) {
+    public Ball(Point point, int radius, java.awt.Color color, GameEnvironment gameEnvironment) {
         this.point = point;
         this.radius = radius;
         this.color = color;
         this.velocity = new Velocity(0, 0);  // default velocity is (0, 0)
+        this.gameEnvironment = gameEnvironment;
     }
 
     /**
@@ -71,15 +76,6 @@ public class Ball {
      */
     public Velocity getVelocity() {
         return new Velocity(velocity.getDx(), velocity.getDy());
-    }
-
-    /**
-     * Move the ball one step according to its current velocity.
-     * If the ball is predicted to hit the boundaries of the window,
-     * its position and velocity will be adjusted to simulate a bounce, as many times as needed.
-     */
-    public void moveOneStep() {
-        this.point = velocity.applyToPoint(this.point);
     }
 
     /**
@@ -123,6 +119,54 @@ public class Ball {
     }
 
     /**
+     * Move the ball one step according to its current velocity.
+     * If the ball is predicted to hit the boundaries of the window,
+     * its position and velocity will be adjusted to simulate a bounce, as many times as needed.
+     */
+    private void moveOneStep() {
+        double stepLength = velocity.getSpeed();
+        if (stepLength == 0) {
+            return; // no movement if velocity is zero
+        }
+
+        Point fullStepPoint = velocity.applyToPoint(this.point);
+        Line trajectory = new Line(this.point, fullStepPoint);
+        /* TODO:
+        ask wether or not I am allowed do make this line a little bit longer
+        sketch:
+        double angle = velocity.getAngle();
+        double len = velocity.getSpeed() + radius;
+        Velocity extendedVelocity = Velocity.fromAngleAndSpeed(angle, len);
+        Point endOfTrajectory = extendedVelocity.applyToPoint(this.point);
+        and replace fullStepPoint with endOfTrajectory everywhere trajectory is defined
+        (recalculate trajectory after every collision as well)
+        */
+        CollisionInfo collisionInfo = gameEnvironment.getClosestCollision(trajectory);
+        while (collisionInfo != null) {
+            Point collisionPoint = collisionInfo.collisionPoint();
+            Collidable collisionObject = collisionInfo.collisionObject();
+            double distToCollision = this.point.distance(collisionPoint);
+            double stepFraction = distToCollision / stepLength;
+            Velocity newVelocity = collisionObject.hit(collisionPoint, velocity);
+            this.point = velocity.applyToPoint(this.point, stepFraction - Helper.DELTA);
+            velocity.reassign(newVelocity);
+            fullStepPoint = velocity.applyToPoint(this.point, FULL_STEP - stepFraction);
+            trajectory = new Line(this.point, fullStepPoint);
+            collisionInfo = gameEnvironment.getClosestCollision(trajectory);
+        }
+        this.point = fullStepPoint;
+        return;
+    }
+
+    /**
+     * Notify the ball that time has passed.
+     * Moves the ball one step according to its current velocity.
+     */
+    public void timePassed() {
+        moveOneStep();
+    }
+
+    /**
      * Draw the ball on the given DrawSurface.
      * @param surface the surface on which to draw the ball
      */
@@ -136,9 +180,10 @@ public class Ball {
      * @param radius the radius of the ball to create
      * @param inside the rectangle representing the area in which the ball should be created
      * @param rand the Random object to use for generating random values
+     * @param ge the game environment to which the ball belongs
      * @return a new Ball object with the specified radius and a random color and position
      */
-    public static Ball createBall(int radius, Rectangle inside, Random rand) {
+    public static Ball createBall(int radius, Rectangle inside, Random rand, GameEnvironment ge) {
         radius = validateRadius(radius, inside);
         float hue = rand.nextFloat(); // 0.0 to 1.0 - full spectrum of colors
         float saturation = 0.5f + rand.nextFloat() * 0.5f; // 0.5 to 1.0 - vibrant colors
@@ -147,7 +192,7 @@ public class Ball {
         double x = rand.nextDouble() * (inside.getWidth() - 2 * radius) + radius + inside.getLeft();
         double y = rand.nextDouble() * (inside.getHeight() - 2 * radius) + radius + inside.getTop();
         Point start = new Point(x, y);
-        return new Ball(start, radius, color);
+        return new Ball(start, radius, color, ge);
     }
 
     /**
@@ -175,15 +220,16 @@ public class Ball {
      * @param size the size of the ball to create
      * @param inside the rectangle representing the area in which the ball should be created
      * @param rand the Random object to use for generating random values
+     * @param ge the game environment to which the ball belongs
      * @return a new Ball object with the specified size and a random color and position
      */
-    public static Ball generateMovingBallBySize(int size, Rectangle inside, Random rand) {
+    public static Ball generateMovingBallBySize(int size, Rectangle inside, Random rand, GameEnvironment ge) {
         int adjustedSize = Math.min(size, MAX_RADIUS_FOR_SPEED);
         adjustedSize = Math.max(adjustedSize, 1); // prevent zero size for speed calculation
         // log(adjustedSize + LOG_SHIFT) to prevent division by zero and enforce speeds < BASE_SPEED for tiny balls
         double speed = BASE_SPEED / Math.log(adjustedSize + LOG_SHIFT);
         Velocity velocity = Velocity.semiRandVelocity(rand, speed);
-        Ball ball = Ball.createBall(size, inside, rand);
+        Ball ball = Ball.createBall(size, inside, rand, ge);
         ball.setVelocity(velocity);
         return ball;
     }

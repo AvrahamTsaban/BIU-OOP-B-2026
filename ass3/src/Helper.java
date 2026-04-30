@@ -13,6 +13,8 @@
 public final class Helper {
     /** Threshold for comparing doubles. */
     public static final double THRESHOLD = 1e-6;
+    /** Small epsilon value for delibreately differentiating doubles. */
+    public static final double DELTA = 1e-4;
 
     /** Width of GUI windows for geometric calculations. */
     public static final int WIDTH = 800;
@@ -22,16 +24,14 @@ public final class Helper {
     public static final Rectangle SCREEN =
     new Rectangle(new Point(0, 0), WIDTH, HEIGHT);
 
-    /** Maximum possible distance between any two points in the window, used for collision detection. */
-    public static final double MAX_LINE_LENGTH = Math.sqrt(WIDTH * WIDTH + HEIGHT * HEIGHT);
     /** Maximum radius for balls in animations. */
     public static final int MAX_RADIUS = Math.min(WIDTH, HEIGHT) / 4;
     /** Default radius for balls in animations. */
-    public static final int DEFAULT_RADIUS = 8;
+    public static final int DEFAULT_RADIUS = 4;
     /** Maximum speed for balls in animations. */
     public static final int MAX_SPEED = Math.min(WIDTH, HEIGHT) / 10;
     /** Sleep time in milliseconds for animations. */
-    public static final int SLEEP_TIME = 50;
+    public static final int SLEEP_TIME = 30;
 
     /**
      * Private constructor to prevent instantiation of this utility class.
