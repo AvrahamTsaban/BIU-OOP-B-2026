@@ -28,12 +28,6 @@ public class Line implements Comparable<Line> {
      * @param end end point candidate
      */
     public Line(Point start, Point end) {
-        boolean replace = replaceEndpoints(start.getX(), start.getY(), end.getX(), end.getY());
-        if (replace) {
-            Point tmp = start;
-            start = end;
-            end = tmp;
-        }
         this.start = new Point(start.getX(), start.getY());
         this.end = new Point(end.getX(), end.getY());
         this.slope = calcSlope();
@@ -49,36 +43,9 @@ public class Line implements Comparable<Line> {
      * @param y2 y coordinate of the second endpoint candidate
      */
     public Line(double x1, double y1, double x2, double y2) {
-        boolean replace = replaceEndpoints(x1, y1, x2, y2);
-        if (replace) {
-            double xTmp = x1;
-            double yTmp = y1;
-            x1 = x2;
-            y1 = y2;
-            x2 = xTmp;
-            y2 = yTmp;
-        }
         this.start = new Point(x1, y1);
         this.end = new Point(x2, y2);
         this.slope = calcSlope();
-    }
-
-    /**
-     * Determines if the endpoints should be swapped.
-     * Lines are ordered by their start point x coordinate, and then by y coordinate.
-     *
-     * @param x1 x coordinate of the first endpoint candidate
-     * @param y1 y coordinate of the first endpoint candidate
-     * @param x2 x coordinate of the second endpoint candidate
-     * @param y2 y coordinate of the second endpoint candidate
-     * @return wether the endpoints should be swapped
-     */
-    private boolean replaceEndpoints(double x1, double y1, double x2, double y2) {
-        if (Helper.doubleEq(x1, x2)) {
-            return (y1 > y2 && !Helper.doubleEq(y1, y2));
-        } else {
-            return x1 > x2;
-        }
     }
 
     /**
@@ -94,7 +61,7 @@ public class Line implements Comparable<Line> {
         }
         Point closest = intersectionPoints.get(0);
         for (Point p : intersectionPoints) {
-            if (p.distance(this.start) < closest.distance(this.start)) {
+            if (start.distance(p) < start.distance(closest)) {
                 closest = p;
             }
         }

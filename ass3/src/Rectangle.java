@@ -52,7 +52,7 @@ public class Rectangle {
     public double getHeight() {
         return height;
     }
-    
+
     /**
      * Get the right boundary of the rectangle (x-coordinate of the right edge).
      * @return the x-coordinate of the right edge of the rectangle

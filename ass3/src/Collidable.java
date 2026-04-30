@@ -1,6 +1,11 @@
+/**
+ * Collidable interface represents an object that can be collided with.
+ * It provides methods to get the collision shape and to handle collisions.
+ */
 public interface Collidable {
     /**
-     * Get the "collision shape" of the object, which is the rectangle that defines its boundaries for collision detection.
+     * Get the "collision shape" of the object,
+     * which is the rectangle that defines its boundaries for collision detection.
      * @return the collision shape of the object
      */
     Rectangle getCollisionRectangle();
