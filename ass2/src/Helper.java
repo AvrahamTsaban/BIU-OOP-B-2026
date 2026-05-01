@@ -46,7 +46,7 @@ public final class Helper {
     /** Maximum speed for balls in animations. */
     public static final int MAX_SPEED = Math.min(WIDTH, HEIGHT) / 10;
     /** Sleep time in milliseconds for animations. */
-    public static final int SLEEP_TIME = 50;
+    public static final int SLEEP_TIME = 18;
 
     /**
      * Private constructor to prevent instantiation of this utility class.

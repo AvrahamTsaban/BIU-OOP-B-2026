@@ -7,31 +7,24 @@
  * <p>This is a utility class with a private constructor to prevent instantiation.</p>
  *
  * @author Avraham Tsaban, avraham.tsaban@gmail.com
- * @version 1.0
+ * @version 1.1
  * @since 2024-06-05
  */
 public final class Helper {
-    /** Threshold for comparing doubles. */
+    /** Threshold (epsilon) for comparing doubles. */
     public static final double THRESHOLD = 1e-6;
-    /** Small epsilon value for delibreately differentiating doubles. */
+    /** Small delta value for delibreately differentiating doubles. */
     public static final double DELTA = 1e-4;
 
-    /** Width of GUI windows for geometric calculations. */
-    public static final int WIDTH = 800;
-    /** Height of GUI windows for geometric calculations. */
-    public static final int HEIGHT = 600;
-    /** Full screen rectangle representing the drawable area. */
-    public static final Rectangle SCREEN =
-    new Rectangle(new Point(0, 0), WIDTH, HEIGHT);
-
     /** Maximum radius for balls in animations. */
-    public static final int MAX_RADIUS = Math.min(WIDTH, HEIGHT) / 4;
+    public static final int MAX_RADIUS = Math.min(Game.WIDTH, Game.HEIGHT) / 4;
     /** Default radius for balls in animations. */
     public static final int DEFAULT_RADIUS = 4;
     /** Maximum speed for balls in animations. */
-    public static final int MAX_SPEED = Math.min(WIDTH, HEIGHT) / 10;
-    /** Sleep time in milliseconds for animations. */
-    public static final int SLEEP_TIME = 30;
+    public static final int MAX_SPEED = Math.min(Game.WIDTH, Game.HEIGHT) / 10;
+    /** Sleep time in milliseconds for animations. FPS will be approximately 1000/SLEEP_TIME. */
+    public static final int SLEEP_TIME = 50;
+    //TODO: could many of these constants be used in Game and Ball classes?
 
     /**
      * Private constructor to prevent instantiation of this utility class.

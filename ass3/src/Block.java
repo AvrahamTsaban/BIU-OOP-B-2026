@@ -83,4 +83,13 @@ public class Block extends Rectangle implements Collidable, Sprite {
     public void timePassed() {
         // do nothing, blocks are static for now
     }
+
+    /**
+     * Add this block to the given game as both a Collidable and a Sprite.
+     * @param g the game to which to add this block
+     */
+    public void addToGame(Game g) {
+        g.addCollidable(this);
+        g.addSprite(this);
+    }
 }

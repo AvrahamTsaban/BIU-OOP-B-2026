@@ -12,7 +12,7 @@
  * Such case is treated for safety, but not recommended.</p>
  *
  * @author Avraham Tsaban, avraham.tsaban@gmail.com
- * @version 1.0
+ * @version 2.0
  * @since 2024-06-05
  */
 public class Line implements Comparable<Line> {

@@ -5,11 +5,19 @@ import biuoop.DrawSurface;
  * It provides methods to draw the sprite and to notify it that time has passed.
  */
 public interface Sprite {
-    /** Draw the sprite to the screen.
+    /**
+     * Draw the sprite to the screen.
      * @param d the DrawSurface on which to draw the sprite
      */
     void drawOn(DrawSurface d);
 
     /** Notify the sprite that time has passed. */
     void timePassed();
+
+    /** Add this sprite to the given game.
+     * Sprites are responsible for determining wether they shluold add themselves to the game as
+     * a Collidable, or only as a Sprite.
+     * @param g the game to which to add this sprite
+     */
+    void addToGame(Game g);
 }

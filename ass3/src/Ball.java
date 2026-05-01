@@ -15,7 +15,7 @@ import biuoop.DrawSurface;
  * precision. For precise position, use {@link #getCenter()}.</p>
  *
  * @author Avraham Tsaban, avraham.tsaban@gmail.com
- * @version 1.0
+ * @version 1.2
  * @since 2024-06-05
  */
 public class Ball implements Sprite {
@@ -24,6 +24,7 @@ public class Ball implements Sprite {
      * relates to the sleep time of the animation to ensure consistency across different frame rates.
      */
     private static final double BASE_SPEED = Helper.SLEEP_TIME * 0.4;
+    //TODO: if SLEEP_TIME is depracated for local int inside Game, it should be cared somehow
     /** used to avoid division by zero and make speed scaling natural. */
     private static final double LOG_SHIFT = 2.0;
     /** maximum radius for which to apply speed scaling. */
@@ -232,5 +233,13 @@ public class Ball implements Sprite {
         Ball ball = Ball.createBall(size, inside, rand, ge);
         ball.setVelocity(velocity);
         return ball;
+    }
+
+    /**
+     * Add this ball to the given game as a sprite.
+     * @param g the game to which to add this ball as a sprite
+     */
+    public void addToGame(Game g) {
+        g.addSprite(this);
     }
 }
