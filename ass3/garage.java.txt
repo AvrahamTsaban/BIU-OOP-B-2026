@@ -1,0 +1,14 @@
++sizeVariation(double): Line
+    /**
+     * Returns a similar line with the same start point and direction, and a new length.
+     * @param newLength the desired length of the new line
+     * @return a new line with the same start point and direction, and the specified length
+     */
+    public Line sizeVariation(double newLength) {
+        Point newStart = this.start();
+        double lenMultiplier = newLength / this.length();
+        double dx = (this.end.getX() - this.start.getX()) * lenMultiplier;
+        double dy = (this.end.getY() - this.start.getY()) * lenMultiplier;
+        Point newEnd = new Point(newStart.getX() + dx, newStart.getY() + dy);
+        return new Line(newStart, newEnd);
+    }

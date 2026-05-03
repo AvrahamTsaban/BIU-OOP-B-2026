@@ -124,4 +124,14 @@ public class Game {
         Ball ball = Ball.generateMovingBallBySize(Helper.DEFAULT_RADIUS, inside, rand, environment);
         return ball;
     }
+
+    /**
+     * The main entry point to run the animation.
+     * @param args command line arguments (neglected)
+     */
+    public static void main(String[] args) {
+        Game game = new Game();
+        game.initialize();
+        game.run();
+    }
 }
