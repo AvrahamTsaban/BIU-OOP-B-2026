@@ -1,6 +1,7 @@
 import biuoop.GUI;
 import biuoop.DrawSurface;
 import biuoop.Sleeper;
+import biuoop.KeyboardSensor;
 import java.awt.Color;
 import java.util.Random;
 
@@ -26,6 +27,14 @@ public class Game {
     public static final int HEIGHT = 600;
     /** Width of the blocks that form the boundaries of the game area. */
     private static final int BLOCK_WIDTH = 25;
+    /** Width of the paddle. */
+    private static final int PADDLE_WIDTH = 100;
+    /** Height of the paddle. */
+    private static final int PADDLE_HEIGHT = 20;
+    /** Frames per second for the animation. */
+    public static final int FPS = 60;
+    /** Milliseconds per frame for the animation. */
+    public static final int MS_PER_FRAME = 1000 / FPS;
 
     private final SpriteCollection sprites;
     private final GameEnvironment environment;
@@ -68,7 +77,10 @@ public class Game {
         for (Block block : boundaries) {
             block.addToGame(this);
         }
-        makeBall().addToGame(this);
+        Ball ball = makeBall();
+        ball.addToGame(this);
+        Paddle paddle = makePaddle();
+        paddle.addToGame(this);
     }
 
 
@@ -77,9 +89,6 @@ public class Game {
      * The method uses a game loop that updates the game state and renders the sprites at a fixed frame rate.
      */
     public void run() {
-        //...
-        final int framesPerSecond = 60;
-        final int millisecondsPerFrame = 1000 / framesPerSecond;
         while (true) {
             long startTime = System.currentTimeMillis(); // timing
 
@@ -90,7 +99,7 @@ public class Game {
 
             // timing
             long usedTime = System.currentTimeMillis() - startTime;
-            long milliSecondLeftToSleep = millisecondsPerFrame - usedTime;
+            long milliSecondLeftToSleep = MS_PER_FRAME - usedTime;
             if (milliSecondLeftToSleep > 0) {
                 sleeper.sleepFor(milliSecondLeftToSleep);
             }
@@ -115,14 +124,25 @@ public class Game {
     }
 
     /**
-     * A helper method to create a ball with a random color and position, and to add it to the game as a sprite.
+     * A helper method to create a ball with a random color and position.
      * @return the ball that was created
      */
     private Ball makeBall() {
         Point tmp = new Point(BLOCK_WIDTH, BLOCK_WIDTH);
-        Rectangle inside = new Rectangle(tmp, WIDTH - 2 * BLOCK_WIDTH, HEIGHT - 2 * BLOCK_WIDTH);
-        Ball ball = Ball.generateMovingBallBySize(Helper.DEFAULT_RADIUS, inside, rand, environment);
+        Rectangle inside = new Rectangle(tmp, WIDTH - 2 * BLOCK_WIDTH, HEIGHT - 5 * BLOCK_WIDTH);
+        Ball ball = Ball.generateMovingBallBySize(Ball.DEFAULT_RADIUS, inside, rand, environment);
         return ball;
+    }
+
+    /**
+     * A helper method to create a paddle.
+     * @return the paddle that was created
+     */
+    private Paddle makePaddle() {
+        Point tmp = new Point(WIDTH / 2.0 - PADDLE_WIDTH / 2.0, HEIGHT - BLOCK_WIDTH - PADDLE_HEIGHT);
+        KeyboardSensor sensor = gui.getKeyboardSensor();
+        Paddle paddle = new Paddle(sensor, tmp, PADDLE_WIDTH, PADDLE_HEIGHT, Color.ORANGE);
+        return paddle;
     }
 
     /**

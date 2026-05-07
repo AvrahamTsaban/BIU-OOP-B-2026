@@ -118,4 +118,26 @@ public class Rectangle {
         return intersectionPoints;
     }
 
+    /**
+     * Check if a given point is contained within the rectangle (including edges and safety margin).
+     * @param p the point to check
+     * @return true if the point is inside the rectangle (or within the safety margin), false otherwise
+     */
+    //TODO add to UML diagram
+    public boolean isInside(Point p) {
+        double margin = Helper.DELTA;
+        double x = p.getX();
+        double leftBound = this.getLeft() - margin;
+        double rightBound = this.getRight() + margin;
+        if (x < leftBound || x > rightBound) {
+            return false;
+        }
+        double y = p.getY();
+        double topBound = this.getTop() - margin;
+        double bottomBound = this.getBottom() + margin;
+        if (y < this.getTop() - margin || y > this.getBottom() + margin) {
+            return false;
+        }
+        return true;
+    }
 }

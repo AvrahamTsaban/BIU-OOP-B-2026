@@ -13,8 +13,13 @@ import java.util.Random;
  * @since 2024-06-05
  */
 public class Velocity {
-        private double dx;
-        private double dy;
+    /** The full step length for velocity applications. */
+    private static final double FULL_STEP = 1.0;
+    /** The empty step length for velocity applications. */
+    private static final double EMPTY_STEP = 0.0;
+
+    private double dx;
+    private double dy;
 
     /**
      * Initialize a new Velocity with the given changes in x and y.
@@ -82,7 +87,7 @@ public class Velocity {
      * @return a new Point with the updated position after applying the velocity for the specified fraction of the step
      */
     public Point applyToPoint(Point p, double partialStep) {
-        partialStep = Math.max(0, Math.min(partialStep, 1)); // ensure partialStep is between 0 and 1
+        partialStep = Math.max(EMPTY_STEP, Math.min(partialStep, FULL_STEP)); // ensure partialStep is between 0 and 1
         return new Point(p.getX() + dx * partialStep, p.getY() + dy * partialStep);
     }
 

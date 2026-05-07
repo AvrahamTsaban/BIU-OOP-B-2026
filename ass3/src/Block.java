@@ -92,4 +92,13 @@ public class Block extends Rectangle implements Collidable, Sprite {
         g.addCollidable(this);
         g.addSprite(this);
     }
+
+    /**
+     * As long as blocks are static, return null to indicate that there is nothing to do.
+     * @param ballCenter the center point of the ball that may be inside the block (ignored)
+     * @return null, since blocks are static and do not need to keep the ball outside
+     */
+    public Point keepOutside(Point ballCenter) {
+        return null;
+    }
 }

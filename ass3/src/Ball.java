@@ -23,12 +23,13 @@ public class Ball implements Sprite {
      * Base speed for generating moving balls, used in relation to ball size.
      * relates to the sleep time of the animation to ensure consistency across different frame rates.
      */
-    private static final double BASE_SPEED = Helper.SLEEP_TIME * 0.4;
-    //TODO: if SLEEP_TIME is depracated for local int inside Game, it should be cared somehow
+    private static final double BASE_SPEED = Game.MS_PER_FRAME * 0.3;
     /** used to avoid division by zero and make speed scaling natural. */
     private static final double LOG_SHIFT = 2.0;
     /** maximum radius for which to apply speed scaling. */
     private static final int MAX_RADIUS_FOR_SPEED = 50;
+    /** Default radius for balls in animations. */
+    public static final int DEFAULT_RADIUS = 4;
     /** the full step size for movement. */
     private static final double FULL_STEP = 1.0;
 
@@ -129,16 +130,22 @@ public class Ball implements Sprite {
         if (stepLength == 0) {
             return; // no movement if velocity is zero
         }
+        // first, ensure the ball is outside of any collidable object to prevent getting stuck
+        Point keepOutsidePoint = gameEnvironment.keepOutside(getCenter());
+        if (keepOutsidePoint != null) {
+            this.point = keepOutsidePoint;
+        }
 
         Point fullStepPoint = velocity.applyToPoint(this.point);
         Line trajectory = new Line(this.point, fullStepPoint);
         /* TODO:
         ask wether or not I am allowed do make this line a little bit longer
         sketch:
-        double angle = velocity.getAngle();
-        double len = velocity.getSpeed() + radius;
-        Velocity extendedVelocity = Velocity.fromAngleAndSpeed(angle, len);
-        Point endOfTrajectory = extendedVelocity.applyToPoint(this.point);
+        double ratio = (velocity.getSpeed() + radius) / velocity.getSpeed();
+        double extendedX = this.point.getX() + velocity.getDx() * ratio;
+        double extendedY = this.point.getY() + velocity.getDy() * ratio;
+        Point endOfTrajectory = new Point(extendedX, extendedY);
+        Line trajectory = new Line(this.point, endOfTrajectory);
         and replace fullStepPoint with endOfTrajectory everywhere trajectory is defined
         (recalculate trajectory after every collision as well)
         */
@@ -149,8 +156,10 @@ public class Ball implements Sprite {
             double distToCollision = this.point.distance(collisionPoint);
             double stepFraction = distToCollision / stepLength;
             Velocity newVelocity = collisionObject.hit(collisionPoint, velocity);
-            this.point = velocity.applyToPoint(this.point, stepFraction - Helper.DELTA);
+            this.point = velocity.applyToPoint(this.point, stepFraction);
             velocity.reassign(newVelocity);
+            this.point = velocity.applyToPoint(this.point, Helper.DELTA);
+            stepFraction += Helper.DELTA;
             fullStepPoint = velocity.applyToPoint(this.point, FULL_STEP - stepFraction);
             trajectory = new Line(this.point, fullStepPoint);
             collisionInfo = gameEnvironment.getClosestCollision(trajectory);
@@ -209,7 +218,7 @@ public class Ball implements Sprite {
             return maxRadius;
         }
         if (radius <= 0) {
-            return Helper.DEFAULT_RADIUS;
+            return DEFAULT_RADIUS;
         }
         return radius;
     }

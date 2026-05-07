@@ -12,3 +12,68 @@
         Point newEnd = new Point(newStart.getX() + dx, newStart.getY() + dy);
         return new Line(newStart, newEnd);
     }
+
+
+
+    /**
+     * Get a rotated version (directed counterclockwise) of this velocity by a specified angle.
+     * @param angleDiff the angle in degrees to rotate this velocity (positive values rotate counterclockwise)
+     * @return a new Velocity instance with the rotated values
+     */
+    public Velocity getRotated(double angleDiff) {
+        double radians = Math.toRadians(angleDiff);
+        double speed = getSpeed();
+        double newAngle = Math.atan2(dy, dx) + radians;
+        double newDx = Math.cos(newAngle) * speed;
+        double newDy = Math.sin(newAngle) * speed;
+        return new Velocity(newDx, newDy);
+    }
+
+
+
+    /**
+     * Check if a given point is contained within the rectangle (including edges and safety margin).
+     * If the point is within a small margin of the edges, it is considered contained to prevent pass-throughs.
+     * @param p the point to check
+     * @return the nearest point outside the rectangle, null if the point is inside
+     */
+    //TODO add to UML diagram
+    public Point nearestOutside(Point p) {
+        double margin = Helper.DELTA;
+        double x = p.getX();
+        double leftBound = this.getLeft() - margin;
+        double rightBound = this.getRight() + margin;
+        if (x < leftBound || x > rightBound) {
+            return null;
+        }
+        double y = p.getY();
+        double topBound = this.getTop() - margin;
+        double bottomBound = this.getBottom() + margin;
+        if (y < this.getTop() - margin || y > this.getBottom() + margin) {
+            return null;
+        }
+
+        double newX = x;
+        double newY = y;
+        double distance = Double.POSITIVE_INFINITY;
+        if (Math.abs(x - leftBound) < distance) {
+            distance = Math.abs(x - this.getLeft());
+            newX = leftBound;
+        }
+        if (Math.abs(x - rightBound) < distance) {
+            distance = Math.abs(x - this.getRight());
+            newX = rightBound;
+        }
+        if (Math.abs(y - topBound) < distance) {
+            distance = Math.abs(y - this.getTop());
+            newY = topBound;
+            newX = x;
+        }
+        if (Math.abs(y - bottomBound) < distance) {
+            distance = Math.abs(y - this.getBottom());
+            newY = bottomBound;
+            newX = x;
+        }
+
+        return new Point(newX, newY);
+    }

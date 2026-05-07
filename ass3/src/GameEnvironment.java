@@ -31,7 +31,7 @@ public class GameEnvironment {
      * @return the information about the closest collision that is to occur, or null if no collision will occur
      */
     public CollisionInfo getClosestCollision(Line trajectory) {
-        if (trajectory == null) {
+        if (trajectory == null || Helper.doubleEq(trajectory.length(), 0) || trajectory.length() < 0) {
             return null;
         }
         Point start = trajectory.start();
@@ -57,5 +57,23 @@ public class GameEnvironment {
         }
 
         return new CollisionInfo(collisionPoint, collisionObject);
+    }
+
+    //TODO add to UML
+    /**
+     * Gets a point just outside the collision shape of any collidable object in the environment that may be inside it.
+     * If the given point is not inside any collision shape, returns it unchanged.
+     * @param ballCenter the center point of the ball that may be inside a collision shape
+     * @return a nearby point just outside any checked collision shape, original point if it's outside all shapes
+     */
+    public Point keepOutside(Point ballCenter) {
+        Point outside = ballCenter;
+        for (Collidable collidable : collidables) {
+            Point keepOutsidePoint = collidable.keepOutside(outside);
+            if (keepOutsidePoint != null) {
+                outside = keepOutsidePoint;
+            }
+        }
+        return outside;
     }
 }

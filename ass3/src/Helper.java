@@ -16,16 +16,6 @@ public final class Helper {
     /** Small delta value for delibreately differentiating doubles. */
     public static final double DELTA = 1e-4;
 
-    /** Maximum radius for balls in animations. */
-    public static final int MAX_RADIUS = Math.min(Game.WIDTH, Game.HEIGHT) / 4;
-    /** Default radius for balls in animations. */
-    public static final int DEFAULT_RADIUS = 4;
-    /** Maximum speed for balls in animations. */
-    public static final int MAX_SPEED = Math.min(Game.WIDTH, Game.HEIGHT) / 10;
-    /** Sleep time in milliseconds for animations. FPS will be approximately 1000/SLEEP_TIME. */
-    public static final int SLEEP_TIME = 50;
-    //TODO: could many of these constants be used in Game and Ball classes?
-
     /**
      * Private constructor to prevent instantiation of this utility class.
      */
