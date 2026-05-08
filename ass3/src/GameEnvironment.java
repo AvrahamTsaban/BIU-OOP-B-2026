@@ -61,19 +61,21 @@ public class GameEnvironment {
 
     //TODO add to UML
     /**
-     * Gets a point just outside the collision shape of any collidable object in the environment that may be inside it.
-     * If the given point is not inside any collision shape, returns it unchanged.
-     * @param ballCenter the center point of the ball that may be inside a collision shape
-     * @return a nearby point just outside any checked collision shape, original point if it's outside all shapes
+     * Keep the ball outside of any collidable object in the environment.
+     * If the ball is inside any collidable object, adjusts its velocity and returns a recommended new center.
+     * @param ball the ball to check and adjust if necessary
+     * @return a recommended new center for the ball, or null if no adjustment is needed
      */
-    public Point keepOutside(Point ballCenter) {
-        Point outside = ballCenter;
+    public Point keepOutside(Ball ball) {
+        Point center = ball.getCenter();
+        Point newCenter = null;
         for (Collidable collidable : collidables) {
-            Point keepOutsidePoint = collidable.keepOutside(outside);
+            Point keepOutsidePoint = collidable.keepOutside(center);
             if (keepOutsidePoint != null) {
-                outside = keepOutsidePoint;
+                ball.setVelocity(collidable.hit(keepOutsidePoint, ball.getVelocity()));
+                newCenter = keepOutsidePoint;
             }
         }
-        return outside;
+        return newCenter;
     }
 }

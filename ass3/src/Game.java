@@ -26,7 +26,7 @@ public class Game {
     /** Height of GUI windows for geometric calculations. */
     public static final int HEIGHT = 600;
     /** Width of the blocks that form the boundaries of the game area. */
-    private static final int BLOCK_WIDTH = 25;
+    public static final int BLOCK_WIDTH = 25;
     /** Width of the paddle. */
     private static final int PADDLE_WIDTH = 100;
     /** Height of the paddle. */
@@ -78,6 +78,11 @@ public class Game {
             block.addToGame(this);
         }
         Ball ball = makeBall();
+        ball.addToGame(this);
+        //TEMP TODO: remove after testing
+        ball = makeBall();
+        ball.addToGame(this);
+        ball = makeBall();
         ball.addToGame(this);
         Paddle paddle = makePaddle();
         paddle.addToGame(this);

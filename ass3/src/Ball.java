@@ -131,7 +131,7 @@ public class Ball implements Sprite {
             return; // no movement if velocity is zero
         }
         // first, ensure the ball is outside of any collidable object to prevent getting stuck
-        Point keepOutsidePoint = gameEnvironment.keepOutside(getCenter());
+        Point keepOutsidePoint = gameEnvironment.keepOutside(this);
         if (keepOutsidePoint != null) {
             this.point = keepOutsidePoint;
         }

@@ -41,7 +41,7 @@ public class Paddle implements Sprite, Collidable {
      */
     public void moveLeft() {
         double newX = this.upperLeft.getX() - SPEED;
-        if (newX < 0) {
+        if (newX < 0 + Game.BLOCK_WIDTH) {
             newX = Game.WIDTH - width; // wrap around to the right edge
         }
         this.upperLeft = new Point(newX, upperLeft.getY());
@@ -52,7 +52,7 @@ public class Paddle implements Sprite, Collidable {
      */
     public void moveRight() {
         double newX = this.upperLeft.getX() + SPEED;
-        if (newX + width > Game.WIDTH) {
+        if (newX + width > Game.WIDTH - Game.BLOCK_WIDTH) {
             newX = 0; // wrap around to the left edge
         }
         this.upperLeft = new Point(newX, upperLeft.getY());
@@ -106,6 +106,7 @@ public class Paddle implements Sprite, Collidable {
         double partitionSize = this.width / (double) PART_NUM;
         double relativeX = collisionPoint.getX() - this.upperLeft.getX();
         int partition = (int) Math.ceil(relativeX / partitionSize);
+        partition = Math.max(1, Math.min(partition, PART_NUM));
         switch (partition) {
             case 1:
                 return Velocity.fromAngleAndSpeed(300, currentVelocity.getSpeed());
@@ -133,8 +134,7 @@ public class Paddle implements Sprite, Collidable {
     }
 
     /**
-     * Keep the ball outside the paddle.
-     * If inside, get it outside to provide the player another chance.
+     * If the ball is inside the Paddle, gives a new position for the ball, just above the paddle.
      * @param ballCenter the center point of the ball that may be inside the paddle
      * @return a point just outside the collision shape of the paddle
      */
@@ -146,6 +146,6 @@ public class Paddle implements Sprite, Collidable {
             return null;
         }
         // lift the ball just above the paddle to keep it outside
-        return new Point(ballCenter.getX(), upperLeft.getY() - Helper.DELTA);
+        return new Point(ballCenter.getX(), upperLeft.getY());
     }
 }

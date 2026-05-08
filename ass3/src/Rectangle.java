@@ -135,7 +135,7 @@ public class Rectangle {
         double y = p.getY();
         double topBound = this.getTop() - margin;
         double bottomBound = this.getBottom() + margin;
-        if (y < this.getTop() - margin || y > this.getBottom() + margin) {
+        if (y < topBound || y > bottomBound) {
             return false;
         }
         return true;
