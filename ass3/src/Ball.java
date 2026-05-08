@@ -15,7 +15,7 @@ import biuoop.DrawSurface;
  * precision. For precise position, use {@link #getCenter()}.</p>
  *
  * @author Avraham Tsaban, avraham.tsaban@gmail.com
- * @version 1.2
+ * @version 1.3
  * @since 2024-06-05
  */
 public class Ball implements Sprite {
@@ -130,25 +130,16 @@ public class Ball implements Sprite {
         if (stepLength == 0) {
             return; // no movement if velocity is zero
         }
-        // first, ensure the ball is outside of any collidable object to prevent getting stuck
+        /* Ensure the ball is outside of any collidable object to prevent getting stuck.
+        If is inside one, its position is adjusted, and its Velocity is auto updated by keepOutside */
         Point keepOutsidePoint = gameEnvironment.keepOutside(this);
         if (keepOutsidePoint != null) {
             this.point = keepOutsidePoint;
+            this.point = velocity.applyToPoint(this.point, Helper.DELTA);
         }
 
         Point fullStepPoint = velocity.applyToPoint(this.point);
         Line trajectory = new Line(this.point, fullStepPoint);
-        /* TODO:
-        ask wether or not I am allowed do make this line a little bit longer
-        sketch:
-        double ratio = (velocity.getSpeed() + radius) / velocity.getSpeed();
-        double extendedX = this.point.getX() + velocity.getDx() * ratio;
-        double extendedY = this.point.getY() + velocity.getDy() * ratio;
-        Point endOfTrajectory = new Point(extendedX, extendedY);
-        Line trajectory = new Line(this.point, endOfTrajectory);
-        and replace fullStepPoint with endOfTrajectory everywhere trajectory is defined
-        (recalculate trajectory after every collision as well)
-        */
         CollisionInfo collisionInfo = gameEnvironment.getClosestCollision(trajectory);
         while (collisionInfo != null) {
             Point collisionPoint = collisionInfo.collisionPoint();

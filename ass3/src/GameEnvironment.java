@@ -4,6 +4,10 @@ import java.util.ArrayList;
  * GameEnvironment class represents all collidable objects in the environment in which the game takes place.
  * It provides methods to add collidable objects,
  * and to determine the closest collision that will occur along a given trajectory.
+ *
+ * @author Avraham Tsaban, avraham.tsaban@gmail.com
+ * @version 1.3
+ * @since 2024-06-05
  */
 public class GameEnvironment {
     private final ArrayList<Collidable> collidables;
@@ -67,6 +71,9 @@ public class GameEnvironment {
      * @return a recommended new center for the ball, or null if no adjustment is needed
      */
     public Point keepOutside(Ball ball) {
+        if (ball == null) {
+            return null;
+        }
         Point center = ball.getCenter();
         Point newCenter = null;
         for (Collidable collidable : collidables) {

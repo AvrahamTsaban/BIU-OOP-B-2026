@@ -9,7 +9,7 @@ import java.util.Random;
  * or copied from another Velocity instance.</p>
  *
  * @author Avraham Tsaban, avraham.tsaban@gmail.com
- * @version 1.0
+ * @version 1.3
  * @since 2024-06-05
  */
 public class Velocity {
@@ -38,10 +38,9 @@ public class Velocity {
      * @return a new Velocity instance with the calculated dx and dy values
      */
     public static Velocity fromAngleAndSpeed(double angle, double speed) {
-        double correctedAngle = 90 - angle;
-        double radians = Math.toRadians(correctedAngle);
-        double dx = Math.cos(radians) * speed;
-        double dy = Math.sin(radians) * speed;
+        double radians = Math.toRadians(angle);
+        double dx = Math.sin(radians) * speed;
+        double dy = -Math.cos(radians) * speed;
         return new Velocity(dx, dy);
     }
 
@@ -59,8 +58,8 @@ public class Velocity {
      * @return the angle of this velocity in degrees (0 degrees is up, 90 degrees is right)
      */
     public double getAngle() {
-        double angle = Math.toDegrees(Math.atan2(dy, dx));
-        return (90 - angle + 360) % 360; // Convert to the desired angle format
+        double angle = Math.toDegrees(Math.atan2(dx, -dy));
+        return (angle + 360) % 360;
     }
 
     /**

@@ -1,6 +1,10 @@
 /**
  * CollisionInfo class represents information about a collision that is about to occur.
  * It contains the point at which the collision occurs and the collidable object involved in the collision.
+ *
+ * @author Avraham Tsaban, avraham.tsaban@gmail.com
+ * @version 1.3
+ * @since 2024-06-05
  */
 public class CollisionInfo {
     private final Point collisionPoint;

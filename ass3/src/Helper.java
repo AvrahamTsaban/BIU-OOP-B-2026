@@ -7,7 +7,7 @@
  * <p>This is a utility class with a private constructor to prevent instantiation.</p>
  *
  * @author Avraham Tsaban, avraham.tsaban@gmail.com
- * @version 1.1
+ * @version 1.3
  * @since 2024-06-05
  */
 public final class Helper {

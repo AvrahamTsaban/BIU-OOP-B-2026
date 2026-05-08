@@ -9,7 +9,7 @@
  * or an outer boundary (collisions from inside).</p>
  *
  * @author Avraham Tsaban, avraham.tsaban@gmail.com
- * @version 1.0
+ * @version 1.3
  * @since 2024-06-05
  */
 public class Rectangle {

@@ -77,3 +77,16 @@
 
         return new Point(newX, newY);
     }
+
+    (for trajectory calculation in Ball.moveOneStep)
+        /* TODO:
+        ask wether or not I am allowed do make this line a little bit longer
+        sketch:
+        double ratio = (velocity.getSpeed() + radius) / velocity.getSpeed();
+        double extendedX = this.point.getX() + velocity.getDx() * ratio;
+        double extendedY = this.point.getY() + velocity.getDy() * ratio;
+        Point endOfTrajectory = new Point(extendedX, extendedY);
+        Line trajectory = new Line(this.point, endOfTrajectory);
+        and replace fullStepPoint with endOfTrajectory everywhere trajectory is defined
+        (recalculate trajectory after every collision as well)
+        */

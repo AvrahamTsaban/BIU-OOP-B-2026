@@ -3,6 +3,10 @@ import biuoop.DrawSurface;
 /**
  * Sprite interface represents a graphical object that can be drawn on the screen and can respond to time passing.
  * It provides methods to draw the sprite and to notify it that time has passed.
+ *
+ * @author Avraham Tsaban, avraham.tsaban@gmail.com
+ * @version 1.3
+ * @since 2024-06-05
  */
 public interface Sprite {
     /**

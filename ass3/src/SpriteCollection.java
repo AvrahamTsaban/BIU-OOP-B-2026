@@ -5,6 +5,10 @@ import biuoop.DrawSurface;
  * SpriteCollection class represents a collection of sprites in the game.
  * It provides methods to add sprites to the collection,
  * notify all sprites that time has passed, and draw all sprites on a given DrawSurface.
+ *
+ * @author Avraham Tsaban, avraham.tsaban@gmail.com
+ * @version 1.3
+ * @since 2024-06-05
  */
 public class SpriteCollection {
     private final ArrayList<Sprite> sprites;

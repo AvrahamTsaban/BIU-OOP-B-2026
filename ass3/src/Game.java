@@ -3,6 +3,7 @@ import biuoop.DrawSurface;
 import biuoop.Sleeper;
 import biuoop.KeyboardSensor;
 import java.awt.Color;
+import java.util.ArrayList;
 import java.util.Random;
 
 /**
@@ -16,8 +17,8 @@ import java.util.Random;
  * and a ball is created with a random position and velocity within these boundaries.
  * The ball bounces off the boundaries and any other collidable objects in the game environment.</p>
  *
- * @author Avraham Tsaban
- * @version 1.0
+ * @author Avraham Tsaban, avraham.tsaban@gmail.com
+ * @version 1.3
  * @since 2024-06-05
  */
 public class Game {
@@ -25,8 +26,10 @@ public class Game {
     public static final int WIDTH = 800;
     /** Height of GUI windows for geometric calculations. */
     public static final int HEIGHT = 600;
-    /** Width of the blocks that form the boundaries of the game area. */
+    /** Width of all blocks. */
     public static final int BLOCK_WIDTH = 25;
+    /** Length of small blocks. */
+    public static final int MINIBLOCK_LENGTH = 50;
     /** Width of the paddle. */
     private static final int PADDLE_WIDTH = 100;
     /** Height of the paddle. */
@@ -48,7 +51,7 @@ public class Game {
     public Game() {
         sprites = new SpriteCollection();
         environment = new GameEnvironment();
-        gui = new GUI("title", WIDTH, HEIGHT);
+        gui = new GUI("double PingPong", WIDTH, HEIGHT);
         sleeper = new biuoop.Sleeper();
         rand = new Random();
     }
@@ -73,19 +76,11 @@ public class Game {
      * Initialize the game by creating the blocks and ball and adding them to the game.
      */
     public void initialize() {
-        Block[] boundaries = makeBoundaries();
-        for (Block block : boundaries) {
-            block.addToGame(this);
-        }
-        Ball ball = makeBall();
-        ball.addToGame(this);
-        //TEMP TODO: remove after testing
-        ball = makeBall();
-        ball.addToGame(this);
-        ball = makeBall();
-        ball.addToGame(this);
-        Paddle paddle = makePaddle();
-        paddle.addToGame(this);
+        addBoundaries();
+        addMiniBlocks();
+        addPaddle();
+        addBall();
+        addBall();
     }
 
 
@@ -113,50 +108,70 @@ public class Game {
 
     /**
      * Create the blocks that form the boundaries of the game area, and  add them to collidables and sprites lists.
-     * @return an array of the blocks that form the boundaries of the game area
      */
-    private Block[] makeBoundaries() {
+    public void addBoundaries() {
         Point tmp = new Point(0, 0);
         Block block1 = new Block(tmp, WIDTH, BLOCK_WIDTH, Color.GRAY);
+        block1.addToGame(this);
         tmp = new Point(0, BLOCK_WIDTH);
         Block block2 = new Block(tmp, BLOCK_WIDTH, HEIGHT - BLOCK_WIDTH, Color.GRAY);
+        block2.addToGame(this);
         tmp = new Point(WIDTH - BLOCK_WIDTH, BLOCK_WIDTH);
         Block block3 = new Block(tmp, BLOCK_WIDTH, HEIGHT - BLOCK_WIDTH, Color.GRAY);
+        block3.addToGame(this);
         tmp = new Point(BLOCK_WIDTH, HEIGHT - BLOCK_WIDTH);
         Block block4 = new Block(tmp, WIDTH - 2 * BLOCK_WIDTH, BLOCK_WIDTH, Color.GRAY);
+        block4.addToGame(this);
+    }
 
-        return new Block[]{block1, block2, block3, block4};
+    /**
+     * A helper method to add the mini blocks in a grid pattern on the right side of the game area.
+     */
+    public void addMiniBlocks() {
+        final int gridColumns = 12;
+        final int gridRows = 5;
+        final int anchorX = WIDTH - BLOCK_WIDTH;
+        final int anchorY = 3 * BLOCK_WIDTH;
+        final Color[] colors = new Color[]{Color.GRAY, Color.RED, Color.YELLOW, Color.BLUE, Color.PINK, Color.GREEN};
+
+        ArrayList<Integer> xValues = new ArrayList<Integer>();
+        for (int n = 1; n <= gridColumns; n++) {
+            xValues.add(anchorX - n * MINIBLOCK_LENGTH);
+        }
+        ArrayList<Integer> yValues = new ArrayList<Integer>();
+        for (int n = 0; n < gridRows; n++) {
+            yValues.add(anchorY + n * BLOCK_WIDTH);
+        }
+
+        for (int a = 0; a < gridRows; a++) {
+            for (int b = 0; b < gridColumns - a; b++) {
+                Point upperLeft = new Point(xValues.get(b), yValues.get(a));
+                Block toAdd = Block.miniBlock(upperLeft, colors[a]);
+                toAdd.addToGame(this);
+            }
+        }
     }
 
     /**
      * A helper method to create a ball with a random color and position.
-     * @return the ball that was created
      */
-    private Ball makeBall() {
+    public void addBall() {
         Point tmp = new Point(BLOCK_WIDTH, BLOCK_WIDTH);
         Rectangle inside = new Rectangle(tmp, WIDTH - 2 * BLOCK_WIDTH, HEIGHT - 5 * BLOCK_WIDTH);
-        Ball ball = Ball.generateMovingBallBySize(Ball.DEFAULT_RADIUS, inside, rand, environment);
-        return ball;
+        Ball ball = null;
+        do {
+            ball = Ball.generateMovingBallBySize(Ball.DEFAULT_RADIUS, inside, rand, environment);
+        } while (environment.keepOutside(ball) != null);
+        ball.addToGame(this);
     }
 
     /**
      * A helper method to create a paddle.
-     * @return the paddle that was created
      */
-    private Paddle makePaddle() {
+    public void addPaddle() {
         Point tmp = new Point(WIDTH / 2.0 - PADDLE_WIDTH / 2.0, HEIGHT - BLOCK_WIDTH - PADDLE_HEIGHT);
         KeyboardSensor sensor = gui.getKeyboardSensor();
         Paddle paddle = new Paddle(sensor, tmp, PADDLE_WIDTH, PADDLE_HEIGHT, Color.ORANGE);
-        return paddle;
-    }
-
-    /**
-     * The main entry point to run the animation.
-     * @param args command line arguments (neglected)
-     */
-    public static void main(String[] args) {
-        Game game = new Game();
-        game.initialize();
-        game.run();
+        paddle.addToGame(this);
     }
 }

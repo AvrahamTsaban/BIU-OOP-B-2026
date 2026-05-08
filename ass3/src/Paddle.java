@@ -7,6 +7,10 @@ import java.awt.Color;
  * and can collide with other objects in the game environment.
  * It implements the Sprite interface to be drawn on the screen,
  * and the Collidable interface to interact with colliding objects.
+ *
+ * @author Avraham Tsaban, avraham.tsaban@gmail.com
+ * @version 1.3
+ * @since 2024-06-05
  */
 public class Paddle implements Sprite, Collidable {
     /** The speed of the paddle. */

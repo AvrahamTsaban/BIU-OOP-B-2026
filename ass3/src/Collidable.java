@@ -1,6 +1,10 @@
 /**
  * Collidable interface represents an object that can be collided with.
  * It provides methods to get the collision shape and to handle collisions.
+ *
+ * @author Avraham Tsaban, avraham.tsaban@gmail.com
+ * @version 1.3
+ * @since 2024-06-05
  */
 public interface Collidable {
     /**

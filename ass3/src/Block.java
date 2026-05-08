@@ -5,6 +5,10 @@ import java.awt.Color;
  * Block class represents a rectangular block that can be collided with.
  * It extends the Rectangle class and implements the Collidable interface,
  * providing methods to get its collision shape and to handle collisions with a ball.
+ *
+ * @author Avraham Tsaban, avraham.tsaban@gmail.com
+ * @version 1.3
+ * @since 2024-06-05
  */
 public class Block extends Rectangle implements Collidable, Sprite {
     private final Color color;
@@ -19,6 +23,16 @@ public class Block extends Rectangle implements Collidable, Sprite {
     public Block(Point upperLeft, double width, double height, Color color) {
         super(upperLeft, width, height);
         this.color = color;
+    }
+
+    /**
+     * Create a new block with the specified upper left corner and color, using default width and height.
+     * @param upperLeft the upper left corner of the block
+     * @param color the color of the block
+     * @return a new block with the specified upper left corner and color, and default width and height
+     */
+    public static Block miniBlock(Point upperLeft, Color color) {
+        return new Block(upperLeft, Game.MINIBLOCK_LENGTH, Game.BLOCK_WIDTH, color);
     }
 
     /**
