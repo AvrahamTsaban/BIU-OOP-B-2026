@@ -29,7 +29,7 @@ public class Ball implements Sprite {
     /** maximum radius for which to apply speed scaling. */
     private static final int MAX_RADIUS_FOR_SPEED = 50;
     /** Default radius for balls in animations. */
-    public static final int DEFAULT_RADIUS = 4;
+    public static final int DEFAULT_RADIUS = 7;
     /** the full step size for movement. */
     private static final double FULL_STEP = 1.0;
 
@@ -126,8 +126,8 @@ public class Ball implements Sprite {
      * its position and velocity will be adjusted to simulate a bounce, as many times as needed.
      */
     private void moveOneStep() {
-        double stepLength = velocity.getSpeed();
-        if (stepLength == 0) {
+        double fullStepLength = velocity.getSpeed();
+        if (fullStepLength == 0) {
             return; // no movement if velocity is zero
         }
         /* Ensure the ball is outside of any collidable object to prevent getting stuck.
@@ -136,26 +136,56 @@ public class Ball implements Sprite {
         if (keepOutsidePoint != null) {
             this.point = keepOutsidePoint;
             this.point = velocity.applyToPoint(this.point, Helper.DELTA);
+            fullStepLength = velocity.getSpeed();
+            if (fullStepLength == 0) {
+                // safety measure (velocity should not be zero after keepOutside, but we haven't learnd exceptions yet
+                return;
+            }
         }
 
-        Point fullStepPoint = velocity.applyToPoint(this.point);
-        Line trajectory = new Line(this.point, fullStepPoint);
-        CollisionInfo collisionInfo = gameEnvironment.getClosestCollision(trajectory);
+        /* Extend the collision probe by a radius scaled (~1.58x) to approximate diagonal distances for common angles,
+        mostly 30°/60° (for 1.58 being the averahe of 1/sin of both angles) */
+        final double adjustedRadius = (double) radius * 1.58;
+
+        double remainingStep = FULL_STEP;
+        double maxStepLength = fullStepLength;
+        Point endOfStep = velocity.applyToPoint(this.point, remainingStep);
+        Line trajectory = new Line(this.point, endOfStep);
+        Line extendedTrajectory = trajectory.resize(maxStepLength + adjustedRadius);
+        CollisionInfo collisionInfo = gameEnvironment.getClosestCollision(extendedTrajectory);
+        if (collisionInfo == null) {
+            this.point = endOfStep; // no collision, move freely
+            return;
+        }
+
         while (collisionInfo != null) {
             Point collisionPoint = collisionInfo.collisionPoint();
             Collidable collisionObject = collisionInfo.collisionObject();
-            double distToCollision = this.point.distance(collisionPoint);
-            double stepFraction = distToCollision / stepLength;
-            Velocity newVelocity = collisionObject.hit(collisionPoint, velocity);
+
+            double wayToCollision = this.point.distance(collisionPoint) - adjustedRadius;
+            double stepFraction = wayToCollision / fullStepLength;
+            stepFraction = Math.max(0, Math.min(stepFraction, remainingStep));
             this.point = velocity.applyToPoint(this.point, stepFraction);
+
+            Velocity newVelocity = collisionObject.hit(collisionPoint, velocity);
             velocity.reassign(newVelocity);
+
             this.point = velocity.applyToPoint(this.point, Helper.DELTA);
             stepFraction += Helper.DELTA;
-            fullStepPoint = velocity.applyToPoint(this.point, FULL_STEP - stepFraction);
-            trajectory = new Line(this.point, fullStepPoint);
-            collisionInfo = gameEnvironment.getClosestCollision(trajectory);
+            remainingStep -= stepFraction;
+            if (remainingStep <= Helper.THRESHOLD) {
+                // <= epsilon moves left
+                return;
+            }
+
+            endOfStep = velocity.applyToPoint(this.point, remainingStep);
+            trajectory = new Line(this.point, endOfStep);
+
+            maxStepLength = fullStepLength * remainingStep;
+            extendedTrajectory = trajectory.resize(maxStepLength + adjustedRadius);
+            collisionInfo = gameEnvironment.getClosestCollision(extendedTrajectory);
         }
-        this.point = fullStepPoint;
+        this.point = endOfStep;
         return;
     }
 

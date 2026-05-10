@@ -135,8 +135,19 @@ public class Velocity {
         double angle;
         do {
             angle = rand.nextDouble() * 360; // random angle between 0 and 360 degrees
-        } while (Helper.doubleEq(angle, 0) || Helper.doubleEq(angle, 90)
-                || Helper.doubleEq(angle, 180) || Helper.doubleEq(angle, 270));
+            angle = (angle + 360) % 360; // normalize angle to be between 0 and 360 degrees
+        } while (isForbiddenAngle(angle));
         return Velocity.fromAngleAndSpeed(angle, speed);
+    }
+
+    /**
+     * A helper method to check if a given angle is within the forbidden ranges for random velocity generation.
+     * Forbidden angles are those that are too close to vertical or horizontal, which could lead to boring gameplay,
+     * as well as strange collision behavior due to the way corner collisions are handled.
+     * @param angle the angle to check in degrees
+     * @return true if the angle is forbidden, false otherwise
+     */
+    private static boolean isForbiddenAngle(double angle) {
+        return angle <= 15 || angle >= 345 || (angle >= 75 && angle <= 105) || (angle >= 255 && angle <= 285);
     }
 }

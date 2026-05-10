@@ -146,7 +146,7 @@ public class Game {
         for (int a = 0; a < gridRows; a++) {
             for (int b = 0; b < gridColumns - a; b++) {
                 Point upperLeft = new Point(xValues.get(b), yValues.get(a));
-                Block toAdd = Block.miniBlock(upperLeft, colors[a]);
+                MiniBlock toAdd = new MiniBlock(upperLeft, colors[a]);
                 toAdd.addToGame(this);
             }
         }
@@ -154,6 +154,9 @@ public class Game {
 
     /**
      * A helper method to create a ball with a random color and position.
+     *
+     * <p><strong>Implementation note:</strong> should be called after all collidables are added to the game,
+     * to ensure the ball is not created inside any of them.</p>
      */
     public void addBall() {
         Point tmp = new Point(BLOCK_WIDTH, BLOCK_WIDTH);
@@ -161,7 +164,7 @@ public class Game {
         Ball ball = null;
         do {
             ball = Ball.generateMovingBallBySize(Ball.DEFAULT_RADIUS, inside, rand, environment);
-        } while (environment.keepOutside(ball) != null);
+        } while (environment.isInsideCollidable(ball.getCenter(), Ball.DEFAULT_RADIUS));
         ball.addToGame(this);
     }
 

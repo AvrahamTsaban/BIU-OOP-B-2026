@@ -121,11 +121,12 @@ public class Rectangle {
     /**
      * Check if a given point is contained within the rectangle (including edges and safety margin).
      * @param p the point to check
+     * @param radius the radius of the ball (used to determine the safety margin for containment)
      * @return true if the point is inside the rectangle (or within the safety margin), false otherwise
      */
     //TODO add to UML diagram
-    public boolean isInside(Point p) {
-        double margin = Helper.DELTA;
+    public boolean isInside(Point p, double radius) {
+        double margin = Helper.DELTA + radius;
         double x = p.getX();
         double leftBound = this.getLeft() - margin;
         double rightBound = this.getRight() + margin;

@@ -1,17 +1,3 @@
-+sizeVariation(double): Line
-    /**
-     * Returns a similar line with the same start point and direction, and a new length.
-     * @param newLength the desired length of the new line
-     * @return a new line with the same start point and direction, and the specified length
-     */
-    public Line sizeVariation(double newLength) {
-        Point newStart = this.start();
-        double lenMultiplier = newLength / this.length();
-        double dx = (this.end.getX() - this.start.getX()) * lenMultiplier;
-        double dy = (this.end.getY() - this.start.getY()) * lenMultiplier;
-        Point newEnd = new Point(newStart.getX() + dx, newStart.getY() + dy);
-        return new Line(newStart, newEnd);
-    }
 
 
 
@@ -79,14 +65,73 @@
     }
 
     (for trajectory calculation in Ball.moveOneStep)
-        /* TODO:
-        ask wether or not I am allowed do make this line a little bit longer
-        sketch:
-        double ratio = (velocity.getSpeed() + radius) / velocity.getSpeed();
-        double extendedX = this.point.getX() + velocity.getDx() * ratio;
-        double extendedY = this.point.getY() + velocity.getDy() * ratio;
-        Point endOfTrajectory = new Point(extendedX, extendedY);
-        Line trajectory = new Line(this.point, endOfTrajectory);
-        and replace fullStepPoint with endOfTrajectory everywhere trajectory is defined
-        (recalculate trajectory after every collision as well)
-        */
+        //added
+
+
+
+
+    /**
+     * Checks if this point equals another point.
+     *
+     * @param other object to compare with
+     * @return true if both coordinates are equal (up to {@link Helper#doubleEq(double, double)})
+     */
+    public boolean equals(Object other) {
+        if (this.getClass() != other.getClass()) {
+            return false;
+        }
+
+        Point otherPoint = (Point) other;
+        return (Helper.doubleEq(this.x, otherPoint.getX()) && Helper.doubleEq(this.y, otherPoint.getY()));
+    }
+    Definition of 'equals()' without corresponding definition of 'hashCode()'.
+
+
+
+keepOutsies:
+miniBlock:
+
+
+    /**
+     * As long as blocks are static, this method should only be effective while creating the balls.
+     * If the ball is inside the block, gives an arbitrary new position for the ball, just to the Left of the block.
+     * @param ballCenter the center point of the ball that may be inside the block
+     * @param ballRadius the radius of the ball
+     * @return a point just outside the block
+     */
+    @Override
+    public Point keepOutside(Point ballCenter, double ballRadius) {
+        Rectangle rect = this.getCollisionRectangle();
+        boolean isInside = rect.isInside(ballCenter, ballRadius);
+        if (!isInside) {
+            return null;
+        }
+        // lift the ball just above the paddle to keep it outside
+        return new Point(this.getLeft() - ballRadius - Helper.DELTA, ballCenter.getY());
+    }
+Block:
+
+
+    /**
+     * As long as blocks are static, this method should only be effective while creating the balls.
+     * If the ball is inside the block, gives an arbitrary new position for the ball, just outside the block.
+     * @param ballCenter the center point of the ball that may be inside the block
+     * @param ballRadius the radius of the ball
+     * @return a point just outside the block
+     */
+    public Point keepOutside(Point ballCenter, double ballRadius) {
+        Rectangle rect = this.getCollisionRectangle();
+        boolean isInside = rect.isInside(ballCenter, ballRadius);
+        if (!isInside) {
+            return null;
+        }
+        // lift the ball just above the paddle to keep it outside
+        double sendHereY = this.getTop() - ballRadius - Helper.DELTA;
+        if (sendHereY > ballRadius + Game.BLOCK_WIDTH) {
+            return new Point(ballCenter.getX(), sendHereY);
+        } else {
+            // if the block is too close to the top, send the ball just below the block instead
+            double sendHereYBelow = this.getBottom() + ballRadius + Helper.DELTA;
+            return new Point(ballCenter.getX(), sendHereYBelow);
+        }
+    }

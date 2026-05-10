@@ -140,16 +140,28 @@ public class Paddle implements Sprite, Collidable {
     /**
      * If the ball is inside the Paddle, gives a new position for the ball, just above the paddle.
      * @param ballCenter the center point of the ball that may be inside the paddle
+     * @param ballRadius the radius of the ball
      * @return a point just outside the collision shape of the paddle
      */
     //TODO add to UML
-    public Point keepOutside(Point ballCenter) {
+    public Point keepOutside(Point ballCenter, double ballRadius) {
         Rectangle rect = this.getCollisionRectangle();
-        boolean isInside = rect.isInside(ballCenter);
+        boolean isInside = rect.isInside(ballCenter, ballRadius);
         if (!isInside) {
             return null;
         }
         // lift the ball just above the paddle to keep it outside
-        return new Point(ballCenter.getX(), upperLeft.getY());
+        return new Point(ballCenter.getX(), upperLeft.getY() - ballRadius - Helper.DELTA);
+    }
+
+    /**
+     * Check if a point is inside the collision shape of the paddle, with a given margin (e.g. ball radius).
+     * @param p the point to check
+     * @param radius the margin to consider (e.g. the radius of the ball)
+     * @return true if the point is inside the collision shape of the paddle with the given margin, false otherwise
+     */
+    public boolean isInside(Point p, double radius) {
+        Rectangle rect = this.getCollisionRectangle();
+        return rect.isInside(p, radius);
     }
 }

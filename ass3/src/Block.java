@@ -26,22 +26,12 @@ public class Block extends Rectangle implements Collidable, Sprite {
     }
 
     /**
-     * Create a new block with the specified upper left corner and color, using default width and height.
-     * @param upperLeft the upper left corner of the block
-     * @param color the color of the block
-     * @return a new block with the specified upper left corner and color, and default width and height
-     */
-    public static Block miniBlock(Point upperLeft, Color color) {
-        return new Block(upperLeft, Game.MINIBLOCK_LENGTH, Game.BLOCK_WIDTH, color);
-    }
-
-    /**
      * Get the "collision shape" of the object,
      * which is the rectangle that defines its boundaries for collision detection.
      * @return the collision shape of the object
      */
     public Rectangle getCollisionRectangle() {
-        return this;
+        return (Rectangle) this;
     }
 
     /**
@@ -108,11 +98,24 @@ public class Block extends Rectangle implements Collidable, Sprite {
     }
 
     /**
-     * As long as blocks are static, return null to indicate that there is nothing to do.
-     * @param ballCenter the center point of the ball that may be inside the block (ignored)
-     * @return null, since blocks are static and do not need to keep the ball outside
+     * This method is intended to ensure collidable did not get eat the ball while moving.
+     * Since blocks are static, this method returns null.
+     * @param ballCenter the center point of the ball that may be inside the collision shape of the object
+     * @param ballRadius the radius of the ball
+     * @return a point just outside the collision shape of the object
      */
-    public Point keepOutside(Point ballCenter) {
+    public Point keepOutside(Point ballCenter, double ballRadius) {
         return null;
+    }
+
+    /**
+     * Check if a given point is contained within the block (including edges and safety margin).
+     * @param p the point to check
+     * @param radius the radius of the ball (used to determine the safety margin for containment)
+     * @return true if the point is inside the block (or within the safety margin), false otherwise
+     */
+     //TODO add to UML
+    public boolean isInside(Point p, double radius) {
+        return super.isInside(p, radius);
     }
 }

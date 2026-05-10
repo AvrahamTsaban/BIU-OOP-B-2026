@@ -65,8 +65,10 @@ public class GameEnvironment {
 
     //TODO add to UML
     /**
-     * Keep the ball outside of any collidable object in the environment.
+     * Keep the ball outside of any collidable object that may get on it while moving,
+     * by adjusting its velocity and returning a recommended new center if necessary.
      * If the ball is inside any collidable object, adjusts its velocity and returns a recommended new center.
+     * Static objects will not be checked.
      * @param ball the ball to check and adjust if necessary
      * @return a recommended new center for the ball, or null if no adjustment is needed
      */
@@ -74,15 +76,33 @@ public class GameEnvironment {
         if (ball == null) {
             return null;
         }
-        Point center = ball.getCenter();
-        Point newCenter = null;
+        double r = (double) ball.getSize();
+        Point ballCenter = ball.getCenter();
+        Point newCenter = ballCenter;
+
         for (Collidable collidable : collidables) {
-            Point keepOutsidePoint = collidable.keepOutside(center);
+            Point keepOutsidePoint = collidable.keepOutside(newCenter, r);
             if (keepOutsidePoint != null) {
                 ball.setVelocity(collidable.hit(keepOutsidePoint, ball.getVelocity()));
                 newCenter = keepOutsidePoint;
             }
         }
-        return newCenter;
+        return newCenter.equals(ballCenter) ? null : newCenter;
+    }
+
+    /**
+     * Check if a point is inside any of the collidable objects in this environment,
+     * with a given margin (e.g. ball radius).
+     * @param p the point to check
+     * @param radius the margin to consider (e.g. the radius of the ball)
+     * @return true if the point is inside any collidable object with the given margin, false otherwise
+     */
+    public boolean isInsideCollidable(Point p, double radius) {
+        for (Collidable collidable : collidables) {
+            if (collidable.isInside(p, radius)) {
+                return true;
+            }
+        }
+        return false;
     }
 }

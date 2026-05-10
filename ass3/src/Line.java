@@ -398,4 +398,28 @@ public class Line implements Comparable<Line> {
             return this.end.compareTo(other.end());
         }
     }
+
+    /**
+     * Returns a similar line with the same start point and direction, and a new length.
+     *
+     * <p><strong>Implementation note:</strong> If the current line is a point (length 0), this method returns a copy
+     * of self, since direction and length are undefined.
+     * Ensure your code handles this case appropriately and avoids entering an infinite loop.</p>
+     * @param newLength the desired length of the new line
+     * @return a new line with the same start point and direction, and the specified length
+     */
+    public Line resize(double newLength) {
+        double currentLength = this.length();
+        if (Helper.doubleEq(currentLength, 0)) {
+            return new Line(this.start(), this.start());
+        }
+
+        Point newStart = this.start();
+        double lenMultiplier = newLength / currentLength;
+        double dx = (this.end.getX() - this.start.getX()) * lenMultiplier;
+        double dy = (this.end.getY() - this.start.getY()) * lenMultiplier;
+        Point newEnd = new Point(newStart.getX() + dx, newStart.getY() + dy);
+        return new Line(newStart, newEnd);
+    }
+
 }
