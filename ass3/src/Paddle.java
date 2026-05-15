@@ -104,7 +104,7 @@ public class Paddle extends Rectangle implements Sprite, Collidable {
         double secondPartWidth = super.getWidth() - firstPartWidth;
         double height = super.getHeight();
         d.fillRectangle((int) leftEdge(), (int) topY(), (int) firstPartWidth, (int) height);
-        d.fillRectangle((int) Game.BLOCK_WIDTH, (int) topY(), (int) secondPartWidth, (int) height);
+        d.fillRectangle(Game.BLOCK_WIDTH, (int) topY(), (int) secondPartWidth, (int) height);
     }
 
     /**
