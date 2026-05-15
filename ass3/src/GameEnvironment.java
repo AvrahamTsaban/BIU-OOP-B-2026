@@ -70,24 +70,27 @@ public class GameEnvironment {
      * If the ball is inside any collidable object, adjusts its velocity and returns a recommended new center.
      * Static objects will not be checked.
      * @param ball the ball to check and adjust if necessary
-     * @return a recommended new center for the ball, or null if no adjustment is needed
+     * @return a CollisionInfo object containing updated ball center and collision details,
+     * or null if no adjustment was needed
      */
-    public Point keepOutside(Ball ball) {
+    public CollisionInfo keepOutside(Ball ball) {
         if (ball == null) {
             return null;
         }
         double r = (double) ball.getSize();
         Point ballCenter = ball.getCenter();
         Point newCenter = ballCenter;
+        CollisionInfo finalCollisionInfo = null;
 
         for (Collidable collidable : collidables) {
-            Point keepOutsidePoint = collidable.keepOutside(newCenter, r);
-            if (keepOutsidePoint != null) {
-                ball.setVelocity(collidable.hit(keepOutsidePoint, ball.getVelocity()));
-                newCenter = keepOutsidePoint;
+            CollisionInfo collisionInfo = collidable.keepOutside(newCenter, r);
+            if (collisionInfo == null) {
+                continue;
             }
+            finalCollisionInfo = collisionInfo;
+            newCenter = collisionInfo.recommendedBallCenter();
         }
-        return newCenter.equals(ballCenter) ? null : newCenter;
+        return newCenter.equals(ballCenter) ? null : finalCollisionInfo;
     }
 
     /**

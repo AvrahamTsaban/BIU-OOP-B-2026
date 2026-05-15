@@ -30,6 +30,8 @@ public class Game {
     public static final int BLOCK_WIDTH = 25;
     /** Length of small blocks. */
     public static final int MINIBLOCK_LENGTH = 50;
+    /** The width of the game area excluding the blocks. */
+    public static final int WIDTH_WITHOUT_BLOCKS = Game.WIDTH - 2 * Game.BLOCK_WIDTH;
     /** Width of the paddle. */
     private static final int PADDLE_WIDTH = 100;
     /** Height of the paddle. */

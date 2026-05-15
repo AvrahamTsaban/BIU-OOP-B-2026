@@ -1,6 +1,7 @@
 import biuoop.DrawSurface;
 import biuoop.KeyboardSensor;
 import java.awt.Color;
+
 /**
  * A class representing a paddle in the game.
  * The paddle can move left and right in response to keyboard input,
@@ -12,16 +13,14 @@ import java.awt.Color;
  * @version 1.3
  * @since 2024-06-05
  */
-public class Paddle implements Sprite, Collidable {
+public class Paddle extends Rectangle implements Sprite, Collidable {
     /** The speed of the paddle. */
     private static final double SPEED = Game.MS_PER_FRAME * 0.4;
     /** The number of partitions the paddle is divided into for collision response. */
     private static final int PART_NUM = 5;
 
-    private Point upperLeft;
-    private final double width;
-    private final double height;
     private final Color color;
+    private final double topY;
     private biuoop.KeyboardSensor keyboard;
 
     /**
@@ -33,33 +32,34 @@ public class Paddle implements Sprite, Collidable {
      * @param color the color of the paddle
      */
     public Paddle(KeyboardSensor keyboard, Point upperLeft, double width, double height, Color color) {
+        super(upperLeft, width < Game.WIDTH_WITHOUT_BLOCKS / 2 ? width : Game.WIDTH_WITHOUT_BLOCKS / 2, height);
         this.keyboard = keyboard;
-        this.upperLeft = upperLeft;
-        this.width = width;
-        this.height = height;
         this.color = color;
+        this.topY = upperLeft.getY();
     }
 
     /**
      * Move the paddle to the left by decreasing the x-coordinate of its upper-left corner by the defined speed.
      */
     public void moveLeft() {
-        double newX = this.upperLeft.getX() - SPEED;
+        double newX = super.getUpperLeft().getX() - SPEED;
         if (newX < 0 + Game.BLOCK_WIDTH) {
-            newX = Game.WIDTH - width; // wrap around to the right edge
+            // wrap around to the right edge
+            newX += (double) Game.WIDTH_WITHOUT_BLOCKS;
         }
-        this.upperLeft = new Point(newX, upperLeft.getY());
+        super.move(new Point(newX, topY));
     }
 
     /**
      * Move the paddle to the right by increasing the x-coordinate of its upper-left corner by the defined speed.
      */
     public void moveRight() {
-        double newX = this.upperLeft.getX() + SPEED;
-        if (newX + width > Game.WIDTH - Game.BLOCK_WIDTH) {
-            newX = 0; // wrap around to the left edge
+        double newX = super.getUpperLeft().getX() + SPEED;
+        if (newX > Game.WIDTH - Game.BLOCK_WIDTH) {
+            // wrap around to the left edge
+            newX -= (double) Game.WIDTH_WITHOUT_BLOCKS;
         }
-        this.upperLeft = new Point(newX, upperLeft.getY());
+        super.move(new Point(newX, topY));
     }
 
     /**
@@ -85,7 +85,22 @@ public class Paddle implements Sprite, Collidable {
      */
     public void drawOn(DrawSurface d) {
         d.setColor(this.color);
+        if (isSplit()) {
+            drawSplit(d);
+            return;
+        }
+        Point upperLeft = super.getUpperLeft();
+        double width = super.getWidth();
+        double height = super.getHeight();
         d.fillRectangle((int) upperLeft.getX(), (int) upperLeft.getY(), (int) width, (int) height);
+    }
+
+    private void drawSplit(DrawSurface d) {
+        double firstPartWidth = Game.WIDTH - Game.BLOCK_WIDTH - leftEdge();
+        double secondPartWidth = super.getWidth() - firstPartWidth;
+        double height = super.getHeight();
+        d.fillRectangle((int) leftEdge(), (int) topY, (int) firstPartWidth, (int) height);
+        d.fillRectangle((int) Game.BLOCK_WIDTH, (int) topY, (int) secondPartWidth, (int) height);
     }
 
     /**
@@ -93,7 +108,7 @@ public class Paddle implements Sprite, Collidable {
      * @return the collision rectangle of the paddle
      */
     public Rectangle getCollisionRectangle() {
-        return new Rectangle(this.upperLeft, this.width, this.height);
+        return (Rectangle) this;
     }
 
     /**
@@ -107,8 +122,11 @@ public class Paddle implements Sprite, Collidable {
      * @return the new velocity expected after the hit
      */
     public Velocity hit(Point collisionPoint, Velocity currentVelocity) {
-        double partitionSize = this.width / (double) PART_NUM;
-        double relativeX = collisionPoint.getX() - this.upperLeft.getX();
+        double partitionSize = super.getWidth() / (double) PART_NUM;
+        double relativeX = collisionPoint.getX() - super.getUpperLeft().getX();
+        if (relativeX < 0) {
+            relativeX += Game.WIDTH_WITHOUT_BLOCKS;
+        }
         int partition = (int) Math.ceil(relativeX / partitionSize);
         partition = Math.max(1, Math.min(partition, PART_NUM));
         switch (partition) {
@@ -144,14 +162,28 @@ public class Paddle implements Sprite, Collidable {
      * @return a point just outside the collision shape of the paddle
      */
     //TODO add to UML
-    public Point keepOutside(Point ballCenter, double ballRadius) {
-        Rectangle rect = this.getCollisionRectangle();
-        boolean isInside = rect.isInside(ballCenter, ballRadius);
+    public CollisionInfo keepOutside(Point ballCenter, double ballRadius) {
+        boolean isInside;
+        if (isSplit()) {
+            Rectangle[] parts = getParts();
+            isInside = false;
+            for (Rectangle part : parts) {
+                if (part.isInside(ballCenter, ballRadius)) {
+                    isInside = true;
+                    break;
+                }
+            }
+        } else {
+            Rectangle rect = new Rectangle(super.getUpperLeft(), super.getWidth(), super.getHeight());
+            isInside = rect.isInside(ballCenter, ballRadius);
+        }
         if (!isInside) {
             return null;
         }
-        // lift the ball just above the paddle to keep it outside
-        return new Point(ballCenter.getX(), upperLeft.getY() - ballRadius - Helper.DELTA);
+        Point collisionPoint = new Point(ballCenter.getX(), topY);
+        // lift the ball to keep it outside
+        Point recommendedBallCenter = new Point(ballCenter.getX(), topY - ballRadius - Helper.DELTA);
+        return new CollisionInfo(collisionPoint, this, recommendedBallCenter);
     }
 
     /**
@@ -161,7 +193,61 @@ public class Paddle implements Sprite, Collidable {
      * @return true if the point is inside the collision shape of the paddle with the given margin, false otherwise
      */
     public boolean isInside(Point p, double radius) {
-        Rectangle rect = this.getCollisionRectangle();
+        if (isSplit()) {
+            Rectangle[] parts = getParts();
+            for (Rectangle part : parts) {
+                if (part.isInside(p, radius)) {
+                    return true;
+                }
+            }
+            return false;
+        }
+        Rectangle rect = new Rectangle(super.getUpperLeft(), super.getWidth(), super.getHeight());
         return rect.isInside(p, radius);
+    }
+
+    /**
+     * Calculate the left edge of the paddle, taking into account wrapping around the game area.
+     * @return the x-coordinate of the left edge of the paddle
+     */
+    private double leftEdge() {
+        return super.getUpperLeft().getX();
+    }
+
+    /**
+     * Check if the paddle is split across the game area.
+     * @return true if the paddle is split, false otherwise
+     */
+    private boolean isSplit() {
+        return leftEdge() > Game.WIDTH - Game.BLOCK_WIDTH - super.getWidth();
+    }
+
+    /**
+     * Calculate the intersection points of a given line with the edges of the paddle,
+     * taking into account wrapping around the game area.
+     * @param line the line to check for intersections
+     * @return a list of intersection points
+     */
+    @Override
+    public java.util.List<Point> intersectionPoints(Line line) {
+        if (isSplit()) {
+            Rectangle[] parts = getParts();
+            java.util.List<Point> intersectionPoints = new java.util.ArrayList<>();
+            for (Rectangle part : parts) {
+                intersectionPoints.addAll(part.intersectionPoints(line));
+            }
+            return intersectionPoints;
+        } else {
+            return super.intersectionPoints(line);
+        }
+    }
+
+    private Rectangle[] getParts() {
+        double firstPartWidth = Game.WIDTH - Game.BLOCK_WIDTH - leftEdge();
+        double secondPartWidth = super.getWidth() - firstPartWidth;
+        double height = super.getHeight();
+        Rectangle firstPart = new Rectangle(super.getUpperLeft(), firstPartWidth, height);
+        Rectangle secondPart = new Rectangle(new Point(Game.BLOCK_WIDTH, topY), secondPartWidth, height);
+        return new Rectangle[]{firstPart, secondPart};
     }
 }

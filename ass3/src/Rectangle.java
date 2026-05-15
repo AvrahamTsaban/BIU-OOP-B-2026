@@ -13,7 +13,7 @@
  * @since 2024-06-05
  */
 public class Rectangle {
-    private final Point upperLeft;
+    private Point upperLeft;
     private final double width;
     private final double height;
 
@@ -86,6 +86,14 @@ public class Rectangle {
     }
 
     /**
+     * Move the rectangle to a new upper-left corner.
+     * @param newUpperLeft the new upper-left corner of the rectangle
+     */
+    protected void move(Point newUpperLeft) {
+        this.upperLeft = new Point(newUpperLeft.getX(), newUpperLeft.getY());
+    }
+
+    /**
      * Calculate the intersection points of a given line with the edges of the rectangle.
      * @param line the line to check for intersections
      * @return a list of intersection points
@@ -126,16 +134,15 @@ public class Rectangle {
      */
     //TODO add to UML diagram
     public boolean isInside(Point p, double radius) {
-        double margin = Helper.DELTA + radius;
         double x = p.getX();
-        double leftBound = this.getLeft() - margin;
-        double rightBound = this.getRight() + margin;
+        double leftBound = this.getLeft() - radius;
+        double rightBound = this.getRight() + radius;
         if (x < leftBound || x > rightBound) {
             return false;
         }
         double y = p.getY();
-        double topBound = this.getTop() - margin;
-        double bottomBound = this.getBottom() + margin;
+        double topBound = this.getTop() - radius;
+        double bottomBound = this.getBottom() + radius;
         if (y < topBound || y > bottomBound) {
             return false;
         }

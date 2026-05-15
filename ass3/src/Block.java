@@ -98,14 +98,58 @@ public class Block extends Rectangle implements Collidable, Sprite {
     }
 
     /**
-     * This method is intended to ensure collidable did not get eat the ball while moving.
-     * Since blocks are static, this method returns null.
+     * Keep the ball outside of any collidable object that may get on it while moving,
+     * or after collision if the ball did not get out of the object.
      * @param ballCenter the center point of the ball that may be inside the collision shape of the object
      * @param ballRadius the radius of the ball
      * @return a point just outside the collision shape of the object
      */
-    public Point keepOutside(Point ballCenter, double ballRadius) {
-        return null;
+    public CollisionInfo keepOutside(Point ballCenter, double ballRadius) {
+        boolean isInside = isInside(ballCenter, ballRadius);
+        if (!isInside) {
+            return null;
+        }
+
+        double buffer = ballRadius + Helper.DELTA;
+        double currentX = ballCenter.getX();
+        double currentY = ballCenter.getY();
+        double rightMinX = this.getRight() + buffer;
+        double leftMaxX = this.getLeft() - buffer;
+        double bottomMinY = this.getBottom() + buffer;
+        double topMaxY = this.getTop() - buffer;
+
+        double newX = currentX;
+        double newY = currentY;
+        double collisionX = currentX;
+        double collisionY = currentY;
+
+        double dxLeft = Math.abs(currentX - leftMaxX);
+        double dxRight = Math.abs(currentX - rightMinX);
+        double dyTop = Math.abs(currentY - topMaxY);
+        double dyBottom = Math.abs(currentY - bottomMinY);
+
+        double minDx = Math.min(dxLeft, dxRight);
+        double minDy = Math.min(dyTop, dyBottom);
+        if (minDx < minDy) {
+            if (dxLeft < dxRight) {
+                newX = leftMaxX;
+                collisionX = this.getLeft();
+            } else {
+                newX = rightMinX;
+                collisionX = this.getRight();
+            }
+        } else {
+            if (dyTop < dyBottom) {
+                newY = topMaxY;
+                collisionY = this.getTop();
+            } else {
+                newY = bottomMinY;
+                collisionY = this.getBottom();
+            }
+        }
+        Point collisionPoint = new Point(collisionX, collisionY);
+        Point newPoint = new Point(newX, newY);
+        return new CollisionInfo(collisionPoint, this, newPoint);
     }
 
     /**

@@ -9,6 +9,7 @@
 public class CollisionInfo {
     private final Point collisionPoint;
     private final Collidable collisionObject;
+    private final Point recommendedBallCenter;
 
     /**
      * Initialize a new CollisionInfo with the given collision point and collidable object.
@@ -18,6 +19,20 @@ public class CollisionInfo {
     public CollisionInfo(Point collisionPoint, Collidable collisionObject) {
         this.collisionPoint = collisionPoint;
         this.collisionObject = collisionObject;
+        this.recommendedBallCenter = collisionPoint;
+    }
+
+
+    /**
+     * Initialize a new CollisionInfo with the given collision point, collidable object, and recommended ball center.
+     * @param collisionPoint the point at which the collision occurs
+     * @param collisionObject the collidable object involved in the collision
+     * @param recommendedBallCenter a nearby point outside the collision shape of the collidable object
+     */
+    public CollisionInfo(Point collisionPoint, Collidable collisionObject, Point recommendedBallCenter) {
+        this.collisionPoint = collisionPoint;
+        this.collisionObject = collisionObject;
+        this.recommendedBallCenter = recommendedBallCenter;
     }
 
     /**
@@ -34,5 +49,13 @@ public class CollisionInfo {
      */
     public Collidable collisionObject() {
         return collisionObject;
+    }
+
+    /**
+     * Get the recommended ball center.
+     * @return the recommended ball center
+     */
+    public Point recommendedBallCenter() {
+        return recommendedBallCenter;
     }
 }

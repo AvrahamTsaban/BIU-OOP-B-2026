@@ -23,7 +23,7 @@ public class Ball implements Sprite {
      * Base speed for generating moving balls, used in relation to ball size.
      * relates to the sleep time of the animation to ensure consistency across different frame rates.
      */
-    private static final double BASE_SPEED = Game.MS_PER_FRAME * 0.3;
+    private static final double BASE_SPEED = Game.MS_PER_FRAME * 0.4;
     /** used to avoid division by zero and make speed scaling natural. */
     private static final double LOG_SHIFT = 2.0;
     /** maximum radius for which to apply speed scaling. */
@@ -124,27 +124,19 @@ public class Ball implements Sprite {
      * Move the ball one step according to its current velocity.
      * If the ball is predicted to hit the boundaries of the window,
      * its position and velocity will be adjusted to simulate a bounce, as many times as needed.
+     * We extend the collision probe by a radius scaled (~1.58x) to approximate diagonal distances for common angles,
+     * mostly 30°/60° (for 1.58 being the averahe of 1/sin of both angles).
+     * We assume collision angle is 15-75°, see Velocity.isForbiddenAngle() and Paddle.hit().
      */
     private void moveOneStep() {
+        ensureStartingPositionIsValid();
         double fullStepLength = velocity.getSpeed();
         if (fullStepLength == 0) {
             return; // no movement if velocity is zero
         }
-        /* Ensure the ball is outside of any collidable object to prevent getting stuck.
-        If is inside one, its position is adjusted, and its Velocity is auto updated by keepOutside */
-        Point keepOutsidePoint = gameEnvironment.keepOutside(this);
-        if (keepOutsidePoint != null) {
-            this.point = keepOutsidePoint;
-            this.point = velocity.applyToPoint(this.point, Helper.DELTA);
-            fullStepLength = velocity.getSpeed();
-            if (fullStepLength == 0) {
-                // safety measure (velocity should not be zero after keepOutside, but we haven't learnd exceptions yet
-                return;
-            }
-        }
 
         /* Extend the collision probe by a radius scaled (~1.58x) to approximate diagonal distances for common angles,
-        mostly 30°/60° (for 1.58 being the averahe of 1/sin of both angles) */
+        mostly 30°/60°, assuming 15° < collision angle < 75° */
         final double adjustedRadius = (double) radius * 1.58;
 
         double remainingStep = FULL_STEP;
@@ -157,10 +149,11 @@ public class Ball implements Sprite {
             this.point = endOfStep; // no collision, move freely
             return;
         }
-
+        Point collisionPoint = null;
+        Collidable collisionObject = null;
         while (collisionInfo != null) {
-            Point collisionPoint = collisionInfo.collisionPoint();
-            Collidable collisionObject = collisionInfo.collisionObject();
+            collisionPoint = collisionInfo.collisionPoint();
+            collisionObject = collisionInfo.collisionObject();
 
             double wayToCollision = this.point.distance(collisionPoint) - adjustedRadius;
             double stepFraction = wayToCollision / fullStepLength;
@@ -174,8 +167,9 @@ public class Ball implements Sprite {
             stepFraction += Helper.DELTA;
             remainingStep -= stepFraction;
             if (remainingStep <= Helper.THRESHOLD) {
-                // <= epsilon moves left
-                return;
+                // moves left <= epsilon
+                endOfStep = this.point;
+                break;
             }
 
             endOfStep = velocity.applyToPoint(this.point, remainingStep);
@@ -186,7 +180,43 @@ public class Ball implements Sprite {
             collisionInfo = gameEnvironment.getClosestCollision(extendedTrajectory);
         }
         this.point = endOfStep;
+        if (collisionPoint != null && collisionObject != null && collisionObject.isInside(this.point, radius)) {
+            ensureOutBound(this.point, collisionObject);
+        }
         return;
+    }
+
+    /**
+     * Keep the ball outside of any collidable object that may get on it while moving,
+     * by adjusting its position if necessary.
+     * If the ball is inside any collidable object, adjusts its position to be just outside the object.
+     * Static objects may not be checked.
+     * @param ballCenter the center point of the ball that may be inside a collidable object
+     * @param collisionObject the collidable object to check against
+     */
+    private void ensureOutBound(Point ballCenter, Collidable collisionObject) {
+        if (collisionObject == null) {
+            return;
+        }
+        if (collisionObject.isInside(ballCenter, radius)) {
+            CollisionInfo collisionInfo = collisionObject.keepOutside(ballCenter, radius);
+            if (collisionInfo != null) {
+                this.point = collisionInfo.recommendedBallCenter();
+            }
+        }
+    }
+
+    /**
+     * Ensure that the ball's starting position is valid (not inside any collidable object).
+     * If the ball is inside a collidable object, adjusts its position and velocity accordingly.
+     */
+    private void ensureStartingPositionIsValid() {
+        CollisionInfo keepOut = gameEnvironment.keepOutside(this);
+        if (keepOut == null) {
+            return;
+        }
+        this.point = keepOut.recommendedBallCenter();
+        this.velocity.reassign(keepOut.collisionObject().hit(keepOut.collisionPoint(), this.velocity));
     }
 
     /**

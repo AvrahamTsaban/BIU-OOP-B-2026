@@ -34,10 +34,10 @@ public interface Collidable {
      * Used to prevent moving objects from getting on the ball.
      * @param ballCenter the center point of the ball that may be inside the collision shape of the object
      * @param ballRadius the radius of the ball
-     * @return a point just outside the collision shape of the object
+     * @return a CollisionInfo object containing updated ball center and collision details
      */
     //TODO add to UML
-    Point keepOutside(Point ballCenter, double ballRadius);
+    CollisionInfo keepOutside(Point ballCenter, double ballRadius);
 
 
     /**
