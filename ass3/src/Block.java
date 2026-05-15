@@ -158,7 +158,6 @@ public class Block extends Rectangle implements Collidable, Sprite {
      * @param radius the radius of the ball (used to determine the safety margin for containment)
      * @return true if the point is inside the block (or within the safety margin), false otherwise
      */
-     //TODO add to UML
     public boolean isInside(Point p, double radius) {
         return super.isInside(p, radius);
     }

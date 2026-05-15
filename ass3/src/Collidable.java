@@ -36,7 +36,6 @@ public interface Collidable {
      * @param ballRadius the radius of the ball
      * @return a CollisionInfo object containing updated ball center and collision details
      */
-    //TODO add to UML
     CollisionInfo keepOutside(Point ballCenter, double ballRadius);
 
 

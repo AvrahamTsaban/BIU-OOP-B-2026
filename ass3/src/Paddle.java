@@ -20,7 +20,6 @@ public class Paddle extends Rectangle implements Sprite, Collidable {
     private static final int PART_NUM = 5;
 
     private final Color color;
-    private final double topY;
     private biuoop.KeyboardSensor keyboard;
 
     /**
@@ -35,7 +34,6 @@ public class Paddle extends Rectangle implements Sprite, Collidable {
         super(upperLeft, width < Game.WIDTH_WITHOUT_BLOCKS / 2 ? width : Game.WIDTH_WITHOUT_BLOCKS / 2, height);
         this.keyboard = keyboard;
         this.color = color;
-        this.topY = upperLeft.getY();
     }
 
     /**
@@ -47,7 +45,7 @@ public class Paddle extends Rectangle implements Sprite, Collidable {
             // wrap around to the right edge
             newX += (double) Game.WIDTH_WITHOUT_BLOCKS;
         }
-        super.move(new Point(newX, topY));
+        super.move(new Point(newX, topY()));
     }
 
     /**
@@ -59,7 +57,7 @@ public class Paddle extends Rectangle implements Sprite, Collidable {
             // wrap around to the left edge
             newX -= (double) Game.WIDTH_WITHOUT_BLOCKS;
         }
-        super.move(new Point(newX, topY));
+        super.move(new Point(newX, topY()));
     }
 
     /**
@@ -95,12 +93,18 @@ public class Paddle extends Rectangle implements Sprite, Collidable {
         d.fillRectangle((int) upperLeft.getX(), (int) upperLeft.getY(), (int) width, (int) height);
     }
 
+    /**
+     * Draw the split paddle on the given DrawSurface.
+     * This method is called when the paddle is split across the game area,
+     * and it draws the two parts of the paddle separately.
+     * @param d the DrawSurface on which to draw the split paddle
+     */
     private void drawSplit(DrawSurface d) {
         double firstPartWidth = Game.WIDTH - Game.BLOCK_WIDTH - leftEdge();
         double secondPartWidth = super.getWidth() - firstPartWidth;
         double height = super.getHeight();
-        d.fillRectangle((int) leftEdge(), (int) topY, (int) firstPartWidth, (int) height);
-        d.fillRectangle((int) Game.BLOCK_WIDTH, (int) topY, (int) secondPartWidth, (int) height);
+        d.fillRectangle((int) leftEdge(), (int) topY(), (int) firstPartWidth, (int) height);
+        d.fillRectangle((int) Game.BLOCK_WIDTH, (int) topY(), (int) secondPartWidth, (int) height);
     }
 
     /**
@@ -161,7 +165,6 @@ public class Paddle extends Rectangle implements Sprite, Collidable {
      * @param ballRadius the radius of the ball
      * @return a point just outside the collision shape of the paddle
      */
-    //TODO add to UML
     public CollisionInfo keepOutside(Point ballCenter, double ballRadius) {
         boolean isInside;
         if (isSplit()) {
@@ -180,9 +183,9 @@ public class Paddle extends Rectangle implements Sprite, Collidable {
         if (!isInside) {
             return null;
         }
-        Point collisionPoint = new Point(ballCenter.getX(), topY);
+        Point collisionPoint = new Point(ballCenter.getX(), topY());
         // lift the ball to keep it outside
-        Point recommendedBallCenter = new Point(ballCenter.getX(), topY - ballRadius - Helper.DELTA);
+        Point recommendedBallCenter = new Point(ballCenter.getX(), topY() - ballRadius - Helper.DELTA);
         return new CollisionInfo(collisionPoint, this, recommendedBallCenter);
     }
 
@@ -215,6 +218,14 @@ public class Paddle extends Rectangle implements Sprite, Collidable {
     }
 
     /**
+     * Calculate the y-coordinate of the top edge of the paddle.
+     * @return the y-coordinate of the top edge of the paddle
+     */
+    private double topY() {
+        return super.getUpperLeft().getY();
+    }
+
+    /**
      * Check if the paddle is split across the game area.
      * @return true if the paddle is split, false otherwise
      */
@@ -242,12 +253,16 @@ public class Paddle extends Rectangle implements Sprite, Collidable {
         }
     }
 
+    /**
+     * Get the parts of the paddle as separate rectangles when it is split across the game area.
+     * @return an array of two rectangles representing the split parts of the paddle
+     */
     private Rectangle[] getParts() {
         double firstPartWidth = Game.WIDTH - Game.BLOCK_WIDTH - leftEdge();
         double secondPartWidth = super.getWidth() - firstPartWidth;
         double height = super.getHeight();
         Rectangle firstPart = new Rectangle(super.getUpperLeft(), firstPartWidth, height);
-        Rectangle secondPart = new Rectangle(new Point(Game.BLOCK_WIDTH, topY), secondPartWidth, height);
+        Rectangle secondPart = new Rectangle(new Point(Game.BLOCK_WIDTH, topY()), secondPartWidth, height);
         return new Rectangle[]{firstPart, secondPart};
     }
 }

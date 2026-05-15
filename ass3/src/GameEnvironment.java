@@ -63,7 +63,6 @@ public class GameEnvironment {
         return new CollisionInfo(collisionPoint, collisionObject);
     }
 
-    //TODO add to UML
     /**
      * Keep the ball outside of any collidable object that may get on it while moving,
      * by adjusting its velocity and returning a recommended new center if necessary.
