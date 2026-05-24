@@ -1,5 +1,4 @@
 import java.util.Random;
-
 import biuoop.DrawSurface;
 import biuoop.GUI;
 import biuoop.Sleeper;
@@ -19,8 +18,22 @@ import biuoop.Sleeper;
  * @since 2024-06-05
  */
 public final class MultipleFramesBouncingBallsAnimation {
+    /** Upper-left corner of the gray square frame. */
+    private static final Point GRAY_SQUARE_UL = new Point(50, 50);
+    /** Edge length of the gray square frame. */
+    private static final double GRAY_SQUARE_EDGE = 450;
+    /** Gray square frame used as the main outer border. */
+    public static final Rectangle GRAY_SQUARE =
+    new Rectangle(GRAY_SQUARE_UL, GRAY_SQUARE_EDGE, GRAY_SQUARE_EDGE, java.awt.Color.GRAY);
+    /** Upper-left corner of the yellow square frame. */
+    private static final Point YELLOW_SQUARE_UL = new Point(450, 450);
+    /** Edge length of the yellow square frame. */
+    private static final double YELLOW_SQUARE_EDGE = 150;
+    /** Yellow square frame used as an inner region. */
+    public static final Rectangle YELLOW_SQUARE =
+    new Rectangle(YELLOW_SQUARE_UL, YELLOW_SQUARE_EDGE, YELLOW_SQUARE_EDGE, java.awt.Color.YELLOW);
     /** An array containing all the predefined squares for easy access. */
-    private static final Rectangle[] ALL_SQUARES = new Rectangle[] {Helper.GRAY_SQUARE, Helper.YELLOW_SQUARE};
+    private static final Rectangle[] ALL_SQUARES = new Rectangle[] {GRAY_SQUARE, YELLOW_SQUARE};
     /** The maximum number of attempts to generate a valid ball position. */
     private static final int MAX_ATTEMPTS = 20;
     /** Private constructor to prevent instantiation of this utility class. */
@@ -38,16 +51,16 @@ public final class MultipleFramesBouncingBallsAnimation {
         Ball[] outsideBalls = allBalls[1];
         while (true) {
             DrawSurface d = gui.getDrawSurface();
-            Helper.GRAY_SQUARE.drawOn(d);
+            GRAY_SQUARE.drawOn(d);
             for (Ball ball : insideBalls) {
-                ball.moveOneStep(Helper.GRAY_SQUARE, Helper.YELLOW_SQUARE);
+                ball.moveOneStep(GRAY_SQUARE, YELLOW_SQUARE);
                 ball.drawOn(d);
             }
             for (Ball ball : outsideBalls) {
                 ball.moveOneStep(new Rectangle[0], ALL_SQUARES);
                 ball.drawOn(d);
             }
-            Helper.YELLOW_SQUARE.drawOn(d);
+            YELLOW_SQUARE.drawOn(d);
             gui.show(d);
             sleeper.sleepFor(sleepTime);
         }
@@ -72,12 +85,12 @@ public final class MultipleFramesBouncingBallsAnimation {
         for (int i = 0; i < numInsideBalls; i++, arrayIndex++) {
             int attempts = 0;
             do {
-                insideBalls[i] = Ball.generateMovingBallBySize(sizes[arrayIndex], Helper.GRAY_SQUARE, rand);
+                insideBalls[i] = Ball.generateMovingBallBySize(sizes[arrayIndex], GRAY_SQUARE, rand);
                 attempts++;
                 if (attempts > MAX_ATTEMPTS) {
                     sizes[arrayIndex] = Helper.DEFAULT_RADIUS; // Fallback to default size if too many attempts
                 }
-            } while (!Helper.YELLOW_SQUARE.isOutside(insideBalls[i]));
+            } while (!YELLOW_SQUARE.isOutside(insideBalls[i]));
         }
         for (int i = 0; i < numBalls - numInsideBalls; i++, arrayIndex++) {
             int attempts = 0;
@@ -87,8 +100,8 @@ public final class MultipleFramesBouncingBallsAnimation {
                 if (attempts > MAX_ATTEMPTS) {
                     sizes[arrayIndex] = Helper.DEFAULT_RADIUS; // Fallback to default size if too many attempts
                 }
-            } while (!Helper.GRAY_SQUARE.isOutside(outsideBalls[i])
-                || !Helper.YELLOW_SQUARE.isOutside(outsideBalls[i]));
+            } while (!GRAY_SQUARE.isOutside(outsideBalls[i])
+                || !YELLOW_SQUARE.isOutside(outsideBalls[i]));
         }
         return new Ball[][] {insideBalls, outsideBalls};
     }

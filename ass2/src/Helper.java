@@ -19,20 +19,6 @@ public final class Helper {
     /** Height of GUI windows for geometric calculations. */
     public static final int HEIGHT = 600;
 
-    /** Upper-left corner of the gray square frame. */
-    private static final Point GRAY_SQUARE_UL = new Point(50, 50);
-    /** Edge length of the gray square frame. */
-    private static final double GRAY_SQUARE_EDGE = 450;
-    /** Gray square frame used as the main outer border. */
-    public static final Rectangle GRAY_SQUARE =
-    new Rectangle(GRAY_SQUARE_UL, GRAY_SQUARE_EDGE, GRAY_SQUARE_EDGE, java.awt.Color.GRAY);
-    /** Upper-left corner of the yellow square frame. */
-    private static final Point YELLOW_SQUARE_UL = new Point(450, 450);
-    /** Edge length of the yellow square frame. */
-    private static final double YELLOW_SQUARE_EDGE = 150;
-    /** Yellow square frame used as an inner region. */
-    public static final Rectangle YELLOW_SQUARE =
-    new Rectangle(YELLOW_SQUARE_UL, YELLOW_SQUARE_EDGE, YELLOW_SQUARE_EDGE, java.awt.Color.YELLOW);
     /** Full screen rectangle representing the drawable area. */
     public static final Rectangle SCREEN =
     new Rectangle(new Point(0, 0), WIDTH, HEIGHT, java.awt.Color.WHITE);

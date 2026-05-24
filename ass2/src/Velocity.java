@@ -9,12 +9,17 @@ import java.util.Random;
  * or copied from another Velocity instance.</p>
  *
  * @author Avraham Tsaban, avraham.tsaban@gmail.com
- * @version 1.0
+ * @version 1.3
  * @since 2024-06-05
  */
 public class Velocity {
-        private double dx;
-        private double dy;
+    /** The full step length for velocity applications. */
+    private static final double FULL_STEP = 1.0;
+    /** The empty step length for velocity applications. */
+    private static final double EMPTY_STEP = 0.0;
+
+    private double dx;
+    private double dy;
 
     /**
      * Initialize a new Velocity with the given changes in x and y.
@@ -33,10 +38,9 @@ public class Velocity {
      * @return a new Velocity instance with the calculated dx and dy values
      */
     public static Velocity fromAngleAndSpeed(double angle, double speed) {
-        double correctedAngle = 90 - angle;
-        double radians = Math.toRadians(correctedAngle);
-        double dx = Math.cos(radians) * speed;
-        double dy = Math.sin(radians) * speed;
+        double radians = Math.toRadians(angle);
+        double dx = Math.sin(radians) * speed;
+        double dy = -Math.cos(radians) * speed;
         return new Velocity(dx, dy);
     }
 
@@ -54,8 +58,8 @@ public class Velocity {
      * @return the angle of this velocity in degrees (0 degrees is up, 90 degrees is right)
      */
     public double getAngle() {
-        double angle = Math.toDegrees(Math.atan2(dy, dx));
-        return (90 - angle + 360) % 360; // Convert to the desired angle format
+        double angle = Math.toDegrees(Math.atan2(dx, -dy));
+        return (angle + 360) % 360;
     }
 
     /**
@@ -82,7 +86,7 @@ public class Velocity {
      * @return a new Point with the updated position after applying the velocity for the specified fraction of the step
      */
     public Point applyToPoint(Point p, double partialStep) {
-        partialStep = Math.max(0, Math.min(partialStep, 1)); // ensure partialStep is between 0 and 1
+        partialStep = Math.max(EMPTY_STEP, Math.min(partialStep, FULL_STEP)); // ensure partialStep is between 0 and 1
         return new Point(p.getX() + dx * partialStep, p.getY() + dy * partialStep);
     }
 
@@ -128,11 +132,22 @@ public class Velocity {
      * @return a Velocity object with random dx and dy values
      */
     public static Velocity semiRandVelocity(Random rand, double speed) {
-        double angle = 0;
-        while (Helper.doubleEq(angle, 0) || Helper.doubleEq(angle, 90)
-                || Helper.doubleEq(angle, 180) || Helper.doubleEq(angle, 270)) {
+        double angle;
+        do {
             angle = rand.nextDouble() * 360; // random angle between 0 and 360 degrees
-        }
+            angle = (angle + 360) % 360; // normalize angle to be between 0 and 360 degrees
+        } while (isForbiddenAngle(angle));
         return Velocity.fromAngleAndSpeed(angle, speed);
+    }
+
+    /**
+     * A helper method to check if a given angle is within the forbidden ranges for random velocity generation.
+     * Forbidden angles are those that are too close to vertical or horizontal, which could lead to boring gameplay,
+     * as well as strange collision behavior due to the way corner collisions are handled.
+     * @param angle the angle to check in degrees
+     * @return true if the angle is forbidden, false otherwise
+     */
+    private static boolean isForbiddenAngle(double angle) {
+        return angle <= 15 || angle >= 345 || (angle >= 75 && angle <= 105) || (angle >= 255 && angle <= 285);
     }
 }
