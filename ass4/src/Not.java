@@ -45,6 +45,10 @@ public class Not extends UnaryExpression {
         return new Nand(expression, expression);
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     protected Nor norifySelf(Expression expression) {
         return new Nor(expression, expression);
     }
