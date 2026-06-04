@@ -75,4 +75,20 @@ public abstract class NonLogic implements Expression {
     public final Expression applyNot() {
         return new Not(this);
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public final InternalValue getInternalValue() {
+        if (getVariables().isEmpty()) {
+            try {
+                Boolean value = this.evaluate();
+                return value ? InternalValue.T : InternalValue.F;
+            } catch (Exception e) {
+                return InternalValue.UNASSIGNED;
+            }
+        }
+        return InternalValue.UNASSIGNED;
+    }
 }

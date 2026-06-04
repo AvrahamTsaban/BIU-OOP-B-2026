@@ -145,20 +145,11 @@ public abstract class BinaryExpression extends BaseExpression {
     public final Expression simplify() {
         Expression simplifiedFirst = this.first.simplify();
         Expression simplifiedSecond = this.second.simplify();
-        InternalValue firstValue;
-        InternalValue secondValue;
-        try {
-            firstValue = simplifiedFirst.evaluate() ?  InternalValue.T : InternalValue.F;
-        } catch (Exception e) {
-            firstValue = InternalValue.UNASSIGNED;
-        }
-        try {
-            secondValue = simplifiedSecond.evaluate() ?  InternalValue.T : InternalValue.F;
-        } catch (Exception e) {
-            secondValue = InternalValue.UNASSIGNED;
-        }
+        InternalValue firstValue = simplifiedFirst.getInternalValue();
+        InternalValue secondValue = simplifiedSecond.getInternalValue();
         return this.simplifySelf(firstValue, secondValue, simplifiedFirst, simplifiedSecond);
     }
+
 
     /**
      * Simplify the expression itself, with the given simplified first and second expressions.

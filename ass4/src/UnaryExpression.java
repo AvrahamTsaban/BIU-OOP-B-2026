@@ -117,12 +117,7 @@ public abstract class UnaryExpression extends BaseExpression {
     @Override
     public final Expression simplify() {
         Expression simplifiedInput = this.input.simplify();
-        InternalValue inputValue;
-        try {
-            inputValue = simplifiedInput.evaluate() ? InternalValue.T : InternalValue.F;
-        } catch (Exception e) {
-            inputValue = InternalValue.UNASSIGNED;
-        }
+        InternalValue inputValue = simplifiedInput.getInternalValue();
         return this.simplifySelf(inputValue, simplifiedInput);
     }
 

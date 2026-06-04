@@ -76,4 +76,20 @@ public abstract class BaseExpression implements Expression {
     public Expression applyNot() {
         return new Not(this);
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public final InternalValue getInternalValue() {
+        if (getVariables().isEmpty()) {
+            try {
+                Boolean value = this.evaluate();
+                return value ? InternalValue.T : InternalValue.F;
+            } catch (Exception e) {
+                return InternalValue.UNASSIGNED;
+            }
+        }
+        return InternalValue.UNASSIGNED;
+    }
 }

@@ -73,4 +73,10 @@ public interface Expression {
      * @return a new expression that is the negation of the current expression
      */
     Expression applyNot();
+
+    /**
+     * Get the internal value of the expression if it is a constant (true or false).
+     * @return the internal value of the expression if it is a constant, or null if it is not a constant
+     */
+    InternalValue getInternalValue();
 }
