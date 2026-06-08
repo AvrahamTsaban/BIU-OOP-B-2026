@@ -1,0 +1,65 @@
+package managers;
+import geometry.Point;
+import geometry.Rectangle;
+import sprites.Velocity;
+import sprites.Ball;
+import sprites.CollisionInfo;
+import java.awt.Color;
+
+/**
+ * Collidable interface represents an object that can be collided with.
+ * It provides methods to get the collision shape and to handle collisions.
+ *
+ * @author Avraham Tsaban, avraham.tsaban@gmail.com
+ * @version 1.3
+ * @since 2024-06-05
+ */
+public interface Collidable {
+    /**
+     * Get the "collision shape" of the object,
+     * which is the rectangle that defines its boundaries for collision detection.
+     * @return the collision shape of the object
+     */
+    Rectangle getCollisionRectangle();
+
+    /**
+     * Notify the object that we collided with it at collisionPoint with
+     * a given velocity.
+     * The return is the new velocity expected after the hit (based on
+     * the force the object inflicted on us).
+     * @param hitter the ball that hit this object
+     * @param collisionPoint the point of collision
+     * @param currentVelocity the current velocity
+     * @return the new velocity expected after the hit
+     */
+    Velocity hit(Ball hitter, Point collisionPoint, Velocity currentVelocity);
+
+    /**
+     * Get a Ball that is suspected of being inside the collision shape of the object,
+     * and ensure that it is outside of it.
+     * If the ball is inside the collision shape, returns a point just outside the collision shape of the object.
+     * Every collidable object may define its own way of choosing the point to return, as long as it is outside of it.
+     * Otherwise, returns the current center of the ball.
+     * Used to prevent moving objects from getting on the ball.
+     * @param ballCenter the center point of the ball that may be inside the collision shape of the object
+     * @param ballRadius the radius of the ball
+     * @return a CollisionInfo object containing updated ball center and collision details
+     */
+    CollisionInfo keepOutside(Point ballCenter, double ballRadius);
+
+
+    /**
+     * Check if a point is inside the collision shape of the object, with a given margin (e.g. ball radius).
+     * @param p the point to check
+     * @param radius the margin to consider (e.g. the radius of the ball)
+     * @return true if the point is inside the collision shape of the object with the given margin, false otherwise
+     */
+    boolean isInside(Point p, double radius);
+
+    /**
+     * If the object is hit by a ball, the ball may want to change its color to match the color of the block it hit.
+     * It is up to each collidable object to decide whether it should change the ball's color.
+     * @return the new color for the ball, or null if no change is needed
+     */
+    Color getNewColor();
+}

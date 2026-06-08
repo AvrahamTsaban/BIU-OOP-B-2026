@@ -1,5 +1,5 @@
 {
-    "java.checkstyle.configuration": "${workspaceFolder}/ass3/biuoop.xml",
+    "java.checkstyle.configuration": "${workspaceFolder}/checkstyle/biuoop.xml",
     "java.project.sourcePaths": [
         "ass3/src",
         "ass3"
