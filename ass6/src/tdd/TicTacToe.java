@@ -2,6 +2,8 @@ package tdd;
 import java.util.Scanner;
 
 final public class TicTacToe {
+    private static final int MIN_BOARD_SIZE = 3;
+    private static final int MAX_BOARD_SIZE = 10;
     private static Scanner sc;
     private Player player1 = new Player("PLAYER-X", 1, 'X');
     private Player player2 = new Player("PLAYER-O", 2, 'O');
@@ -53,8 +55,9 @@ final public class TicTacToe {
         this.player2.closeSC();
     }
 
-    private void handleWinner(Player winner) {
-        // TODO -- Need to implement
+    void handleWinner(Player winner) {
+        System.out.println(winner.getName() + " has won this round!");
+        winner.incrementNumberOfWins();
     }
 
     private void welcome() {
@@ -75,9 +78,19 @@ final public class TicTacToe {
         }
     }
 
-    private boolean verifyBoardSize(String boardSize) {
-        // TODO -- Need to implement
-        return true;
+    boolean verifyBoardSize(String boardSize) {
+        try {
+            int size = Integer.parseInt(boardSize);
+            if (size >= MIN_BOARD_SIZE && size <= MAX_BOARD_SIZE) {
+                return true;
+            } else {
+                System.out.println("Invalid board size. Please enter a number between " + MIN_BOARD_SIZE + " and " + MAX_BOARD_SIZE + ".");
+                return false;
+            }
+        } catch (NumberFormatException e) {
+            System.out.println("Invalid input. Please enter a valid number for the board size.");
+            return false;
+        }
     }
 
     private boolean playAgain() {

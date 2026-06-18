@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testsuite errors="0" failures="0" hostname="fedora" name="tdd.TicTacToeTest" skipped="0" tests="5" time="0.068" timestamp="2026-06-18T10:11:01">
+  <properties>
+    <property name="ant.library.dir" value="/usr/share/ant/lib" />
+    <property name="ant.file.type" value="file" />
+    <property name="java.specification.version" value="25" />
+    <property name="ant.project.name" value="TDD" />
+    <property name="sun.jnu.encoding" value="UTF-8" />
+    <property name="java.class.path" value="/usr/share/java/ant.jar:/usr/share/java/ant-launcher.jar:/usr/share/java/junit.jar:/usr/share/java/hamcrest/hamcrest.jar:/usr/share/java/ant/ant-junit.jar:/usr/share/java/junit.jar:/usr/share/java/hamcrest/hamcrest.jar:/usr/share/java/ant/ant-junit4.jar:/usr/share/ant/lib/ant.jar:/usr/share/ant/lib/ant-junit4.jar:/usr/share/ant/lib/ant-bootstrap.jar:/usr/share/ant/lib/ant-launcher.jar:/usr/share/ant/lib/ant-junit.jar" />
+    <property name="java.vm.vendor" value="Red Hat, Inc." />
+    <property name="sun.arch.data.model" value="64" />
+    <property name="java.vendor.url" value="https://www.redhat.com/" />
+    <property name="os.name" value="Linux" />
+    <property name="java.vm.specification.version" value="25" />
+    <property name="sun.java.launcher" value="SUN_STANDARD" />
+    <property name="user.country" value="GB" />
+    <property name="sun.boot.library.path" value="/usr/lib/jvm/java-25-openjdk/lib" />
+    <property name="sun.java.command" value="org.apache.tools.ant.launch.Launcher -cp  clean compile compile-tests test" />
+    <property name="jdk.debug" value="release" />
+    <property name="sun.cpu.endian" value="little" />
+    <property name="test.dir" value="test" />
+    <property name="user.home" value="/home/avraham_tsaban" />
+    <property name="user.language" value="en" />
+    <property name="java.specification.vendor" value="Oracle Corporation" />
+    <property name="java.version.date" value="2026-04-21" />
+    <property name="java.home" value="/usr/lib/jvm/java-25-openjdk" />
+    <property name="basedir" value="/home/avraham_tsaban/cs/BIU-OOP-B-2026/ass6" />
+    <property name="file.separator" value="/" />
+    <property name="java.vm.compressedOopsMode" value="Zero based" />
+    <property name="line.separator" value="&#xa;" />
+    <property name="ant.java.version" value="25" />
+    <property name="java.specification.name" value="Java Platform API Specification" />
+    <property name="java.vm.specification.vendor" value="Oracle Corporation" />
+    <property name="ant.file.TDD" value="/home/avraham_tsaban/cs/BIU-OOP-B-2026/ass6/build.xml" />
+    <property name="test.report.dir" value="build/test-reports" />
+    <property name="sun.management.compiler" value="HotSpot 64-Bit Tiered Compilers" />
+    <property name="java.runtime.version" value="25.0.3+9" />
+    <property name="user.name" value="avraham_tsaban" />
+    <property name="ant.file.type.TDD" value="file" />
+    <property name="ant.file" value="/home/avraham_tsaban/cs/BIU-OOP-B-2026/ass6/build.xml" />
+    <property name="stdout.encoding" value="UTF-8" />
+    <property name="path.separator" value=":" />
+    <property name="os.version" value="7.0.12-201.fc44.x86_64" />
+    <property name="java.runtime.name" value="OpenJDK Runtime Environment" />
+    <property name="file.encoding" value="UTF-8" />
+    <property name="ant.project.invoked-targets" value="clean,compile,compile-tests,test" />
+    <property name="jar.file" value="build/dist/MyJavaProject.jar" />
+    <property name="java.vm.name" value="OpenJDK 64-Bit Server VM" />
+    <property name="java.vendor.version" value="(Red_Hat-25.0.3.0.9-1)" />
+    <property name="dist.dir" value="build/dist" />
+    <property name="build.dir" value="build" />
+    <property name="ant.core.lib" value="/usr/share/java/ant/ant.jar" />
+    <property name="java.vendor.url.bug" value="https://bugzilla.redhat.com/enter_bug.cgi?product=Fedora&amp;component=java-25-openjdk&amp;version=42" />
+    <property name="java.io.tmpdir" value="/tmp" />
+    <property name="java.version" value="25.0.3" />
+    <property name="user.dir" value="/home/avraham_tsaban/cs/BIU-OOP-B-2026/ass6" />
+    <property name="os.arch" value="amd64" />
+    <property name="java.vm.specification.name" value="Java Virtual Machine Specification" />
+    <property name="ant.home" value="/usr/share/ant" />
+    <property name="lib.dir" value="lib" />
+    <property name="native.encoding" value="UTF-8" />
+    <property name="ant.version" value="Apache Ant(TM) version 1.10.15 compiled on March 6 2026" />
+    <property name="java.library.path" value="/usr/java/packages/lib:/usr/lib64:/lib64:/lib:/usr/lib" />
+    <property name="stderr.encoding" value="UTF-8" />
+    <property name="java.vendor" value="Red Hat, Inc." />
+    <property name="java.vm.info" value="mixed mode, sharing" />
+    <property name="java.vm.version" value="25.0.3+9" />
+    <property name="stdin.encoding" value="UTF-8" />
+    <property name="classes.dir" value="build/classes" />
+    <property name="sun.io.unicode.encoding" value="UnicodeLittle" />
+    <property name="java.class.version" value="69.0" />
+    <property name="src.dir" value="src" />
+    <property name="ant.project.default-target" value="jar" />
+  </properties>
+  <testcase classname="tdd.TicTacToeTest" name="verifyBoardSizeTest" time="0.006" />
+  <testcase classname="tdd.TicTacToeTest" name="handleWinnerTest" time="0.0" />
+  <testcase classname="tdd.TicTacToeTest" name="isValidPositionTest" time="0.002" />
+  <testcase classname="tdd.TicTacToeTest" name="isFullTest" time="0.0" />
+  <testcase classname="tdd.TicTacToeTest" name="checkWin" time="0.0" />
+  <system-out><![CDATA[Invalid board size. Please enter a number between 3 and 10.
+Invalid board size. Please enter a number between 3 and 10.
+Invalid board size. Please enter a number between 3 and 10.
+Invalid board size. Please enter a number between 3 and 10.
+Invalid board size. Please enter a number between 3 and 10.
+Invalid board size. Please enter a number between 3 and 10.
+Invalid board size. Please enter a number between 3 and 10.
+Invalid board size. Please enter a number between 3 and 10.
+Invalid board size. Please enter a number between 3 and 10.
+Invalid board size. Please enter a number between 3 and 10.
+Invalid board size. Please enter a number between 3 and 10.
+Invalid board size. Please enter a number between 3 and 10.
+Invalid input. Please enter a valid number for the board size.
+Invalid input. Please enter a valid number for the board size.
+PLAYER-1has won this round!
+PLAYER-1has won this round!
+]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

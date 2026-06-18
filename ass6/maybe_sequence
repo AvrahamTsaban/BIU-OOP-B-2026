@@ -1,0 +1,59 @@
+sequenceDiagram
+    autonumber
+    participant Main
+    actor User as (output/sc)
+    participant TicTacToe
+    participant Board
+    participant Player
+
+    Main->>TicTacToe: new TicTacToe()
+    Main->>TicTacToe: play()
+    
+    activate TicTacToe
+    TicTacToe->>TicTacToe: playAgain()
+    activate TicTacToe
+    TicTacToe->>User: welcome(), sc.nextLine()
+    User-->>TicTacToe: 
+    
+    alt if answer is Y/y
+        TicTacToe->>TicTacToe: getBoardSize()
+        TicTacToe->>User: בקשת גודל לוח
+        User-->>TicTacToe: הזנת גודל
+        TicTacToe->>Board: new Board(boardSize)
+        Board->>Board: setBoard() (אתחול מטריצה)
+    else קלט אחר
+        TicTacToe->>TicTacToe: gameOver()
+    end
+    deactivate TicTacToe
+
+    loop לולאת המשחק (while true)
+        TicTacToe->>Player: move(board)
+        activate Player
+        
+        loop עד להזנת מיקום תקין
+            Player->>Board: print()
+            Board-->>User: הצגת הלוח למשתמש
+            Player->>User: בקשת מיקום למהלך
+            User-->>Player: הזנת מיקום (movePos)
+            Player->>Board: isValidPosition(movePos)
+            Board-->>Player: החזרת תקינות (boolean)
+        end
+        
+        Player->>Board: placeTheMove(marker, movePosition)
+        deactivate Player
+
+        TicTacToe->>Board: checkWin(marker)
+        Board-->>TicTacToe: החזרת תוצאה (boolean)
+        
+        alt יש ניצחון
+            TicTacToe->>TicTacToe: handleWinner(currentPlayer)
+            TicTacToe->>TicTacToe: playAgain()
+        else הלוח מלא (תיקו)
+            TicTacToe->>Board: isFull()
+            Board-->>TicTacToe: true
+            TicTacToe->>TicTacToe: playAgain()
+        end
+        
+        Note over TicTacToe: החלפת השחקן הנוכחי
+    end
+    deactivate TicTacToe

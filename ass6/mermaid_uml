@@ -1,0 +1,59 @@
+classDiagram
+    class Main {
+        +main(String[] args) static
+    }
+
+    class TicTacToe {
+        -Scanner sc static
+        -Player player1
+        -Player player2
+        -Board board
+        +TicTacToe()
+        +TicTacToe(Player player1, Player player2)
+        +play()
+        -gameOver()
+        -handleWinner(Player winner)
+        -welcome()
+        -getBoardSize() int
+        -verifyBoardSize(String boardSize) boolean
+        -playAgain() boolean
+        +printResults()
+    }
+
+    class Player {
+        -int id final
+        -String name final
+        -char marker final
+        -Scanner sc final
+        -int numberOfWins
+        +Player(String name, int id, char marker)
+        +getId() int
+        +getName() String
+        +getMarker() char
+        +getSC() Scanner
+        +closeSC()
+        +getNumberOfWins() int
+        +incrementNumberOfWins()
+        +resetNumberOfWins()
+        +move(Board board)
+    }
+
+    class Board {
+        -int boardSize
+        -char[][] board
+        -Board()
+        +Board(int boardSize)
+        +setBoardSize(int boardSize)
+        +getBoardSize() int
+        -setBoard()
+        +print()
+        +placeTheMove(char checkMark, int movePosition)
+        +checkWin(char player) boolean
+        +isValidPosition(String position) boolean
+        +isFull() boolean
+    }
+
+    Main -- TicTacToe 
+    TicTacToe "1" *-- "2" Player 
+    TicTacToe "1" *-- "1" Board 
+    Player -- Board
