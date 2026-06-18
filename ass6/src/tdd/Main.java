@@ -15,18 +15,19 @@ public class Main {
             System.out.println("Invalid number of players. Please enter a number between 0 and 2.");
             return;
         }
-        Player player1 = null;
-        Player player2 = null;
 
+        if (numPlayers == ALL_HUMAN_PLAYERS) {
+            TicTacToe game = new TicTacToe();
+            game.play();
+            return;
+        }
+
+        Player player1 = null;
+        Player player2 = new AutoPlayer("PLAYER-O", 2, 'O');
         if (numPlayers == ALL_AUTOMATIC_PLAYERS) {
             player1 = new AutoPlayer("PLAYER-X", 1, 'X');
         } else {
             player1 = new Player("PLAYER-X", 1, 'X');
-        }
-        if (numPlayers == ALL_HUMAN_PLAYERS) {
-            player2 = new Player("PLAYER-O", 2, 'O');
-        } else {
-            player2 = new AutoPlayer("PLAYER-O", 2, 'O');
         }
 
         TicTacToe game = new TicTacToe(player1, player2);
