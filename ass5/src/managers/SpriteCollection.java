@@ -31,6 +31,14 @@ public class SpriteCollection {
     }
 
     /**
+     * Remove the given sprite from the collection.
+     * @param s the sprite to remove from the collection
+     */
+    public void removeSprite(Sprite s) {
+        sprites.remove(s);
+    }
+
+    /**
      * Notify all sprites in the collection that time has passed.
      */
     public void notifyAllTimePassed() {
@@ -48,13 +56,5 @@ public class SpriteCollection {
         for (Sprite s : this.sprites) {
             s.drawOn(d);
         }
-    }
-
-    /**
-     * Remove the given sprite from the collection.
-     * @param s the sprite to remove from the collection
-     */
-    public void removeSprite(Sprite s) {
-        sprites.remove(s);
     }
 }

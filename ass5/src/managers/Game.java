@@ -59,6 +59,8 @@ public class Game {
     /** An array of colors for the blocks. */
     private static final Color[] COLOR_PALLETE = new Color[]{
         Color.GRAY, Color.RED, Color.YELLOW, Color.BLUE, Color.PINK, Color.GREEN};
+    /** The color of the background of the game area. */
+    private static final Color BACKGROUND_COLOR = Color.WHITE;
 
     private final SpriteCollection sprites;
     private final GameEnvironment environment;
@@ -97,6 +99,22 @@ public class Game {
      */
     public void addSprite(Sprite s) {
         sprites.addSprite(s);
+    }
+
+    /**
+     * remove the given collidable from the game environment.
+     * @param c the collidable to remove from the game environment
+     */
+    public void removeCollidable(Collidable c) {
+        environment.removeCollidable(c);
+    }
+
+    /**
+     * Remove the given sprite from the game.
+     * @param s the sprite to remove from the game
+     */
+    public void removeSprite(Sprite s) {
+        sprites.removeSprite(s);
     }
 
     /**
@@ -145,13 +163,17 @@ public class Game {
             messages.add("You win!");
             messages.add("Your score is: " + score.getValue());
         }
-        celebrate(messages);
+        try {
+            celebrate(messages);
+        } catch (IllegalArgumentException e) {
+            System.err.println("Error during celebration animation: \n" + e.getMessage());
+        }
         gui.close();
     }
 
     /** A helper method to add the background to the game. */
     private void addBackground() {
-        BackGround background = new BackGround();
+        BackGround background = new BackGround(BACKGROUND_COLOR);
         background.addToGame(this);
     }
 
@@ -252,29 +274,11 @@ public class Game {
     }
 
     /**
-     * remove the given collidable from the game environment.
-     * @param c the collidable to remove from the game environment
+     * A helper method to display a celebration animation with the given messages.
+     * Used to "celebrate" the end of the game, whether it's a win or a loss.
+     * @param messages the messages to display during the celebration animation
+     * @throws IllegalArgumentException if any of the messages are too long to be displayed properly
      */
-    public void removeCollidable(Collidable c) {
-        environment.removeCollidable(c);
-    }
-
-    /**
-     * Remove the given sprite from the game.
-     * @param s the sprite to remove from the game
-     */
-    public void removeSprite(Sprite s) {
-        sprites.removeSprite(s);
-    }
-
-    /**
-     * Get the number of remaining blocks in the game.
-     * @return the number of remaining blocks
-     */
-    public int getRemainingBlocks() {
-        return remainingBlocks.getValue();
-    }
-
     private void celebrate(final ArrayList<String> messages) throws IllegalArgumentException {
         final int charSize = 25;
         final int animationDuration = 2500;
@@ -283,7 +287,7 @@ public class Game {
         for (String message : messages) {
             maxTextWidth = Math.max(maxTextWidth, message.length() * charSize / 2); // Approximate width of the text
             if (maxTextWidth > widthCenter) {
-                throw new IllegalArgumentException("Message is too long to be displayed properly.");
+                throw new IllegalArgumentException("Message is too long to be displayed properly: \"" + message + "\"");
             }
         }
         final int xStart = widthCenter - maxTextWidth / 2;

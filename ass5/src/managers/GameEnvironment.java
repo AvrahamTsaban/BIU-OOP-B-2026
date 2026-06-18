@@ -35,6 +35,14 @@ public class GameEnvironment {
     }
 
     /**
+     * Remove the given collidable from the environment.
+     * @param c the collidable to remove
+     */
+    public void removeCollidable(Collidable c) {
+        collidables.remove(c);
+    }
+
+    /**
      * Gets a line representing the trajectory of an object moving from line.start() to line.end().
      * If this object will not collide with any of the collidables in this collection,
      * returns null. Else, returns the information about the closest collision that is going to occur.
@@ -115,13 +123,5 @@ public class GameEnvironment {
             }
         }
         return false;
-    }
-
-    /**
-     * Remove the given collidable from the environment.
-     * @param c the collidable to remove
-     */
-    public void removeCollidable(Collidable c) {
-        collidables.remove(c);
     }
 }
