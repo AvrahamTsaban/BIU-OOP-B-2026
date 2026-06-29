@@ -1,3 +1,4 @@
+from board import Board
 from gui import GUI
 
 def get_number(prompt, min_value, max_value):
@@ -14,7 +15,8 @@ def get_number(prompt, min_value, max_value):
 def main():
     grid_size = get_number("Enter the grid size (5-20): ", 5, 20)
     mines_number = get_number(f"Enter the number of mines (1-{int(grid_size * grid_size / 3)}): ", 1, int(grid_size * grid_size / 3))
-    gui = GUI(grid_size)
+    board = Board(grid_size, mines_number)
+    gui = GUI(grid_size, board)
     gui.run()
 
 if __name__ == "__main__":
