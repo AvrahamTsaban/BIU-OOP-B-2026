@@ -2,6 +2,7 @@ class Cell:
     def __init__(self, has_mine=False, state="hidden"):
         self.has_mine = has_mine
         self.state = state
+        self.neighbor_mines = 0
 
     def is_hidden(self):
         return self.state == "hidden"
