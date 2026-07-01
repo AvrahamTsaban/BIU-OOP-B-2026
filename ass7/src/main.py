@@ -5,6 +5,8 @@ def get_number(prompt):
     while True:
         try:
             value = int(input(prompt))
+            if value <= 0:
+                raise ValueError
             return value
         except ValueError:
             print("Please enter a positive integer.")
